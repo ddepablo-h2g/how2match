@@ -701,40 +701,63 @@ async function runDiscovery(){
     ptext.textContent='Gemini analysing "'+ruleData.rule.bc+'" ↔ "'+ruleData.rule.sc+'" ('+buyerTerms.length+' buyer terms, '+sellerTerms.length+' seller terms)...';
 
     try{
-      var prompt='You are a multilingual B2B trade fair matchmaking assistant.\n\n'+
-        'Given these two lists of terms from buyers and sellers at a trade fair, find ALL semantic equivalences between them — including translations, synonyms, abbreviations, spelling variations, and hierarchical relationships.\n\n'+
-        'Buyer terms: '+buyerTerms.join(' | ')+'\n'+
-        'Seller terms: '+sellerTerms.join(' | ')+'\n\n'+
-        'Return ONLY a JSON array. Each item must have:\n'+
-        '- "a": exact buyer term from the list above\n'+
-        '- "b": exact seller term from the list above\n'+
-        '- "reason": short explanation in English (max 8 words)\n'+
-        '- "confidence": "high", "medium" or "low"\n\n'+
-        'Include ALL equivalences you find including translations and abbreviations. Terms that are identical need not be included. Return [] if truly nothing matches. Return only raw JSON, no markdown.';
+      // Split into chunks if too many terms to avoid token limits
+      var MAX_TERMS=30;
+      var chunks=[];
+      if(buyerTerms.length<=MAX_TERMS&&sellerTerms.length<=MAX_TERMS){
+        chunks.push({buyers:buyerTerms,sellers:sellerTerms});
+      } else {
+        // Split buyer terms into chunks, always compare against all sellers
+        for(var c=0;c<buyerTerms.length;c+=MAX_TERMS){
+          chunks.push({buyers:buyerTerms.slice(c,c+MAX_TERMS),sellers:sellerTerms.slice(0,MAX_TERMS)});
+        }
+      }
 
-      var resp=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+CONFIG.GEMINI_API_KEY,{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.1}})
-      });
-      var data=await resp.json();
-      var text=data.candidates[0].content.parts[0].text.trim();
-      // Strip markdown if present
-      text=text.replace(/```json/g,'').replace(/```/g,'').trim();
-      var match=text.match(/\[[\s\S]*\]/);
-      if(match){
-        var pairs=JSON.parse(match[0]);
-        pairs.forEach(function(p){
-          if(p.a&&p.b&&clean(p.a)!==clean(p.b)){
-            allEquivalences.push({
-              termA:p.a,termB:p.b,
-              reason:p.reason||'Semantic match',
-              confidence:p.confidence||'medium',
-              rule:ruleData.rule,
-              approved:p.confidence!=='low'
-            });
-          }
+      for(var ci=0;ci<chunks.length;ci++){
+        var chunk=chunks[ci];
+        var prompt='You are a multilingual B2B trade fair matchmaking assistant.\n\n'+
+          'Given these two lists of terms from buyers and sellers at a trade fair, find ALL semantic equivalences between them — including translations, synonyms, abbreviations, spelling variations, and hierarchical relationships.\n\n'+
+          'Buyer terms: '+chunk.buyers.join(' | ')+'\n'+
+          'Seller terms: '+chunk.sellers.join(' | ')+'\n\n'+
+          'Return ONLY a JSON array. Each item must have:\n'+
+          '- "a": exact buyer term from the list above\n'+
+          '- "b": exact seller term from the list above\n'+
+          '- "reason": short explanation in English (max 8 words)\n'+
+          '- "confidence": "high", "medium" or "low"\n\n'+
+          'Include ALL equivalences — translations, abbreviations, same concept different language. Terms that are identical need not be included. Return [] if nothing matches. Return only raw JSON, no markdown.';
+
+        var resp=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+CONFIG.GEMINI_API_KEY,{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.1}})
         });
+        if(!resp.ok){
+          var errData=await resp.json();
+          console.error('Gemini API error:',errData);
+          toast('Gemini API error: '+(errData.error&&errData.error.message||resp.status)+' — check your API key','err');
+          continue;
+        }
+        var data=await resp.json();
+        var text=data.candidates[0].content.parts[0].text.trim();
+        text=text.replace(/```json/g,'').replace(/```/g,'').trim();
+        var match=text.match(/\[[\s\S]*\]/);
+        if(match){
+          var pairs=JSON.parse(match[0]);
+          pairs.forEach(function(p){
+            if(p.a&&p.b&&clean(p.a)!==clean(p.b)){
+              allEquivalences.push({
+                termA:p.a,termB:p.b,
+                reason:p.reason||'Semantic match',
+                confidence:p.confidence||'medium',
+                rule:ruleData.rule,
+                approved:p.confidence!=='low'
+              });
+            }
+          });
+        }
+        if(chunks.length>1&&ci<chunks.length-1){
+          await new Promise(function(r){setTimeout(r,500);});
+        }
       }
     }catch(e){
       console.error('Discovery error:',e);
