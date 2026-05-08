@@ -200,7 +200,7 @@ var CONFIG = {
     <div class="gmail-status" id="gmail-status"><span class="gmail-dot" id="gmail-dot"></span><span id="gmail-label">Gmail: not connected</span></div>
     <button class="tbtn" onclick="connectGmail()">Connect Gmail</button>
     <button class="tbtn" onclick="goStep(6)">📖 Help</button>
-    <button class="tbtn accent" onclick="exportHTML()">⬇ Export</button>
+
   </div>
 </div>
 
@@ -322,6 +322,13 @@ var CONFIG = {
     <div class="slbl-t">Rules</div>
     <div id="rules-container"></div>
     <button class="btn bo bsm" onclick="addRule()" style="margin-bottom:12px">+ Add criterion</button>
+    <div id="ai-progress" style="display:none;margin-bottom:12px">
+      <div style="background:#f0f7ff;border:1px solid var(--blue40);border-radius:6px;padding:12px 16px">
+        <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:6px">🤖 Gemini AI analysing pairs...</div>
+        <div class="prog"><div class="prog-bar" id="ai-pbar" style="width:0%"></div></div>
+        <div style="font-size:11px;color:var(--char60);margin-top:4px" id="ai-prog-text">Starting...</div>
+      </div>
+    </div>
   </div>
   <div class="actions">
     <button class="btn bg" onclick="goStep(1)">← Back</button>
@@ -601,7 +608,9 @@ function fetchGmailUser(){
     });
 }
 function sendGmailMessage(to,subject,body){
-  var msg='To: '+to+'\r\nSubject: '+subject+'\r\nContent-Type: text/html; charset=utf-8\r\n\r\n'+body;
+  // Encode subject properly to handle special chars like — € etc
+  var encodedSubject='=?UTF-8?B?'+btoa(unescape(encodeURIComponent(subject)))+'?=';
+  var msg='To: '+to+'\r\nSubject: '+encodedSubject+'\r\nContent-Type: text/html; charset=utf-8\r\n\r\n'+body;
   var encoded=btoa(unescape(encodeURIComponent(msg))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
   return fetch('https://www.googleapis.com/gmail/v1/users/me/messages/send',{
     method:'POST',
@@ -610,19 +619,31 @@ function sendGmailMessage(to,subject,body){
   });
 }
 
-// ── GEMINI AI MATCHING ──
-async function geminiMatch(buyerVals,sellerVals){
+// ── GEMINI AI MATCHING — BATCH ──
+async function geminiBatchMatch(pairs){
+  // pairs = [{buyerVals:[], sellerVals:[], idx:n}]
   try{
-    var prompt='Do these two lists of values represent compatible business interests that could lead to a productive B2B meeting? Answer only YES or NO.\nList A: '+buyerVals.join(', ')+'\nList B: '+sellerVals.join(', ');
+    var prompt='You are a B2B trade fair matchmaking assistant. For each pair below, determine if the buyer and seller have compatible business interests that could lead to a productive meeting. Consider semantic equivalence across languages (e.g. "Manzanas"="Apples", "Frutas frescas"="Fresh fruit", "Bio"="Organic", "Supermercados"="Supermarkets").\n\nAnswer with a JSON array of booleans, one per pair, in order. Example: [true,false,true]\n\nPairs:\n';
+    pairs.forEach(function(p,i){
+      prompt+=(i+1)+'. Buyer: '+p.buyerVals.join(', ')+' | Seller: '+p.sellerVals.join(', ')+'\n';
+    });
     var resp=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+CONFIG.GEMINI_API_KEY,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})
+      body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0}})
     });
     var data=await resp.json();
-    var answer=data.candidates[0].content.parts[0].text.trim().toUpperCase();
-    return answer.startsWith('YES');
-  }catch(e){return false;}
+    var text=data.candidates[0].content.parts[0].text.trim();
+    var match=text.match(/\[[\s\S]*?\]/);
+    if(match){
+      var results=JSON.parse(match[0]);
+      return results;
+    }
+    return pairs.map(function(){return false;});
+  }catch(e){
+    console.error('Gemini batch error:',e);
+    return pairs.map(function(){return false;});
+  }
 }
 
 // ── NAV ──
@@ -753,46 +774,134 @@ async function runMatch(){
   var prefRules=S.rules.filter(function(r){return r.bc&&r.sc&&r.type==='preferred';});
   if(!reqRules.length&&!prefRules.length){toast('Define at least one rule','w');return;}
   if(!S.buyers.d.length||!S.sellers.d.length){toast('Upload both files first','w');return;}
-  toast('Generating matches'+(S.aiOn?' with Gemini AI':'')+'...','ok');
+
+  var matchBtn=document.querySelector('.btn.bn[onclick="runMatch()"]');
+  if(matchBtn){matchBtn.disabled=true;matchBtn.textContent='⏳ Processing...';}
+
   var matches=[],reasons={};
-  for(var bi=0;bi<S.buyers.d.length;bi++){
-    var br=S.buyers.d[bi];
-    for(var si=0;si<S.sellers.d.length;si++){
-      var sr=S.sellers.d[si];
-      var matchedRules=[];
-      var ok=true;
-      for(var ri=0;ri<reqRules.length;ri++){
-        var rule=reqRules[ri];
+  var BATCH_SIZE=25;
+
+  if(S.aiOn){
+    // ── BATCH GEMINI MODE ──
+    document.getElementById('ai-progress').style.display='block';
+    var progressBar=document.getElementById('ai-pbar');
+    var progressText=document.getElementById('ai-prog-text');
+
+    // Build all pairs that need AI evaluation (those with no exact match on required rules)
+    var allPairs=[];
+    for(var bi=0;bi<S.buyers.d.length;bi++){
+      for(var si=0;si<S.sellers.d.length;si++){
+        allPairs.push({bi:bi,si:si});
+      }
+    }
+    var total=allPairs.length;
+    var aiResults={};
+
+    // Process required rules with batching
+    for(var ri=0;ri<reqRules.length;ri++){
+      var rule=reqRules[ri];
+      var pairsNeedingAI=[];
+      // First pass: find pairs with no exact match
+      allPairs.forEach(function(p){
+        var br=S.buyers.d[p.bi],sr=S.sellers.d[p.si];
         var bv=getVals(br,S.buyers.h,rule.bc);
         var sv=getVals(sr,S.sellers.h,rule.sc);
         var ov=overlap(bv,sv);
-        if(ov.length>0){matchedRules.push({col:rule.bc+'↔'+rule.sc,vals:ov,type:'required'});}
-        else if(S.aiOn&&bv.length&&sv.length){
-          var aiMatch=await geminiMatch(bv,sv);
-          if(aiMatch){matchedRules.push({col:rule.bc+'↔'+rule.sc,vals:['AI: semantic match'],type:'required'});}
+        var key=p.bi+'_'+p.si+'_'+ri;
+        if(ov.length>0){aiResults[key]='exact';}
+        else if(bv.length&&sv.length){pairsNeedingAI.push({bi:p.bi,si:p.si,ri:ri,buyerVals:bv,sellerVals:sv,key:key});}
+        else{aiResults[key]='no';}
+      });
+
+      // Batch process pairs needing AI
+      for(var b=0;b<pairsNeedingAI.length;b+=BATCH_SIZE){
+        var batch=pairsNeedingAI.slice(b,b+BATCH_SIZE);
+        var processed=b+batch.length;
+        var pct=Math.round(100*processed/Math.max(pairsNeedingAI.length,1));
+        progressBar.style.width=pct+'%';
+        progressText.textContent='Rule "'+(rule.bc)+'" — AI checking '+processed+' of '+pairsNeedingAI.length+' pairs...';
+        var results=await geminiBatchMatch(batch);
+        batch.forEach(function(p,idx){aiResults[p.key]=results[idx]?'ai-yes':'no';});
+        // Small pause to respect rate limits
+        if(b+BATCH_SIZE<pairsNeedingAI.length){await new Promise(function(r){setTimeout(r,1000);});}
+      }
+    }
+
+    progressText.textContent='Building matches...';
+
+    // Build final matches using AI results
+    for(var bi=0;bi<S.buyers.d.length;bi++){
+      for(var si=0;si<S.sellers.d.length;si++){
+        var br=S.buyers.d[bi],sr=S.sellers.d[si];
+        var matchedRules=[],ok=true;
+        for(var ri=0;ri<reqRules.length;ri++){
+          var rule=reqRules[ri];
+          var key=bi+'_'+si+'_'+ri;
+          var result=aiResults[key];
+          var bv=getVals(br,S.buyers.h,rule.bc);
+          var sv=getVals(sr,S.sellers.h,rule.sc);
+          if(result==='exact'){var ov=overlap(bv,sv);matchedRules.push({col:rule.bc+'↔'+rule.sc,vals:ov,type:'required'});}
+          else if(result==='ai-yes'){matchedRules.push({col:rule.bc+'↔'+rule.sc,vals:['🤖 AI: semantic match'],type:'required'});}
           else{ok=false;break;}
-        } else {ok=false;break;}
+        }
+        if(!ok)continue;
+        var score=0;
+        for(var ri=0;ri<prefRules.length;ri++){
+          var rule=prefRules[ri];
+          var bv=getVals(br,S.buyers.h,rule.bc);
+          var sv=getVals(sr,S.sellers.h,rule.sc);
+          var ov=overlap(bv,sv);
+          if(ov.length>0){score++;matchedRules.push({col:rule.bc+'↔'+rule.sc,vals:ov,type:'preferred'});}
+        }
+        var bco=getColVal(br,S.buyers.h,'Company name');
+        var bn=getColVal(br,S.buyers.h,'Contact name');
+        var sco=getColVal(sr,S.sellers.h,'Company name');
+        var sn=getColVal(sr,S.sellers.h,'Contact name');
+        matches.push({buyer:bn,buyerCo:bco,seller:sn,sellerCo:sco,score:score,buyerRow:br,sellerRow:sr});
+        reasons[bco+'||'+sco]=matchedRules;
       }
-      if(!ok)continue;
-      var score=0;
-      for(var ri=0;ri<prefRules.length;ri++){
-        var rule=prefRules[ri];
-        var bv=getVals(br,S.buyers.h,rule.bc);
-        var sv=getVals(sr,S.sellers.h,rule.sc);
-        var ov=overlap(bv,sv);
-        if(ov.length>0){score++;matchedRules.push({col:rule.bc+'↔'+rule.sc,vals:ov,type:'preferred'});}
+    }
+    progressBar.style.width='100%';
+    progressText.textContent='✓ Done! '+matches.length+' matches found.';
+    setTimeout(function(){document.getElementById('ai-progress').style.display='none';},3000);
+
+  } else {
+    // ── EXACT MATCH MODE (no AI) ──
+    for(var bi=0;bi<S.buyers.d.length;bi++){
+      var br=S.buyers.d[bi];
+      for(var si=0;si<S.sellers.d.length;si++){
+        var sr=S.sellers.d[si];
+        var matchedRules=[],ok=true;
+        for(var ri=0;ri<reqRules.length;ri++){
+          var rule=reqRules[ri];
+          var bv=getVals(br,S.buyers.h,rule.bc);
+          var sv=getVals(sr,S.sellers.h,rule.sc);
+          var ov=overlap(bv,sv);
+          if(ov.length>0){matchedRules.push({col:rule.bc+'↔'+rule.sc,vals:ov,type:'required'});}
+          else{ok=false;break;}
+        }
+        if(!ok)continue;
+        var score=0;
+        for(var ri=0;ri<prefRules.length;ri++){
+          var rule=prefRules[ri];
+          var bv=getVals(br,S.buyers.h,rule.bc);
+          var sv=getVals(sr,S.sellers.h,rule.sc);
+          var ov=overlap(bv,sv);
+          if(ov.length>0){score++;matchedRules.push({col:rule.bc+'↔'+rule.sc,vals:ov,type:'preferred'});}
+        }
+        var bco=getColVal(br,S.buyers.h,'Company name');
+        var bn=getColVal(br,S.buyers.h,'Contact name');
+        var sco=getColVal(sr,S.sellers.h,'Company name');
+        var sn=getColVal(sr,S.sellers.h,'Contact name');
+        matches.push({buyer:bn,buyerCo:bco,seller:sn,sellerCo:sco,score:score,buyerRow:br,sellerRow:sr});
+        reasons[bco+'||'+sco]=matchedRules;
       }
-      var bco=getColVal(br,S.buyers.h,'Company name');
-      var bn=getColVal(br,S.buyers.h,'Contact name');
-      var sco=getColVal(sr,S.sellers.h,'Company name');
-      var sn=getColVal(sr,S.sellers.h,'Contact name');
-      var key=bco+'||'+sco;
-      matches.push({buyer:bn,buyerCo:bco,seller:sn,sellerCo:sco,score:score,buyerRow:br,sellerRow:sr});
-      reasons[key]=matchedRules;
     }
   }
+
   matches.sort(function(a,b){return b.score-a.score;});
   S.matches=matches;S.matchReasons=reasons;
+  if(matchBtn){matchBtn.disabled=false;matchBtn.textContent='⚡ Generate matches →';}
   buildSchedule();
   goStep(3);
   toast(matches.length+' matches found','ok');
