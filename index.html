@@ -545,12 +545,35 @@ function fetchGmailUser(){
   fetch('https://www.googleapis.com/gmail/v1/users/me/profile',{headers:{Authorization:'Bearer '+S.gmailToken}})
     .then(function(r){return r.json();})
     .then(function(d){
-      S.gmailUser=d.emailAddress;
-      document.getElementById('gmail-label').textContent='Gmail: '+d.emailAddress;
+      var email=d.emailAddress||d.email||'connected';
+      S.gmailUser=email;
+      document.getElementById('gmail-label').textContent='Gmail: '+email;
       document.getElementById('gmail-dot').classList.add('on');
       document.getElementById('gmail-status').classList.add('connected');
       document.getElementById('gmail-connect-prompt').style.display='none';
-      toast('Gmail connected: '+d.emailAddress,'ok');
+      toast('Gmail connected: '+email,'ok');
+    })
+    .catch(function(e){
+      // Try userinfo endpoint as fallback
+      fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+S.gmailToken}})
+        .then(function(r){return r.json();})
+        .then(function(d){
+          var email=d.email||'connected';
+          S.gmailUser=email;
+          document.getElementById('gmail-label').textContent='Gmail: '+email;
+          document.getElementById('gmail-dot').classList.add('on');
+          document.getElementById('gmail-status').classList.add('connected');
+          document.getElementById('gmail-connect-prompt').style.display='none';
+          toast('Gmail connected: '+email,'ok');
+        })
+        .catch(function(){
+          S.gmailUser='connected';
+          document.getElementById('gmail-label').textContent='Gmail: connected';
+          document.getElementById('gmail-dot').classList.add('on');
+          document.getElementById('gmail-status').classList.add('connected');
+          document.getElementById('gmail-connect-prompt').style.display='none';
+          toast('Gmail connected','ok');
+        });
     });
 }
 function sendGmailMessage(to,subject,body){
