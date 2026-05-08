@@ -208,10 +208,9 @@ var CONFIG = {
   <div class="step active" id="sn0" onclick="goStep(0)"><div class="snum">1</div>Event</div>
   <div class="step" id="sn1" onclick="goStep(1)"><div class="snum">2</div>Data</div>
   <div class="step" id="sn2" onclick="goStep(2)"><div class="snum">3</div>Matching</div>
-  <div class="step" id="sn25" onclick="goStep(25)"><div class="snum">4</div>Discovery</div>
-  <div class="step" id="sn3" onclick="goStep(3)"><div class="snum">5</div>Schedule</div>
-  <div class="step" id="sn4" onclick="goStep(4)"><div class="snum">6</div>Template</div>
-  <div class="step" id="sn5" onclick="goStep(5)"><div class="snum">7</div>Send</div>
+  <div class="step" id="sn3" onclick="goStep(3)"><div class="snum">4</div>Schedule</div>
+  <div class="step" id="sn4" onclick="goStep(4)"><div class="snum">5</div>Template</div>
+  <div class="step" id="sn5" onclick="goStep(5)"><div class="snum">6</div>Send</div>
   <div class="step" id="sn6" onclick="goStep(6)"><div class="snum">?</div>Help</div>
 </div>
 
@@ -333,37 +332,6 @@ var CONFIG = {
   </div>
   <div class="actions">
     <button class="btn bg" onclick="goStep(1)">← Back</button>
-    <button class="btn bn" onclick="runDiscovery()">🔍 Discover equivalences →</button>
-  </div>
-</div>
-
-<!-- ── STEP 2.5: DISCOVERY ── -->
-<div class="panel" id="p25">
-  <div class="card">
-    <div class="ctitle">🔍 Semantic Discovery — Step 2.5</div>
-    <div class="csub">Gemini has analysed all unique values in your data and found potential equivalences across languages and spelling variations. Review and approve which ones to use in matching.</div>
-    <div id="discovery-loading" style="display:none">
-      <div style="background:#f0f7ff;border:1px solid var(--blue40);border-radius:6px;padding:16px;margin-bottom:14px">
-        <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px">🤖 Gemini is analysing your data...</div>
-        <div class="prog"><div class="prog-bar" id="disc-pbar" style="width:0%;transition:width 2s ease"></div></div>
-        <div style="font-size:11px;color:var(--char60);margin-top:6px" id="disc-prog-text">Extracting unique values...</div>
-      </div>
-    </div>
-    <div id="discovery-results" style="display:none">
-      <div class="infobox ii" style="margin-bottom:14px">ℹ️ <div>Check the equivalences you want to use. Approved equivalences will be used during matching — values will be treated as identical even if written differently.</div></div>
-      <div id="discovery-list"></div>
-      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--gray);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <button class="btn bo bsm" onclick="selectAllDiscovery(true)">✓ Select all</button>
-        <button class="btn bg bsm" onclick="selectAllDiscovery(false)">✗ Deselect all</button>
-        <span style="font-size:11px;color:var(--char60)" id="discovery-count"></span>
-      </div>
-    </div>
-    <div id="discovery-none" style="display:none">
-      <div class="infobox io">✓ No equivalences needed — all values match exactly across buyers and sellers. You can proceed directly to matching.</div>
-    </div>
-  </div>
-  <div class="actions">
-    <button class="btn bg" onclick="goStep(2)">← Back</button>
     <button class="btn bn" onclick="runMatch()">⚡ Generate matches →</button>
   </div>
 </div>
@@ -385,7 +353,7 @@ var CONFIG = {
     <div id="tab-nm" style="display:none"></div>
     <div id="tab-int" style="display:none"></div>
     <div class="actions">
-      <button class="btn bg" onclick="goStep(25)">← Back</button>
+      <button class="btn bg" onclick="goStep(2)">← Back</button>
       <button class="btn bo" onclick="exportCSV()">⬇ CSV</button>
       <button class="btn bp" onclick="goStep(4)">Template →</button>
     </div>
@@ -651,169 +619,7 @@ function sendGmailMessage(to,subject,body){
   });
 }
 
-// ── DISCOVERY ──
-S.equivalences = []; // [{termA, termB, approved, rule}]
-
-function extractUniqueTerms(){
-  var termsByRule={};
-  S.rules.filter(function(r){return r.bc&&r.sc;}).forEach(function(rule){
-    var key=rule.bc+'||'+rule.sc;
-    if(!termsByRule[key]){termsByRule[key]={buyerTerms:new Set(),sellerTerms:new Set(),rule:rule};}
-    S.buyers.d.forEach(function(row){
-      getVals(row,S.buyers.h,rule.bc).forEach(function(v){termsByRule[key].buyerTerms.add(v);});
-    });
-    S.sellers.d.forEach(function(row){
-      getVals(row,S.sellers.h,rule.sc).forEach(function(v){termsByRule[key].sellerTerms.add(v);});
-    });
-  });
-  return termsByRule;
-}
-
-async function runDiscovery(){
-  var validRules=S.rules.filter(function(r){return r.bc&&r.sc;});
-  if(!validRules.length){toast('Define at least one matching rule first','w');return;}
-  if(!S.buyers.d.length||!S.sellers.d.length){toast('Upload both files first','w');return;}
-
-  goStep(25);
-  document.getElementById('discovery-loading').style.display='block';
-  document.getElementById('discovery-results').style.display='none';
-  document.getElementById('discovery-none').style.display='none';
-
-  var pbar=document.getElementById('disc-pbar');
-  var ptext=document.getElementById('disc-prog-text');
-  pbar.style.width='20%';
-  ptext.textContent='Extracting unique values from your data...';
-
-  var termsByRule=extractUniqueTerms();
-  var allEquivalences=[];
-  var ruleKeys=Object.keys(termsByRule);
-
-  for(var ri=0;ri<ruleKeys.length;ri++){
-    var key=ruleKeys[ri];
-    var ruleData=termsByRule[key];
-    // Send ALL unique terms — let Gemini decide what's equivalent
-    var buyerTerms=Array.from(ruleData.buyerTerms);
-    var sellerTerms=Array.from(ruleData.sellerTerms);
-
-    if(!buyerTerms.length||!sellerTerms.length)continue;
-
-    pbar.style.width=(20+60*(ri+1)/ruleKeys.length)+'%';
-    ptext.textContent='Gemini analysing "'+ruleData.rule.bc+'" ↔ "'+ruleData.rule.sc+'" ('+buyerTerms.length+' buyer terms, '+sellerTerms.length+' seller terms)...';
-
-    try{
-      // Split into chunks if too many terms to avoid token limits
-      var MAX_TERMS=30;
-      var chunks=[];
-      if(buyerTerms.length<=MAX_TERMS&&sellerTerms.length<=MAX_TERMS){
-        chunks.push({buyers:buyerTerms,sellers:sellerTerms});
-      } else {
-        // Split buyer terms into chunks, always compare against all sellers
-        for(var c=0;c<buyerTerms.length;c+=MAX_TERMS){
-          chunks.push({buyers:buyerTerms.slice(c,c+MAX_TERMS),sellers:sellerTerms.slice(0,MAX_TERMS)});
-        }
-      }
-
-      for(var ci=0;ci<chunks.length;ci++){
-        var chunk=chunks[ci];
-        var prompt='You are a multilingual B2B trade fair matchmaking assistant.\n\n'+
-          'Given these two lists of terms from buyers and sellers at a trade fair, find ALL semantic equivalences between them — including translations, synonyms, abbreviations, spelling variations, and hierarchical relationships.\n\n'+
-          'Buyer terms: '+chunk.buyers.join(' | ')+'\n'+
-          'Seller terms: '+chunk.sellers.join(' | ')+'\n\n'+
-          'Return ONLY a JSON array. Each item must have:\n'+
-          '- "a": exact buyer term from the list above\n'+
-          '- "b": exact seller term from the list above\n'+
-          '- "reason": short explanation in English (max 8 words)\n'+
-          '- "confidence": "high", "medium" or "low"\n\n'+
-          'Include ALL equivalences — translations, abbreviations, same concept different language. Terms that are identical need not be included. Return [] if nothing matches. Return only raw JSON, no markdown.';
-
-        var resp=await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key='+CONFIG.GEMINI_API_KEY,{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.1}})
-        });
-        if(!resp.ok){
-          var errData=await resp.json();
-          console.error('Gemini API error:',errData);
-          toast('Gemini API error: '+(errData.error&&errData.error.message||resp.status)+' — check your API key','err');
-          continue;
-        }
-        var data=await resp.json();
-        var text=data.candidates[0].content.parts[0].text.trim();
-        text=text.replace(/```json/g,'').replace(/```/g,'').trim();
-        var match=text.match(/\[[\s\S]*\]/);
-        if(match){
-          var pairs=JSON.parse(match[0]);
-          pairs.forEach(function(p){
-            if(p.a&&p.b&&clean(p.a)!==clean(p.b)){
-              allEquivalences.push({
-                termA:p.a,termB:p.b,
-                reason:p.reason||'Semantic match',
-                confidence:p.confidence||'medium',
-                rule:ruleData.rule,
-                approved:p.confidence!=='low'
-              });
-            }
-          });
-        }
-        if(chunks.length>1&&ci<chunks.length-1){
-          await new Promise(function(r){setTimeout(r,500);});
-        }
-      }
-    }catch(e){
-      console.error('Discovery error:',e);
-      toast('Gemini error on rule "'+ruleData.rule.bc+'" — check API key','err');
-    }
-  }
-
-  pbar.style.width='100%';
-  document.getElementById('discovery-loading').style.display='none';
-  S.equivalences=allEquivalences;
-
-  if(!allEquivalences.length){
-    document.getElementById('discovery-none').style.display='block';
-    ptext.textContent='Done — no equivalences found.';
-  } else {
-    renderDiscovery();
-    document.getElementById('discovery-results').style.display='block';
-  }
-}
-
-function renderDiscovery(){
-  var eq=S.equivalences;
-  var confColor={high:'#27ae60',medium:'#e67e22',low:'#e74c3c'};
-  var html=eq.map(function(e,i){
-    return '<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:6px;margin-bottom:6px;background:white">'+
-      '<input type="checkbox" id="eq-'+i+'" '+(e.approved?'checked':'')+' style="width:auto;margin-top:2px;flex-shrink:0" onchange="S.equivalences['+i+'].approved=this.checked;updateDiscoveryCount()">'+
-      '<label for="eq-'+i+'" style="cursor:pointer;flex:1">'+
-        '<div style="font-size:13px;font-weight:700;color:var(--navy)">'+
-          '"'+e.termA+'" <span style="color:var(--char40)">≈</span> "'+e.termB+'"'+
-        '</div>'+
-        '<div style="font-size:11px;color:var(--char60);margin-top:2px">'+
-          '<span style="color:'+confColor[e.confidence]+';font-weight:700">'+e.confidence.toUpperCase()+'</span> · '+e.reason+
-          ' <span style="color:var(--char40)">· Rule: '+e.rule.bc+'↔'+e.rule.sc+'</span>'+
-        '</div>'+
-      '</label>'+
-    '</div>';
-  }).join('');
-  document.getElementById('discovery-list').innerHTML=html;
-  updateDiscoveryCount();
-}
-
-function updateDiscoveryCount(){
-  var approved=S.equivalences.filter(function(e){return e.approved;}).length;
-  document.getElementById('discovery-count').textContent=approved+' of '+S.equivalences.length+' equivalences approved';
-}
-
-function selectAllDiscovery(val){
-  S.equivalences.forEach(function(e,i){
-    e.approved=val;
-    var cb=document.getElementById('eq-'+i);
-    if(cb)cb.checked=val;
-  });
-  updateDiscoveryCount();
-}
-
-
+// ── GEMINI AI MATCHING — BATCH ──
 async function geminiBatchMatch(pairs){
   // pairs = [{buyerVals:[], sellerVals:[], idx:n}]
   try{
@@ -821,7 +627,7 @@ async function geminiBatchMatch(pairs){
     pairs.forEach(function(p,i){
       prompt+=(i+1)+'. Buyer: '+p.buyerVals.join(', ')+' | Seller: '+p.sellerVals.join(', ')+'\n';
     });
-    var resp=await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key='+CONFIG.GEMINI_API_KEY,{
+    var resp=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+CONFIG.GEMINI_API_KEY,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0}})
@@ -843,21 +649,8 @@ async function geminiBatchMatch(pairs){
 // ── NAV ──
 function goStep(n){
   S.step=n;
-  // Map step number to panel index
-  var panelMap={0:0,1:1,2:2,25:3,3:4,4:5,5:6,6:7};
-  var navMap={0:'sn0',1:'sn1',2:'sn2',25:'sn25',3:'sn3',4:'sn4',5:'sn5',6:'sn6'};
-  var panelIdx=panelMap[n];
-  document.querySelectorAll('.panel').forEach(function(p,i){p.classList.toggle('active',i===panelIdx);});
-  // Update nav steps
-  var stepOrder=[0,1,2,25,3,4,5,6];
-  var currentPos=stepOrder.indexOf(n);
-  stepOrder.forEach(function(step,pos){
-    var el=document.getElementById(navMap[step]);
-    if(!el)return;
-    el.classList.remove('active','done');
-    if(step===n)el.classList.add('active');
-    else if(pos<currentPos)el.classList.add('done');
-  });
+  document.querySelectorAll('.panel').forEach(function(p,i){p.classList.toggle('active',i===n);});
+  document.querySelectorAll('.step').forEach(function(s,i){s.classList.remove('active','done');if(i===n)s.classList.add('active');else if(i<n)s.classList.add('done');});
   if(n===3)renderSchedule();
   if(n===5)renderSendStep();
 }
@@ -974,23 +767,7 @@ function renderRules(){
 // ── MATCHING ──
 function clean(t){return t.toString().replace(/\u200B/g,'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();}
 function getVals(row,headers,col){var idx=headers.indexOf(col);if(idx<0)return[];var raw=row[idx]?row[idx].toString():'';return raw.split(',').map(function(p){return clean(p);}).filter(Boolean);}
-
-// Apply approved equivalences to expand a value list
-function applyEquivalences(vals, col, side){
-  if(!S.equivalences||!S.equivalences.length)return vals;
-  var expanded=vals.slice();
-  S.equivalences.forEach(function(eq){
-    if(!eq.approved)return;
-    var sameRule=(col===eq.rule.bc||col===eq.rule.sc);
-    if(!sameRule)return;
-    var termA=clean(eq.termA);
-    var termB=clean(eq.termB);
-    // If we have termA, add termB and vice versa
-    if(expanded.indexOf(termA)>=0&&expanded.indexOf(termB)<0){expanded.push(termB);}
-    if(expanded.indexOf(termB)>=0&&expanded.indexOf(termA)<0){expanded.push(termA);}
-  });
-  return expanded;
-}
+function overlap(av,bv){return av.filter(function(a){return bv.some(function(b){return a===b||a.includes(b)||b.includes(a);});});}
 
 async function runMatch(){
   var reqRules=S.rules.filter(function(r){return r.bc&&r.sc&&r.type==='required';});
@@ -1089,8 +866,7 @@ async function runMatch(){
     setTimeout(function(){document.getElementById('ai-progress').style.display='none';},3000);
 
   } else {
-    // ── EXACT MATCH MODE (with approved equivalences from Discovery) ──
-    var hasEquiv=S.equivalences&&S.equivalences.some(function(e){return e.approved;});
+    // ── EXACT MATCH MODE (no AI) ──
     for(var bi=0;bi<S.buyers.d.length;bi++){
       var br=S.buyers.d[bi];
       for(var si=0;si<S.sellers.d.length;si++){
@@ -1100,10 +876,6 @@ async function runMatch(){
           var rule=reqRules[ri];
           var bv=getVals(br,S.buyers.h,rule.bc);
           var sv=getVals(sr,S.sellers.h,rule.sc);
-          if(hasEquiv){
-            bv=applyEquivalences(bv,rule.bc,'buyer');
-            sv=applyEquivalences(sv,rule.sc,'seller');
-          }
           var ov=overlap(bv,sv);
           if(ov.length>0){matchedRules.push({col:rule.bc+'↔'+rule.sc,vals:ov,type:'required'});}
           else{ok=false;break;}
@@ -1114,10 +886,6 @@ async function runMatch(){
           var rule=prefRules[ri];
           var bv=getVals(br,S.buyers.h,rule.bc);
           var sv=getVals(sr,S.sellers.h,rule.sc);
-          if(hasEquiv){
-            bv=applyEquivalences(bv,rule.bc,'buyer');
-            sv=applyEquivalences(sv,rule.sc,'seller');
-          }
           var ov=overlap(bv,sv);
           if(ov.length>0){score++;matchedRules.push({col:rule.bc+'↔'+rule.sc,vals:ov,type:'preferred'});}
         }
