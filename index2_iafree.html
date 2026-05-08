@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How2Match — B2B Matchmaking Tool</title>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#0484d1;--navy:#094172;--gray:#EEEEEE;--dark:#303030;
+  --blue20:#cce6f5;--blue40:#9acdec;--blue60:#68b5e3;--blue80:#369cda;
+  --navy20:#cdd9e2;--navy40:#9cb3c6;--navy60:#6b8daa;--navy80:#3a668e;
+  --char40:#acacac;--char60:#828282;--char80:#595959;
+  --border:#d5d5d5;--success:#27ae60;--warn:#e67e22;--danger:#e74c3c;
+}
+body{font-family:'Lato',sans-serif;background:#f7f8fa;color:var(--dark);font-size:14px;min-height:100vh}
+.topbar{background:var(--navy);padding:0 24px;height:54px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:200}
+.brand{display:flex;align-items:center;gap:8px;text-decoration:none}
+.brand-icon{width:30px;height:30px;background:var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.brand-icon svg{width:16px;height:16px;fill:none;stroke:white;stroke-width:2.5;stroke-linecap:round}
+.brand-name{font-size:17px;font-weight:700;color:white;letter-spacing:-.4px}
+.brand-name span{color:var(--blue60)}
+.proj-pill{font-size:11px;color:var(--navy40);background:rgba(255,255,255,.1);padding:3px 11px;border-radius:20px}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.tbtn{font-family:'Lato',sans-serif;font-size:11px;padding:5px 12px;border-radius:4px;cursor:pointer;border:1px solid rgba(255,255,255,.3);background:transparent;color:white;transition:background .15s;white-space:nowrap}
+.tbtn:hover{background:rgba(255,255,255,.12)}
+.tbtn.accent{background:rgba(4,132,209,.35);border-color:var(--blue)}
+.gmail-status{font-size:11px;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.1);color:white;display:flex;align-items:center;gap:5px}
+.gmail-status.connected{background:rgba(39,174,96,.2);border:1px solid rgba(39,174,96,.4)}
+.gmail-dot{width:6px;height:6px;border-radius:50%;background:var(--char40)}
+.gmail-dot.on{background:var(--success)}
+.stepnav{background:white;border-bottom:1px solid var(--border);display:flex;overflow-x:auto}
+.step{flex:1;min-width:80px;padding:9px 4px;text-align:center;font-size:10px;color:var(--char60);cursor:pointer;border-bottom:3px solid transparent;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:3px}
+.step:hover{color:var(--blue);background:#f0f7ff}
+.step.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:700}
+.step.done{color:var(--success)}
+.snum{width:20px;height:20px;border-radius:50%;background:var(--gray);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;color:var(--char60)}
+.step.active .snum{background:var(--blue);color:white}
+.step.done .snum{background:var(--success);color:white}
+.main{max-width:980px;margin:0 auto;padding:22px 18px}
+.panel{display:none}.panel.active{display:block}
+.card{background:white;border:1px solid var(--border);border-radius:8px;padding:20px;margin-bottom:16px}
+.ctitle{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:3px}
+.csub{font-size:11px;color:var(--char60);font-weight:300;margin-bottom:16px}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.r4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.f{margin-bottom:12px}
+.f label{display:block;font-size:10px;font-weight:700;color:var(--char60);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+input[type=text],input[type=number],input[type=date],input[type=time],input[type=email],input[type=password],select,textarea{width:100%;font-family:'Lato',sans-serif;font-size:13px;padding:7px 10px;border:1px solid var(--border);border-radius:4px;color:var(--dark);background:white;outline:none;transition:border .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--blue)}
+textarea{resize:vertical}
+input[type=color]{width:44px;height:32px;padding:2px;border:1px solid var(--border);border-radius:4px;cursor:pointer}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 15px;border-radius:4px;font-family:'Lato',sans-serif;font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .15s;white-space:nowrap}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.bp{background:var(--blue);color:white}.bp:hover:not(:disabled){background:var(--blue80)}
+.bn{background:var(--navy);color:white}.bn:hover:not(:disabled){background:var(--navy80)}
+.bo{background:transparent;color:var(--blue);border:1px solid var(--blue)}.bo:hover:not(:disabled){background:#f0f7ff}
+.bg{background:transparent;color:var(--char60);border:1px solid var(--border)}.bg:hover:not(:disabled){background:var(--gray)}
+.bsuc{background:var(--success);color:white}
+.bsm{padding:5px 10px;font-size:11px}
+.actions{display:flex;justify-content:flex-end;gap:8px;padding-top:16px;border-top:1px solid var(--gray);margin-top:16px;flex-wrap:wrap}
+.uzone{border:2px dashed var(--blue40);border-radius:6px;padding:24px;text-align:center;cursor:pointer;transition:all .15s;background:#f8fbff}
+.uzone:hover{border-color:var(--blue);background:#eef6ff}
+.uzone .ui{font-size:26px;display:block;margin-bottom:6px}
+.uzone p{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:2px}
+.uzone small{font-size:11px;color:var(--char60)}
+.fok{display:flex;align-items:center;gap:10px;padding:10px 13px;border:1px solid #a3d9b5;border-radius:6px;background:#f0faf5}
+.fok .fi{font-size:18px;color:var(--success)}
+.fok .fn{font-size:13px;font-weight:700}
+.fok .fm{font-size:11px;color:var(--char60)}
+.fok .fx{margin-left:auto;cursor:pointer;font-size:16px;color:var(--char40)}
+.ctag{padding:2px 7px;border-radius:3px;font-size:10px;font-weight:700;background:var(--blue20);color:var(--navy);display:inline-block;margin:2px}
+.slots-area{max-height:220px;overflow-y:auto;margin-bottom:7px}
+.si{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--border);border-radius:4px;font-size:12px;margin-bottom:4px;background:white}
+.si.brk{background:var(--gray);color:var(--char60);font-style:italic}
+.st{flex:1}
+.sdel{cursor:pointer;color:var(--char40);font-size:14px}.sdel:hover{color:var(--danger)}
+.sgen{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;padding:12px;background:var(--gray);border-radius:6px;margin-bottom:10px}
+.sgen .sf{display:flex;flex-direction:column;gap:3px}
+.sgen .sf label{font-size:10px;font-weight:700;color:var(--char60);text-transform:uppercase}
+.sgen input{width:auto}
+.asr{display:flex;gap:6px;margin-top:6px}
+.asr input{flex:1}
+.rule-row{display:flex;align-items:center;gap:6px;padding:8px 10px;border:1px solid var(--border);border-radius:4px;margin-bottom:6px;background:white;flex-wrap:wrap}
+.rule-row select{flex:1;min-width:100px;font-size:11px}
+.rbadge{padding:2px 6px;border-radius:3px;font-size:10px;font-weight:700;white-space:nowrap}
+.rb-req{background:#fde8e8;color:#8b1a1a}
+.rb-pref{background:#fff3e0;color:#7a4a00}
+.metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.metric{background:var(--gray);border-radius:6px;padding:13px;text-align:center}
+.metric .v{font-size:24px;font-weight:700;color:var(--navy)}
+.metric .l{font-size:10px;color:var(--char60);margin-top:3px;font-weight:300}
+.tab-bar{display:flex;gap:2px;margin-bottom:12px;border-bottom:1px solid var(--border)}
+.tab{padding:7px 13px;font-size:11px;font-weight:700;cursor:pointer;color:var(--char60);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.tab:hover{color:var(--blue)}.tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.aw{overflow-x:auto}
+.atbl{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed}
+.atbl th{padding:5px 7px;text-align:left;font-weight:700;background:var(--navy);color:white;border:1px solid var(--navy80);font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.atbl td{padding:4px 7px;border:1px solid var(--border);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;position:relative}
+.atbl td.hit{background:#e8f5fe;color:var(--navy);font-weight:700;cursor:pointer}
+.atbl td.hit:hover{background:var(--blue20)}
+.atbl td.miss{color:var(--char40)}
+.atbl td.slbl{background:var(--gray);font-weight:700;color:var(--dark);font-size:10px;white-space:nowrap}
+.tooltip{position:fixed;background:var(--navy);color:white;border-radius:6px;padding:10px 13px;font-size:11px;line-height:1.6;max-width:270px;z-index:9999;pointer-events:none;display:none;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.tt-title{font-weight:700;font-size:12px;margin-bottom:6px;color:var(--blue60)}
+.tt-row{display:flex;gap:6px;margin-bottom:3px}
+.nm-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:4px;background:var(--gray);margin-bottom:4px;font-size:12px}
+.badge{padding:2px 6px;border-radius:3px;font-size:10px;font-weight:700}
+.bb{background:#fff3e0;color:#7a4a00}.bbs{background:#fde8e8;color:#7a1a1a}
+.infobox{padding:9px 12px;border-radius:4px;font-size:12px;display:flex;align-items:flex-start;gap:7px;margin-bottom:10px;font-weight:300;line-height:1.6}
+.ii{background:#e8f5fe;border-left:3px solid var(--blue);color:var(--navy)}
+.io{background:#f0faf5;border-left:3px solid var(--success);color:#1a6a3a}
+.iw{background:#fff9e6;border-left:3px solid var(--warn);color:#7a4a00}
+.ie{background:#fde8e8;border-left:3px solid var(--danger);color:#7a1a1a}
+.slbl-t{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--char60);margin-bottom:6px;margin-top:16px}
+.slbl-t:first-child{margin-top:0}
+.ap{border:1px solid var(--border);border-radius:6px;overflow:hidden;background:white;font-family:Arial,sans-serif;max-width:560px}
+.aph{width:100%;min-height:68px;background:var(--gray);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.aph img{width:100%;max-height:100px;object-fit:cover}
+.ap-title{font-size:12px;font-weight:700;text-align:center;padding:7px;border-bottom:1px solid var(--border)}
+.ap-intro{font-size:10px;font-style:italic;text-align:center;padding:5px 10px;color:#555;border-bottom:1px solid #eee}
+.aptbl{width:100%;border-collapse:collapse;font-size:10px}
+.aptbl th{padding:3px 7px;text-align:left;font-weight:700}
+.apdate{font-weight:700;font-size:10px;padding:3px 7px}
+.aptbl td{padding:3px 7px;border-bottom:.5px solid #f0f0f0}
+.tpl-tabs{display:flex;border:1px solid var(--border);border-radius:4px;overflow:hidden;margin-bottom:14px}
+.tpl-tab{flex:1;padding:8px;text-align:center;font-size:12px;font-weight:700;cursor:pointer;background:var(--gray);color:var(--char60);transition:all .15s}
+.tpl-tab.active{background:var(--blue);color:white}
+.testrun-box{background:#f4f8fb;border:1px solid var(--blue40);border-radius:8px;padding:18px;margin-bottom:16px}
+.pc{border:1px solid var(--border);border-radius:6px;background:white;padding:13px;margin-bottom:8px}
+.pc-type{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--char60);margin-bottom:3px}
+.pc-name{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.mr{display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:.5px solid var(--gray);font-size:11px}
+.mr:last-child{border-bottom:none}
+.mr-time{color:var(--char60);min-width:125px;font-size:10px;padding-top:1px}
+.mr-co{font-weight:700;flex:1}
+.mr-desk{color:var(--blue);font-weight:700;min-width:55px;text-align:right}
+.mr-reason{font-size:10px;color:var(--char60);margin-top:1px}
+.var-tag{display:inline-flex;padding:2px 7px;border-radius:3px;font-size:11px;background:var(--gray);border:1px solid var(--border);cursor:pointer;color:var(--char80);margin:2px;font-family:'Lato',sans-serif}
+.var-tag:hover{background:var(--blue20);color:var(--navy)}
+.desk-in{width:46px;font-size:11px;padding:2px 4px;text-align:center}
+.tpl-box{border:1px dashed var(--navy40);border-radius:6px;padding:12px;background:#f4f8fb;display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.tpl-box .ti{font-size:24px}
+.tpl-box .tt{flex:1}
+.tpl-box .tt-t{font-size:12px;font-weight:700;color:var(--navy)}
+.tpl-box .tt-s{font-size:10px;color:var(--char60);font-weight:300}
+.prog{width:100%;height:4px;background:var(--gray);border-radius:2px;overflow:hidden;margin:6px 0}
+.prog-bar{height:100%;background:var(--blue);border-radius:2px;transition:width .3s}
+.send-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--border);border-radius:4px;margin-bottom:4px;font-size:12px}
+.ai-box{border:1px solid var(--blue40);border-radius:4px;padding:10px 13px;background:#f8fbff;display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.tswitch{position:relative;width:38px;height:20px;flex-shrink:0}
+.tswitch input{opacity:0;width:0;height:0}
+.tslider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--char40);border-radius:20px;transition:.3s}
+.tslider:before{position:absolute;content:'';height:14px;width:14px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.3s}
+input:checked+.tslider{background:var(--blue)}
+input:checked+.tslider:before{transform:translateX(18px)}
+/* INSTRUCTIONS */
+.lang-tabs{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap}
+.lang-tab{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;background:var(--gray);color:var(--char60);border:none;transition:all .15s}
+.lang-tab.active{background:var(--navy);color:white}
+.instr-section{margin-bottom:20px}
+.instr-section h3{font-size:13px;font-weight:700;color:var(--blue);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--blue20)}
+.instr-step{display:flex;gap:10px;margin-bottom:8px;font-size:12px;line-height:1.6}
+.instr-num{width:22px;height:22px;border-radius:50%;background:var(--navy);color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+/* GMAIL AUTH */
+.gmail-btn{display:flex;align-items:center;gap:10px;padding:10px 16px;border:1px solid var(--border);border-radius:6px;background:white;cursor:pointer;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;color:var(--dark);transition:all .15s;width:100%;max-width:320px}
+.gmail-btn:hover{border-color:var(--blue);background:#f8fbff}
+.gmail-btn svg{width:20px;height:20px;flex-shrink:0}
+.gmail-connected-box{display:flex;align-items:center;gap:10px;padding:10px 13px;border:1px solid #a3d9b5;border-radius:6px;background:#f0faf5;font-size:12px}
+#toast-area{position:fixed;bottom:16px;right:16px;z-index:999;display:flex;flex-direction:column;gap:5px}
+.toast{background:white;border:1px solid var(--border);border-left:4px solid var(--blue);border-radius:4px;padding:8px 13px;font-size:12px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.12);animation:fadein .2s;max-width:300px}
+.toast.ok{border-left-color:var(--success)}.toast.err{border-left-color:var(--danger)}.toast.w{border-left-color:var(--warn)}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<div id="tooltip" class="tooltip"></div>
+
+<!-- CONFIG — paste your keys here -->
+<script>
+var CONFIG = {
+  GEMINI_API_KEY: 'AIzaSyCmnd8K6U05ius1n9QdAUrcM5PnhueVYdw',
+  GMAIL_CLIENT_ID: '298419726-opq1m82vhnsurmgg07qqqi61bne90lg9.apps.googleusercontent.com',
+  GMAIL_SCOPES: 'https://www.googleapis.com/auth/gmail.send'
+};
+</script>
+
+<div class="topbar">
+  <a class="brand" href="#">
+    <div class="brand-icon"><svg viewBox="0 0 24 24"><path d="M7 16l-4-4 4-4M17 8l4 4-4 4M14 4l-4 16"/></svg></div>
+    <span class="brand-name">HOW2<span>MATCH</span></span>
+  </a>
+  <span class="proj-pill" id="proj-pill">No project</span>
+  <div class="topbar-right">
+    <div class="gmail-status" id="gmail-status"><span class="gmail-dot" id="gmail-dot"></span><span id="gmail-label">Gmail: not connected</span></div>
+    <button class="tbtn" onclick="connectGmail()">Connect Gmail</button>
+    <button class="tbtn" onclick="goStep(6)">📖 Help</button>
+
+  </div>
+</div>
+
+<div class="stepnav">
+  <div class="step active" id="sn0" onclick="goStep(0)"><div class="snum">1</div>Event</div>
+  <div class="step" id="sn1" onclick="goStep(1)"><div class="snum">2</div>Data</div>
+  <div class="step" id="sn2" onclick="goStep(2)"><div class="snum">3</div>Matching</div>
+  <div class="step" id="sn3" onclick="goStep(3)"><div class="snum">4</div>Schedule</div>
+  <div class="step" id="sn4" onclick="goStep(4)"><div class="snum">5</div>Template</div>
+  <div class="step" id="sn5" onclick="goStep(5)"><div class="snum">6</div>Send</div>
+  <div class="step" id="sn6" onclick="goStep(6)"><div class="snum">?</div>Help</div>
+</div>
+
+<div class="main">
+
+<!-- ── STEP 0: EVENT ── -->
+<div class="panel active" id="p0">
+  <div class="card">
+    <div class="ctitle">Event configuration</div>
+    <div class="csub">Name, capacity and meeting constraints.</div>
+    <div class="r2">
+      <div class="f"><label>Event name</label><input type="text" id="ev-name" placeholder="e.g. Fruit Attraction São Paulo 2025" oninput="updatePill()"></div>
+      <div class="f"><label>Organiser</label><input type="text" id="ev-org" placeholder="Organisation name"></div>
+    </div>
+    <div class="r3">
+      <div class="f"><label>Start date</label><input type="date" id="ev-start"></div>
+      <div class="f"><label>End date</label><input type="date" id="ev-end"></div>
+      <div class="f"><label>Meeting duration (min)</label><input type="number" id="ev-dur" value="20" min="5" max="120" step="5"></div>
+    </div>
+    <div class="r4">
+      <div class="f"><label>Tables available</label><input type="number" id="ev-tables" value="10" min="1" max="500"></div>
+      <div class="f"><label>Min meetings / person</label><input type="number" id="ev-min" value="2" min="0"></div>
+      <div class="f"><label>Max meetings / person</label><input type="number" id="ev-max" value="10" min="1"></div>
+      <div class="f"><label>Desk mode</label>
+        <select id="ev-desk-mode">
+          <option value="fixed">Fixed per buyer</option>
+          <option value="rotating">Rotating per slot</option>
+          <option value="manual">Manual</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ctitle">Schedule builder</div>
+    <div class="csub">Run the generator multiple times to add morning + afternoon blocks across different days.</div>
+    <div class="sgen">
+      <div class="sf"><label>Date</label><input type="date" id="sg-date" style="width:145px"></div>
+      <div class="sf"><label>From</label><input type="time" id="sg-from" value="09:00" style="width:95px"></div>
+      <div class="sf"><label>Until</label><input type="time" id="sg-to" value="13:00" style="width:95px"></div>
+      <div class="sf"><label>Break between (min)</label><input type="number" id="sg-break" value="0" min="0" max="120" style="width:75px"></div>
+      <button class="btn bp bsm" onclick="genSlots()" style="margin-top:auto">⚡ Generate</button>
+      <button class="btn bg bsm" onclick="addBreak()" style="margin-top:auto">☕ Add break</button>
+    </div>
+    <div class="slbl-t">Slots <span id="slot-count" style="color:var(--blue)">(0 active)</span></div>
+    <div class="slots-area" id="slot-list"></div>
+    <div class="asr">
+      <input type="text" id="slot-manual" placeholder="Manual entry: 25/03/2025 14:00-14:20   or   — Lunch break —">
+      <button class="btn bo bsm" onclick="addSlotManual()">+ Add</button>
+    </div>
+  </div>
+  <div class="actions"><button class="btn bp" onclick="goStep(1)">Next: Data →</button></div>
+</div>
+
+<!-- ── STEP 1: DATA ── -->
+<div class="panel" id="p1">
+  <div class="card">
+    <div class="ctitle">Upload participant data</div>
+    <div class="csub">Download the templates, fill them in, then upload each file.</div>
+    <div class="tpl-box">
+      <span class="ti">📋</span>
+      <div class="tt"><div class="tt-t">How2Match templates</div><div class="tt-s">Two separate files — same column structure for buyers and sellers.</div></div>
+      <button class="btn bo bsm" onclick="downloadTemplate('Buyers')">⬇ Buyers</button>
+      <button class="btn bo bsm" onclick="downloadTemplate('Sellers')">⬇ Sellers</button>
+    </div>
+    <div class="r2">
+      <div>
+        <div class="slbl-t">Buyers file</div>
+        <div id="buyers-area"><div class="uzone" onclick="triggerUp('buyers')"><span class="ui">👥</span><p>Upload buyers Excel</p><small>.xlsx or .csv</small></div></div>
+        <input type="file" id="file-buyers" accept=".xlsx,.csv" style="display:none" onchange="loadFile('buyers',this)">
+      </div>
+      <div>
+        <div class="slbl-t">Sellers file</div>
+        <div id="sellers-area"><div class="uzone" onclick="triggerUp('sellers')"><span class="ui">🏪</span><p>Upload sellers Excel</p><small>.xlsx or .csv</small></div></div>
+        <input type="file" id="file-sellers" accept=".xlsx,.csv" style="display:none" onchange="loadFile('sellers',this)">
+      </div>
+    </div>
+    <div id="cols-preview" style="display:none;margin-top:12px">
+      <div class="slbl-t">Detected columns</div>
+      <div class="r2">
+        <div><div style="font-size:11px;color:var(--char60);margin-bottom:4px">Buyers · <strong id="b-count">0</strong> rows</div><div id="b-cols"></div></div>
+        <div><div style="font-size:11px;color:var(--char60);margin-bottom:4px">Sellers · <strong id="s-count">0</strong> rows</div><div id="s-cols"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="btn bg" onclick="goStep(0)">← Back</button>
+    <button class="btn bp" onclick="goStep(2)">Next: Matching →</button>
+  </div>
+</div>
+
+<!-- ── STEP 2: MATCHING ── -->
+<div class="panel" id="p2">
+  <div class="card">
+    <div class="ctitle">Matching parameters</div>
+    <div class="csub">Map buyer columns to seller columns. Required = blocks match if no overlap. Preferred = boosts ranking when it overlaps.</div>
+    <div class="ai-box">
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:700;color:var(--navy)">🤖 Gemini AI semantic matching</div>
+          <label class="tswitch"><input type="checkbox" id="ai-toggle" onchange="S.aiOn=this.checked;document.getElementById('ai-status').textContent=this.checked?'ON — Gemini will interpret similar values':'OFF — exact text matching only'"><span class="tslider"></span></label>
+        </div>
+        <div id="ai-status" style="font-size:11px;font-weight:700;color:var(--char60);margin-bottom:8px">OFF — exact text matching only</div>
+        <div style="font-size:11px;color:var(--char60);font-weight:300;margin-bottom:8px">When ON: <em>"Apples" ≈ "Fresh fruit" ≈ "Manzanas"</em> — Gemini interprets semantically similar values as matches.</div>
+        <div style="height:1px;background:var(--border);margin-bottom:8px"></div>
+        <div style="font-size:11px;color:var(--navy);font-weight:400"><strong>How comparison works (AI OFF):</strong> cells can contain comma-separated values (e.g. <em>"Spain, France, Portugal"</em>). A match occurs when any value from the buyer overlaps with any value from the seller. Values must be written identically.</div>
+        <div style="font-size:11px;color:var(--warn);font-weight:700;margin-top:6px">⚠️ Numeric ranges (e.g. "€50,000–200,000") will rarely match exactly — use them as Preferred criteria or enable Gemini AI.</div>
+      </div>
+    </div>
+    <div class="slbl-t">Rules</div>
+    <div id="rules-container"></div>
+    <button class="btn bo bsm" onclick="addRule()" style="margin-bottom:12px">+ Add criterion</button>
+    <div id="ai-progress" style="display:none;margin-bottom:12px">
+      <div style="background:#f0f7ff;border:1px solid var(--blue40);border-radius:6px;padding:12px 16px">
+        <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:6px">🤖 Gemini AI analysing pairs...</div>
+        <div class="prog"><div class="prog-bar" id="ai-pbar" style="width:0%"></div></div>
+        <div style="font-size:11px;color:var(--char60);margin-top:4px" id="ai-prog-text">Starting...</div>
+      </div>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="btn bg" onclick="goStep(1)">← Back</button>
+    <button class="btn bn" onclick="runMatch()">⚡ Generate matches →</button>
+  </div>
+</div>
+
+<!-- ── STEP 3: SCHEDULE ── -->
+<div class="panel" id="p3">
+  <div class="card">
+    <div class="ctitle">Generated schedule</div>
+    <div class="csub">Hover any cell to see why buyer and seller matched.</div>
+    <div class="metrics-grid" id="metrics"></div>
+    <div class="tab-bar">
+      <div class="tab active" id="tb-macro" onclick="showTab('macro',this)">Macro schedule</div>
+      <div class="tab" id="tb-desks" onclick="showTab('desks',this)">Desks</div>
+      <div class="tab" id="tb-nm" onclick="showTab('nm',this)">No match</div>
+      <div class="tab" id="tb-int" onclick="showTab('int',this)">Integrity</div>
+    </div>
+    <div id="tab-macro"><div class="aw"><table class="atbl" id="agenda-tbl"></table></div><div id="macro-note"></div></div>
+    <div id="tab-desks" style="display:none"></div>
+    <div id="tab-nm" style="display:none"></div>
+    <div id="tab-int" style="display:none"></div>
+    <div class="actions">
+      <button class="btn bg" onclick="goStep(2)">← Back</button>
+      <button class="btn bo" onclick="exportCSV()">⬇ CSV</button>
+      <button class="btn bp" onclick="goStep(4)">Template →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── STEP 4: TEMPLATE ── -->
+<div class="panel" id="p4">
+  <div class="card">
+    <div class="ctitle">Agenda template</div>
+    <div class="csub">Buyers stay at their fixed desk. Sellers move between tables. Each gets a different agenda version.</div>
+    <div class="slbl-t">Header image (shared)</div>
+    <div id="header-area"><div class="uzone" onclick="triggerUp('header-img')" style="padding:16px"><span class="ui" style="font-size:20px">🖼</span><p style="font-size:12px">Upload event banner</p><small>PNG/JPG · 800×200px</small></div></div>
+    <input type="file" id="file-header-img" accept="image/*" style="display:none" onchange="loadHeaderImg(this)">
+    <div class="r2" style="margin-top:10px">
+      <div class="f"><label>Date row colour</label><div style="display:flex;align-items:center;gap:8px"><input type="color" id="col-date" value="#094172" oninput="updatePreview()"><span style="font-size:10px;color:var(--char60)">#094172</span></div></div>
+      <div class="f"><label>Table header colour</label><div style="display:flex;align-items:center;gap:8px"><input type="color" id="col-thead" value="#0484d1" oninput="updatePreview()"><span style="font-size:10px;color:var(--char60)">#0484d1</span></div></div>
+    </div>
+    <div class="slbl-t">Columns to show</div>
+    <div style="display:flex;gap:14px;margin-bottom:14px;flex-wrap:wrap">
+      <label style="display:flex;align-items:center;gap:5px;font-size:12px"><input type="checkbox" id="col-time" checked style="width:auto" onchange="updatePreview()"> TIME</label>
+      <label style="display:flex;align-items:center;gap:5px;font-size:12px"><input type="checkbox" id="col-company" checked style="width:auto" onchange="updatePreview()"> COMPANY</label>
+      <label style="display:flex;align-items:center;gap:5px;font-size:12px"><input type="checkbox" id="col-contact" checked style="width:auto" onchange="updatePreview()"> CONTACT NAME</label>
+      <label style="display:flex;align-items:center;gap:5px;font-size:12px"><input type="checkbox" id="col-desk" checked style="width:auto" onchange="updatePreview()"> DESK</label>
+    </div>
+    <div class="slbl-t">Programme texts</div>
+    <div class="tpl-tabs">
+      <div class="tpl-tab active" id="tplt-b" onclick="switchTpl('buyer')">👥 Buyers version</div>
+      <div class="tpl-tab" id="tplt-s" onclick="switchTpl('seller')">🏪 Sellers version</div>
+    </div>
+    <div id="tpl-b">
+      <div class="infobox ii" style="font-size:11px">ℹ️ Buyers stay at their <strong>fixed desk</strong>. Sellers come to them.</div>
+      <div class="f"><label>Title (buyers)</label><input type="text" id="ttl-b" placeholder="BUSINESS MEETINGS PROGRAMME" oninput="updatePreview()"></div>
+      <div class="f"><label>Intro text (buyers)</label><textarea id="int-b" rows="3" oninput="updatePreview()" placeholder="Please remain at your assigned desk. Sellers will come to you at each scheduled time."></textarea></div>
+    </div>
+    <div id="tpl-s" style="display:none">
+      <div class="infobox iw" style="font-size:11px">⚠️ Sellers <strong>move between desks</strong>. Their agenda shows which desk to go to at each slot.</div>
+      <div class="f"><label>Title (sellers)</label><input type="text" id="ttl-s" placeholder="YOUR MEETING SCHEDULE" oninput="updatePreview()"></div>
+      <div class="f"><label>Intro text (sellers)</label><textarea id="int-s" rows="3" oninput="updatePreview()" placeholder="Please move to the desk indicated at each time. The buyer will be waiting for you."></textarea></div>
+    </div>
+    <div class="slbl-t">Preview — <span id="prev-label">Buyer agenda</span></div>
+    <div class="ap" id="agenda-preview">
+      <div class="aph" id="prev-img"><span style="font-size:20px;color:var(--char40)">🖼</span></div>
+      <div class="ap-title" id="prev-title">PROGRAMME TITLE</div>
+      <div class="ap-intro" id="prev-intro">Introductory text...</div>
+      <table class="aptbl"><thead><tr id="prev-thead"></tr></thead><tbody id="prev-tbody"></tbody></table>
+    </div>
+    <div class="actions">
+      <button class="btn bg" onclick="goStep(3)">← Back</button>
+      <button class="btn bp" onclick="goStep(5)">Configure sending →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── STEP 5: SEND ── -->
+<div class="panel" id="p5">
+  <div class="testrun-box">
+    <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:3px">🧪 Test run — approve before sending</div>
+    <div style="font-size:11px;color:var(--char60);margin-bottom:12px">Preview 3 sample agendas. The Send all button is locked until you approve.</div>
+    <div id="testrun-content"></div>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <button class="btn bo" onclick="generateTestRun()">Generate preview</button>
+      <button class="btn bsuc" id="approve-btn" onclick="approveRun()" style="display:none">✓ Looks good — unlock send</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ctitle">Send agendas by email</div>
+    <div class="csub">Gmail connected — emails sent directly from your account.</div>
+    <div id="gmail-connect-prompt" style="margin-bottom:14px">
+      <div class="infobox iw">⚠️ Gmail not connected. Click "Connect Gmail" in the top bar to authorise sending.</div>
+    </div>
+    <div class="slbl-t">Contact columns</div>
+    <div class="r2">
+      <div class="f"><label>Buyers: email column</label><select id="ecol-b" style="font-size:12px"></select></div>
+      <div class="f"><label>Sellers: email column</label><select id="ecol-s" style="font-size:12px"></select></div>
+    </div>
+    <div class="r2">
+      <div class="f"><label>Buyers: name column</label><select id="ncol-b" style="font-size:12px"></select></div>
+      <div class="f"><label>Sellers: name column</label><select id="ncol-s" style="font-size:12px"></select></div>
+    </div>
+    <div class="slbl-t">Email</div>
+    <div class="f"><label>Subject</label><input type="text" id="email-subj" value="Your meeting agenda — {{event}}" oninput="updateEmailPreview()"></div>
+    <div style="margin-bottom:8px">
+      <div style="font-size:10px;font-weight:700;color:var(--char60);text-transform:uppercase;margin-bottom:4px">Variables</div>
+      <span class="var-tag" onclick="insertVar('{{name}}')">{{name}}</span>
+      <span class="var-tag" onclick="insertVar('{{company}}')">{{company}}</span>
+      <span class="var-tag" onclick="insertVar('{{event}}')">{{event}}</span>
+      <span class="var-tag" onclick="insertVar('{{n_meetings}}')">{{n_meetings}}</span>
+      <span class="var-tag" onclick="insertVar('{{agenda_table}}')">{{agenda_table}}</span>
+    </div>
+    <div class="f"><label>Body</label><textarea id="email-body" rows="7" oninput="updateEmailPreview()">Dear {{name}},
+
+Please find your personalised meeting agenda for {{event}}.
+
+You have {{n_meetings}} meetings scheduled.
+
+{{agenda_table}}
+
+Thank you for your participation.</textarea></div>
+    <div style="border:1px solid var(--border);border-radius:4px;padding:12px;font-size:12px;line-height:1.7;background:#fafafa;margin-bottom:14px;white-space:pre-wrap" id="email-preview"></div>
+    <div style="background:#f0faf5;border:1px solid #a3d9b5;border-radius:6px;padding:14px;margin-bottom:14px">
+      <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px">🧪 Send test email before bulk send</div>
+      <div style="font-size:11px;color:var(--char60);margin-bottom:10px">Send 1 buyer agenda + 1 seller agenda to your own email to verify format and delivery before sending to all participants.</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input type="email" id="test-email" placeholder="your@email.com" style="flex:1;min-width:200px;font-size:12px">
+        <button class="btn bsuc" onclick="sendTestEmailReal()">📧 Send test (1 buyer + 1 seller)</button>
+      </div>
+      <div id="test-email-status" style="font-size:11px;color:var(--char60);margin-top:6px;display:none"></div>
+    </div>
+        <option value="all">All participants</option>
+        <option value="buyers">Buyers (hosted buyers)</option>
+        <option value="sellers">Sellers (exhibitors)</option>
+      </select>
+      <button class="btn bo" onclick="exportAllCSV()">⬇ Export CSV agendas</button>
+      <button class="btn bn" id="send-all-btn" onclick="sendAllEmails()" disabled>📤 Send all — approve test first</button>
+    </div>
+    <div class="infobox iw" style="margin-top:10px">⚠️ <div><strong>Gmail sending limits:</strong> Google Workspace accounts can send up to 100 emails/hour. For large events (100+ participants), the tool will automatically pause every 50 emails and resume — the process may take several minutes. Do not close the browser tab while sending is in progress.</div></div>
+    <div id="send-prog" style="display:none;margin-top:10px">
+      <div class="prog"><div class="prog-bar" id="spbar" style="width:0%"></div></div>
+      <div style="font-size:11px;color:var(--char60);margin-top:4px" id="send-status"></div>
+    </div>
+    <div class="actions"><button class="btn bg" onclick="goStep(4)">← Back</button></div>
+  </div>
+</div>
+
+<!-- ── STEP 6: HELP ── -->
+<div class="panel" id="p6">
+  <div class="card">
+    <div class="ctitle">How to use How2Match</div>
+    <div class="csub">Select your language below.</div>
+    <div class="lang-tabs">
+      <button class="lang-tab active" onclick="showLang('en',this)">🇬🇧 English</button>
+      <button class="lang-tab" onclick="showLang('es',this)">🇪🇸 Español</button>
+      <button class="lang-tab" onclick="showLang('tr',this)">🇹🇷 Türkçe</button>
+      <button class="lang-tab" onclick="showLang('ko',this)">🇰🇷 한국어</button>
+      <button class="lang-tab" onclick="showLang('pt',this)">🇵🇹 Português</button>
+    </div>
+    <div id="lang-en">
+      <div class="infobox ii" style="flex-direction:column;align-items:flex-start;gap:6px">
+        <div><strong>ℹ️ What is How2Match?</strong></div>
+        <div>A B2B matchmaking tool designed for trade fairs and business events. It connects <strong>hosted buyers</strong> (invited purchasing companies) with <strong>exhibitors / sellers</strong> (companies showcasing at the event) based on criteria you define — products, markets, languages, etc. The tool builds an optimised meeting schedule and sends each participant their personalised agenda by email. Buyers and sellers are referred to together as <strong>participants</strong>.</div>
+      </div>
+      <div class="infobox iw">⚠️ <strong>Gmail sending limits:</strong> Google allows up to 100 emails/hour. For events with 100+ participants, the tool auto-pauses every 50 emails. Do not close the browser tab while sending.</div>
+      <div class="instr-section"><h3>Step 1 — Event setup</h3><div class="instr-step"><div class="instr-num">1</div><div>Enter the event name, organiser and dates.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Set <strong>available tables</strong> (physical meeting spaces at the fair), <strong>min meetings</strong> (the minimum each participant must have — buyers are usually committed to attend a minimum; sellers need a minimum to justify their participation) and <strong>max meetings</strong>.</div></div><div class="instr-step"><div class="instr-num">3</div><div>Use the <strong>Schedule builder</strong> to generate time slots per day. Set date, start time, end time and any break between meetings (e.g. 10 min turnaround). Click Generate. Repeat for afternoon sessions or other days. Use <strong>Add break</strong> to insert lunch or coffee break rows.</div></div></div>
+      <div class="instr-section"><h3>Step 2 — Participant data</h3><div class="instr-step"><div class="instr-num">1</div><div>Download the <strong>Buyers template</strong> (hosted buyers) and <strong>Sellers template</strong> (exhibitors). Fill one row per company.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Values in matching columns must be comma-separated. Example: <em>Spain, France, Portugal</em> or <em>Apples, Citrus, Berries</em>. Spelling must be consistent across both files for exact matching to work.</div></div><div class="instr-step"><div class="instr-num">3</div><div>Upload each file. The tool auto-detects your column headers.</div></div></div>
+      <div class="instr-section"><h3>Step 3 — Matching rules</h3><div class="instr-step"><div class="instr-num">1</div><div>Map buyer columns to seller columns. Example: buyer "Region of interest" ↔ seller "Region of interest".</div></div><div class="instr-step"><div class="instr-num">2</div><div><strong>Required:</strong> both must share at least one value — if not, no meeting. <strong>Preferred:</strong> boosts the meeting score when values overlap, but does not block the match.</div></div><div class="instr-step"><div class="instr-num">3</div><div>⚠️ Avoid using numeric ranges (e.g. "€50,000–200,000") as Required criteria — exact text match is very unlikely. Use them as Preferred, or enable Gemini AI to interpret them semantically.</div></div><div class="instr-step"><div class="instr-num">4</div><div>Enable <strong>Gemini AI</strong> if your data contains spelling variations or semantic differences (e.g. "Manzanas" ≈ "Apples" ≈ "Fresh fruit").</div></div><div class="instr-step"><div class="instr-num">5</div><div>Click <strong>Generate matches</strong>.</div></div></div>
+      <div class="instr-section"><h3>Step 4 — Review schedule</h3><div class="instr-step"><div class="instr-num">1</div><div>The macro schedule shows all meetings. <strong>Hover any cell</strong> to see why that buyer–seller pair was matched and which values overlapped.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Participants below the minimum appear in the <strong>No match</strong> tab with a warning.</div></div><div class="instr-step"><div class="instr-num">3</div><div>Go to <strong>Desks</strong> to assign or edit the fixed desk number for each buyer. Buyers stay at their desk — sellers move between tables.</div></div><div class="instr-step"><div class="instr-num">4</div><div>Check <strong>Integrity</strong> to confirm no double-bookings.</div></div></div>
+      <div class="instr-section"><h3>Step 5 — Agenda template</h3><div class="instr-step"><div class="instr-num">1</div><div>Upload your event banner image (logo/header).</div></div><div class="instr-step"><div class="instr-num">2</div><div>Edit the <strong>Buyers version</strong> and <strong>Sellers version</strong> separately. Buyers see "stay at your desk, sellers come to you." Sellers see "move to desk X at each time."</div></div></div>
+      <div class="instr-section"><h3>Step 6 — Send agendas</h3><div class="instr-step"><div class="instr-num">1</div><div>Click <strong>Connect Gmail</strong> in the top bar and authorise with your Google account.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Select the email and name columns from your uploaded files.</div></div><div class="instr-step"><div class="instr-num">3</div><div>Click <strong>Generate preview</strong> to review 3 sample agendas (2 buyers + 1 seller). Approve to unlock bulk sending.</div></div><div class="instr-step"><div class="instr-num">4</div><div>Click <strong>Send all agendas</strong>. Each participant receives their personalised agenda directly from your Gmail. The tool auto-pauses every 50 emails to respect Gmail limits.</div></div></div>
+    </div>
+    <div id="lang-es" style="display:none">
+      <div class="infobox ii" style="flex-direction:column;align-items:flex-start;gap:6px"><div><strong>ℹ️ ¿Qué es How2Match?</strong></div><div>Una herramienta de matchmaking B2B para ferias y eventos de negocio. Conecta <strong>compradores invitados</strong> (empresas compradoras que acuden por invitación) con <strong>expositores / vendedores</strong> (empresas que exponen en la feria) según criterios que tú defines. Genera un calendario optimizado de reuniones y envía a cada participante su agenda personalizada por email. Compradores y vendedores se llaman conjuntamente <strong>participantes</strong>.</div></div>
+      <div class="infobox iw">⚠️ <strong>Límite de envío Gmail:</strong> Google permite hasta 100 emails/hora. Para eventos con más de 100 participantes, la herramienta hace pausas automáticas cada 50 emails. No cierres el navegador durante el envío.</div>
+      <div class="instr-section"><h3>Paso 1 — Configuración del evento</h3><div class="instr-step"><div class="instr-num">1</div><div>Introduce el nombre del evento, organizador y fechas.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Configura las <strong>mesas disponibles</strong> (espacios físicos de reunión en la feria), el <strong>mínimo de reuniones</strong> (los compradores suelen tener un mínimo comprometido; los vendedores necesitan un mínimo para justificar su participación) y el <strong>máximo</strong>.</div></div><div class="instr-step"><div class="instr-num">3</div><div>Usa el <strong>generador de slots</strong>: selecciona fecha, hora de inicio y fin, y minutos de descanso entre reuniones. Haz clic en Generar. Repite para el bloque de tarde u otros días. Usa <strong>Añadir pausa</strong> para insertar descansos o comida.</div></div></div>
+      <div class="instr-section"><h3>Paso 2 — Datos de participantes</h3><div class="instr-step"><div class="instr-num">1</div><div>Descarga la plantilla de <strong>Compradores</strong> y la de <strong>Vendedores</strong>. Rellena una fila por empresa.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Los valores en columnas de matching deben separarse por comas. Ejemplo: <em>España, Francia, Portugal</em>. La ortografía debe ser consistente en ambos archivos para que el matching exacto funcione.</div></div><div class="instr-step"><div class="instr-num">3</div><div>Sube cada archivo. La herramienta detecta automáticamente las columnas.</div></div></div>
+      <div class="instr-section"><h3>Paso 3 — Reglas de matching</h3><div class="instr-step"><div class="instr-num">1</div><div>Conecta columnas de compradores con columnas de vendedores. Ejemplo: "Región de interés" del comprador ↔ "Región de interés" del vendedor.</div></div><div class="instr-step"><div class="instr-num">2</div><div><strong>Obligatorio:</strong> deben compartir al menos un valor — si no, no hay reunión. <strong>Preferible:</strong> mejora el score cuando coincide, pero no bloquea el match.</div></div><div class="instr-step"><div class="instr-num">3</div><div>⚠️ Evita usar rangos numéricos (ej. "50.000–200.000 €") como criterio Obligatorio — la coincidencia exacta de texto es muy improbable. Úsalos como Preferible o activa Gemini AI.</div></div><div class="instr-step"><div class="instr-num">4</div><div>Activa <strong>Gemini AI</strong> si tus datos tienen variaciones ortográficas o semánticas ("Manzanas" ≈ "Apples" ≈ "Fruta fresca").</div></div><div class="instr-step"><div class="instr-num">5</div><div>Haz clic en <strong>Generar matches</strong>.</div></div></div>
+      <div class="instr-section"><h3>Paso 4 — Revisar la agenda</h3><div class="instr-step"><div class="instr-num">1</div><div>El calendario macro muestra todas las reuniones. <strong>Pasa el ratón</strong> sobre cualquier celda para ver por qué ese par coincidió.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Los participantes por debajo del mínimo aparecen en la pestaña <strong>Sin match</strong>.</div></div><div class="instr-step"><div class="instr-num">3</div><div>En <strong>Mesas</strong> asigna el número de mesa fijo a cada comprador. Los compradores no se mueven — los vendedores van de mesa en mesa.</div></div><div class="instr-step"><div class="instr-num">4</div><div>Verifica la pestaña <strong>Integridad</strong> para confirmar que no hay conflictos.</div></div></div>
+      <div class="instr-section"><h3>Paso 5 — Plantilla de agenda</h3><div class="instr-step"><div class="instr-num">1</div><div>Sube la imagen de cabecera del evento.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Edita por separado la versión de <strong>Compradores</strong> y de <strong>Vendedores</strong>. Los compradores ven "quédate en tu mesa". Los vendedores ven "ve a la mesa X a cada hora".</div></div></div>
+      <div class="instr-section"><h3>Paso 6 — Enviar agendas</h3><div class="instr-step"><div class="instr-num">1</div><div>Haz clic en <strong>Connect Gmail</strong> y autoriza con tu cuenta de Google.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Selecciona las columnas de email y nombre de cada archivo.</div></div><div class="instr-step"><div class="instr-num">3</div><div>Genera una previsualización (2 compradores + 1 vendedor), apruébala y desbloquea el envío masivo.</div></div><div class="instr-step"><div class="instr-num">4</div><div>Haz clic en <strong>Enviar todas las agendas</strong>. Cada participante recibe la suya desde tu Gmail. La herramienta hace pausas automáticas cada 50 emails.</div></div></div>
+    </div>
+    <div id="lang-tr" style="display:none">
+      <div class="infobox ii" style="flex-direction:column;align-items:flex-start;gap:6px"><div><strong>ℹ️ How2Match nedir?</strong></div><div>Ticaret fuarları ve iş etkinlikleri için tasarlanmış bir B2B eşleştirme aracıdır. <strong>Hosted alıcıları</strong> (davetli alıcı şirketler) ile <strong>fuarcılar / satıcılar</strong> (fuarda stant kuran şirketler) tanımladığınız kriterlere göre eşleştirir. Her katılımcıya kişiselleştirilmiş programını e-posta ile gönderir. Alıcılar ve satıcılar birlikte <strong>katılımcılar</strong> olarak adlandırılır.</div></div>
+      <div class="infobox iw">⚠️ <strong>Gmail gönderim limiti:</strong> Google saatte 100 e-postaya izin verir. 100+ katılımcılı etkinliklerde araç her 50 e-postada otomatik duraklar. Gönderim sırasında tarayıcı sekmesini kapatmayın.</div>
+      <div class="instr-section"><h3>Adım 1 — Etkinlik kurulumu</h3><div class="instr-step"><div class="instr-num">1</div><div>Etkinlik adını, organizatörü ve tarihleri girin.</div></div><div class="instr-step"><div class="instr-num">2</div><div><strong>Mevcut masaları</strong> (fuardaki fiziksel toplantı alanları), <strong>minimum toplantı sayısını</strong> (alıcılar genellikle minimuma katılmayı taahhüt eder; satıcıların katılımı meşrulaştırmak için minimuma ihtiyacı vardır) ve <strong>maksimum</strong> sayıyı ayarlayın.</div></div><div class="instr-step"><div class="instr-num">3</div><div>Gün bazında zaman dilimleri oluşturmak için <strong>Program oluşturucuyu</strong> kullanın. Tarih, başlangıç saati, bitiş saati ve toplantılar arası mola süresini ayarlayın. Oluştur'a tıklayın. Öğleden sonra seansları veya farklı günler için tekrarlayın. Öğle yemeği veya kahve molaları için <strong>Mola ekle</strong>'yi kullanın.</div></div></div>
+      <div class="instr-section"><h3>Adım 2 — Katılımcı verileri</h3><div class="instr-step"><div class="instr-num">1</div><div><strong>Alıcılar</strong> ve <strong>Satıcılar</strong> şablonlarını indirin. Her şirket için bir satır doldurun.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Eşleştirme sütunlarındaki değerler virgülle ayrılmalıdır. Örnek: <em>İspanya, Fransa, Portekiz</em>. Yazım her iki dosyada tutarlı olmalıdır.</div></div><div class="instr-step"><div class="instr-num">3</div><div>Her dosyayı yükleyin. Araç sütun başlıklarını otomatik olarak algılar.</div></div></div>
+      <div class="instr-section"><h3>Adım 3 — Eşleştirme kuralları</h3><div class="instr-step"><div class="instr-num">1</div><div>Alıcı sütunlarını satıcı sütunlarıyla eşleyin. Örnek: "İlgi bölgesi" ↔ "İlgi bölgesi".</div></div><div class="instr-step"><div class="instr-num">2</div><div><strong>Zorunlu:</strong> en az bir ortak değer olmalı — yoksa toplantı yok. <strong>Tercihli:</strong> değerler örtüştüğünde puanı artırır ama eşleşmeyi engellemez.</div></div><div class="instr-step"><div class="instr-num">3</div><div>⚠️ Sayısal aralıkları Zorunlu kriter olarak kullanmaktan kaçının — tam metin eşleşmesi neredeyse imkânsızdır. Tercihli olarak kullanın veya Gemini AI'yi etkinleştirin.</div></div><div class="instr-step"><div class="instr-num">4</div><div>Verilerinizde yazım veya anlamsal farklılıklar varsa <strong>Gemini AI</strong>'yi etkinleştirin — "Elmalar" ≈ "Taze meyve" gibi değerleri otomatik olarak eşleştirir.</div></div><div class="instr-step"><div class="instr-num">5</div><div><strong>Eşleşme oluştur</strong>'a tıklayın.</div></div></div>
+      <div class="instr-section"><h3>Adım 4 — Programı inceleyin</h3><div class="instr-step"><div class="instr-num">1</div><div>Makro programı inceleyin. Eşleşme nedenini görmek için herhangi bir hücrenin üzerine gelin.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Minimumun altındaki katılımcılar <strong>Eşleşme yok</strong> sekmesinde görünür.</div></div><div class="instr-step"><div class="instr-num">3</div><div><strong>Masalar</strong> sekmesinde her alıcıya sabit masa numarası atayın. Alıcılar masalarında sabit kalır — satıcılar masalar arasında hareket eder.</div></div><div class="instr-step"><div class="instr-num">4</div><div>Çakışma olmadığını doğrulamak için <strong>Bütünlük</strong> sekmesini kontrol edin.</div></div></div>
+      <div class="instr-section"><h3>Adım 5 — Program şablonu</h3><div class="instr-step"><div class="instr-num">1</div><div>Etkinlik banner görselini yükleyin.</div></div><div class="instr-step"><div class="instr-num">2</div><div><strong>Alıcı versiyonu</strong> ve <strong>Satıcı versiyonu</strong>nu ayrı ayrı düzenleyin. Alıcılar "masanızda kalın" mesajını görür, satıcılar "her saatte X masaya gidin" mesajını görür.</div></div></div>
+      <div class="instr-section"><h3>Adım 6 — Programları gönderin</h3><div class="instr-step"><div class="instr-num">1</div><div>Üst çubukta <strong>Connect Gmail</strong>'e tıklayın ve Google hesabınızla yetkilendirin.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Her dosyadan e-posta ve ad sütunlarını seçin.</div></div><div class="instr-step"><div class="instr-num">3</div><div>Önizleme oluşturun (2 alıcı + 1 satıcı), onaylayın ve toplu gönderimi açın.</div></div><div class="instr-step"><div class="instr-num">4</div><div><strong>Tüm programları gönder</strong>'e tıklayın. Her katılımcı kişisel programını Gmail'inizden alır. Araç her 50 e-postada otomatik duraklar.</div></div></div>
+    </div>
+    <div id="lang-ko" style="display:none">
+      <div class="infobox ii" style="flex-direction:column;align-items:flex-start;gap:6px"><div><strong>ℹ️ How2Match란?</strong></div><div>무역 박람회와 비즈니스 행사를 위한 B2B 매칭 도구입니다. <strong>호스티드 바이어</strong>(초청 구매 기업)와 <strong>전시업체/판매자</strong>(행사 참가 기업)를 정의한 기준에 따라 연결합니다. 최적화된 미팅 일정을 생성하고 각 참가자에게 맞춤형 일정을 이메일로 전송합니다. 구매자와 판매자는 통칭 <strong>참가자</strong>라고 합니다.</div></div>
+      <div class="infobox iw">⚠️ <strong>Gmail 발송 한도:</strong> Google은 시간당 최대 100개의 이메일을 허용합니다. 100명 이상의 참가자가 있는 행사의 경우 도구가 50개마다 자동으로 일시 중지됩니다. 발송 중에는 브라우저 탭을 닫지 마세요.</div>
+      <div class="instr-section"><h3>1단계 — 행사 설정</h3><div class="instr-step"><div class="instr-num">1</div><div>행사 이름, 주최자, 날짜를 입력하세요.</div></div><div class="instr-step"><div class="instr-num">2</div><div><strong>사용 가능한 테이블 수</strong>, <strong>최소 미팅 수</strong>(구매자는 보통 최소 미팅 참석을 약속합니다. 판매자는 참가를 정당화하기 위한 최솟값이 필요합니다), <strong>최대 미팅 수</strong>를 설정하세요.</div></div><div class="instr-step"><div class="instr-num">3</div><div>날짜별 시간 슬롯을 생성하려면 <strong>일정 생성기</strong>를 사용하세요. 날짜, 시작/종료 시간, 미팅 간 휴식 시간을 설정하고 생성을 클릭하세요. 오후 세션이나 다른 날에 대해 반복하고, <strong>휴식 추가</strong>를 사용해 점심이나 커피 휴식 행을 삽입하세요.</div></div></div>
+      <div class="instr-section"><h3>2단계 — 참가자 데이터</h3><div class="instr-step"><div class="instr-num">1</div><div><strong>구매자</strong> 및 <strong>판매자</strong> 템플릿을 다운로드하고 회사당 한 행씩 채우세요.</div></div><div class="instr-step"><div class="instr-num">2</div><div>매칭 열의 값은 쉼표로 구분해야 합니다. 예: <em>스페인, 프랑스, 포르투갈</em>. 정확한 매칭을 위해 두 파일의 철자가 일치해야 합니다.</div></div><div class="instr-step"><div class="instr-num">3</div><div>각 파일을 업로드하세요. 도구가 열 머리글을 자동으로 감지합니다.</div></div></div>
+      <div class="instr-section"><h3>3단계 — 매칭 규칙</h3><div class="instr-step"><div class="instr-num">1</div><div>구매자 열을 판매자 열에 매핑하세요. 예: "관심 지역" ↔ "관심 지역".</div></div><div class="instr-step"><div class="instr-num">2</div><div><strong>필수:</strong> 최소 하나의 값이 겹쳐야 합니다 — 겹치지 않으면 미팅 없음. <strong>선호:</strong> 값이 겹칠 때 점수를 높이지만 매칭을 차단하지 않습니다.</div></div><div class="instr-step"><div class="instr-num">3</div><div>⚠️ 숫자 범위(예: "€50,000–200,000")를 필수 기준으로 사용하지 마세요 — 정확한 텍스트 매칭이 거의 불가능합니다. 선호로 설정하거나 Gemini AI를 활성화하세요.</div></div><div class="instr-step"><div class="instr-num">4</div><div>데이터에 철자 변형이나 의미론적 차이가 있으면 <strong>Gemini AI</strong>를 활성화하세요 — "사과" ≈ "신선한 과일"처럼 유사한 값을 자동으로 매칭합니다.</div></div><div class="instr-step"><div class="instr-num">5</div><div><strong>매칭 생성</strong>을 클릭하세요.</div></div></div>
+      <div class="instr-section"><h3>4단계 — 일정 검토</h3><div class="instr-step"><div class="instr-num">1</div><div>매크로 일정을 검토하세요. 셀 위에 마우스를 올려 매칭 이유를 확인하세요.</div></div><div class="instr-step"><div class="instr-num">2</div><div>최솟값 미달 참가자는 <strong>매칭 없음</strong> 탭에 표시됩니다.</div></div><div class="instr-step"><div class="instr-num">3</div><div><strong>테이블</strong> 탭에서 각 구매자에게 고정 테이블 번호를 지정하세요. 구매자는 테이블에 고정됩니다 — 판매자가 테이블 사이를 이동합니다.</div></div><div class="instr-step"><div class="instr-num">4</div><div><strong>무결성</strong> 탭을 확인해 충돌이 없는지 검증하세요.</div></div></div>
+      <div class="instr-section"><h3>5단계 — 일정 템플릿</h3><div class="instr-step"><div class="instr-num">1</div><div>행사 배너 이미지를 업로드하세요.</div></div><div class="instr-step"><div class="instr-num">2</div><div><strong>구매자 버전</strong>과 <strong>판매자 버전</strong>을 별도로 편집하세요. 구매자는 "테이블에 머무세요"를, 판매자는 "각 시간에 X 테이블로 이동하세요"를 받습니다.</div></div></div>
+      <div class="instr-section"><h3>6단계 — 일정 전송</h3><div class="instr-step"><div class="instr-num">1</div><div>상단 바에서 <strong>Connect Gmail</strong>을 클릭하고 Google 계정으로 승인하세요.</div></div><div class="instr-step"><div class="instr-num">2</div><div>업로드한 파일에서 이메일 및 이름 열을 선택하세요.</div></div><div class="instr-step"><div class="instr-num">3</div><div>미리보기를 생성하고(구매자 2명 + 판매자 1명), 승인하여 일괄 전송을 잠금 해제하세요.</div></div><div class="instr-step"><div class="instr-num">4</div><div><strong>모든 일정 전송</strong>을 클릭하세요. 각 참가자가 Gmail에서 맞춤형 일정을 받습니다. 도구는 50개마다 자동으로 일시 중지됩니다.</div></div></div>
+    </div>
+    <div id="lang-pt" style="display:none">
+      <div class="infobox ii" style="flex-direction:column;align-items:flex-start;gap:6px"><div><strong>ℹ️ O que é o How2Match?</strong></div><div>Uma ferramenta de matchmaking B2B para feiras e eventos de negócios. Conecta <strong>compradores convidados</strong> (empresas compradoras que participam por convite) com <strong>expositores / vendedores</strong> (empresas com stand na feira) com base em critérios que você define. Gera uma agenda de reuniões otimizada e envia a cada participante a sua agenda personalizada por e-mail. Compradores e vendedores são chamados conjuntamente de <strong>participantes</strong>.</div></div>
+      <div class="infobox iw">⚠️ <strong>Limite de envio Gmail:</strong> O Google permite até 100 e-mails por hora. Para eventos com mais de 100 participantes, a ferramenta faz pausas automáticas a cada 50 e-mails. Não feche o browser durante o envio.</div>
+      <div class="instr-section"><h3>Passo 1 — Configuração do evento</h3><div class="instr-step"><div class="instr-num">1</div><div>Insira o nome do evento, organizador e datas.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Configure as <strong>mesas disponíveis</strong> (espaços físicos de reunião na feira), o <strong>mínimo de reuniões</strong> (os compradores geralmente têm um compromisso mínimo; os vendedores precisam de um mínimo para justificar a participação) e o <strong>máximo</strong>.</div></div><div class="instr-step"><div class="instr-num">3</div><div>Use o <strong>gerador de slots</strong> para criar horários por dia. Defina data, hora de início, hora de fim e pausa entre reuniões. Repita para blocos da tarde ou outros dias. Use <strong>Adicionar pausa</strong> para inserir almoço ou intervalos.</div></div></div>
+      <div class="instr-section"><h3>Passo 2 — Dados dos participantes</h3><div class="instr-step"><div class="instr-num">1</div><div>Baixe os templates de <strong>Compradores</strong> e <strong>Vendedores</strong>. Preencha uma linha por empresa.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Os valores nas colunas de matching devem ser separados por vírgulas. Exemplo: <em>Espanha, França, Portugal</em>. A ortografia deve ser consistente nos dois ficheiros.</div></div><div class="instr-step"><div class="instr-num">3</div><div>Carregue cada ficheiro. A ferramenta deteta automaticamente os cabeçalhos das colunas.</div></div></div>
+      <div class="instr-section"><h3>Passo 3 — Regras de matching</h3><div class="instr-step"><div class="instr-num">1</div><div>Mapeie colunas de compradores com colunas de vendedores. Exemplo: "Região de interesse" ↔ "Região de interesse".</div></div><div class="instr-step"><div class="instr-num">2</div><div><strong>Obrigatório:</strong> devem partilhar pelo menos um valor — se não, sem reunião. <strong>Preferível:</strong> melhora o score quando há sobreposição, mas não bloqueia o match.</div></div><div class="instr-step"><div class="instr-num">3</div><div>⚠️ Evite intervalos numéricos (ex. "€50.000–200.000") como critério Obrigatório — a correspondência exata de texto é muito improvável. Use-os como Preferível ou ative o Gemini AI.</div></div><div class="instr-step"><div class="instr-num">4</div><div>Ative o <strong>Gemini AI</strong> se os seus dados tiverem variações ortográficas ou semânticas — "Maçãs" ≈ "Fruta fresca" ≈ "Apples".</div></div><div class="instr-step"><div class="instr-num">5</div><div>Clique em <strong>Gerar matches</strong>.</div></div></div>
+      <div class="instr-section"><h3>Passo 4 — Rever a agenda</h3><div class="instr-step"><div class="instr-num">1</div><div>Revise a agenda macro. Passe o mouse sobre qualquer célula para ver <strong>por que</strong> esse par coincidiu.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Os participantes abaixo do mínimo aparecem no separador <strong>Sem match</strong>.</div></div><div class="instr-step"><div class="instr-num">3</div><div>Em <strong>Mesas</strong>, atribua o número de mesa fixo a cada comprador. Os compradores ficam na mesa — os vendedores circulam entre mesas.</div></div><div class="instr-step"><div class="instr-num">4</div><div>Verifique o separador <strong>Integridade</strong> para confirmar que não há conflitos.</div></div></div>
+      <div class="instr-section"><h3>Passo 5 — Template da agenda</h3><div class="instr-step"><div class="instr-num">1</div><div>Carregue a imagem de cabeçalho do evento.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Edite separadamente a versão de <strong>Compradores</strong> e de <strong>Vendedores</strong>. Os compradores veem "fique na sua mesa". Os vendedores veem "vá para a mesa X em cada horário".</div></div></div>
+      <div class="instr-section"><h3>Passo 6 — Enviar agendas</h3><div class="instr-step"><div class="instr-num">1</div><div>Clique em <strong>Connect Gmail</strong> na barra superior e autorize com a sua conta Google.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Selecione as colunas de e-mail e nome de cada ficheiro.</div></div><div class="instr-step"><div class="instr-num">3</div><div>Gere uma pré-visualização (2 compradores + 1 vendedor), aprove e desbloqueie o envio em massa.</div></div><div class="instr-step"><div class="instr-num">4</div><div>Clique em <strong>Enviar todas as agendas</strong>. Cada participante recebe a sua agenda personalizada a partir do seu Gmail. A ferramenta pausa automaticamente a cada 50 e-mails.</div></div></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+<div id="toast-area"></div>
+
+<script>
+var S={
+  slots:[],buyers:{h:[],d:[]},sellers:{h:[],d:[]},
+  rules:[],sched:null,matches:[],matchReasons:{},noMatch:[],desks:{},
+  headerImgData:null,step:0,aiOn:false,testApproved:false,tplTab:'buyer',
+  gmailToken:null,gmailUser:null
+};
+var HEADERS=['Company name','Contact name','Email','Language(s)','Region of interest','Criterion 1','Criterion 2','Criterion 3','Criterion 4','Criterion 5'];
+
+// ── GMAIL OAUTH ──
+function connectGmail(){
+  var client=google.accounts.oauth2.initTokenClient({
+    client_id:CONFIG.GMAIL_CLIENT_ID,
+    scope:CONFIG.GMAIL_SCOPES,
+    callback:function(resp){
+      if(resp.error){toast('Gmail auth failed: '+resp.error,'err');return;}
+      S.gmailToken=resp.access_token;
+      fetchGmailUser();
+    }
+  });
+  client.requestAccessToken();
+}
+function fetchGmailUser(){
+  fetch('https://www.googleapis.com/gmail/v1/users/me/profile',{headers:{Authorization:'Bearer '+S.gmailToken}})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var email=d.emailAddress||d.email||'connected';
+      S.gmailUser=email;
+      document.getElementById('gmail-label').textContent='Gmail: '+email;
+      document.getElementById('gmail-dot').classList.add('on');
+      document.getElementById('gmail-status').classList.add('connected');
+      document.getElementById('gmail-connect-prompt').style.display='none';
+      toast('Gmail connected: '+email,'ok');
+    })
+    .catch(function(e){
+      // Try userinfo endpoint as fallback
+      fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+S.gmailToken}})
+        .then(function(r){return r.json();})
+        .then(function(d){
+          var email=d.email||'connected';
+          S.gmailUser=email;
+          document.getElementById('gmail-label').textContent='Gmail: '+email;
+          document.getElementById('gmail-dot').classList.add('on');
+          document.getElementById('gmail-status').classList.add('connected');
+          document.getElementById('gmail-connect-prompt').style.display='none';
+          toast('Gmail connected: '+email,'ok');
+        })
+        .catch(function(){
+          S.gmailUser='connected';
+          document.getElementById('gmail-label').textContent='Gmail: connected';
+          document.getElementById('gmail-dot').classList.add('on');
+          document.getElementById('gmail-status').classList.add('connected');
+          document.getElementById('gmail-connect-prompt').style.display='none';
+          toast('Gmail connected','ok');
+        });
+    });
+}
+function sendGmailMessage(to,subject,body){
+  // Encode subject properly to handle special chars like — € etc
+  var encodedSubject='=?UTF-8?B?'+btoa(unescape(encodeURIComponent(subject)))+'?=';
+  var msg='To: '+to+'\r\nSubject: '+encodedSubject+'\r\nContent-Type: text/html; charset=utf-8\r\n\r\n'+body;
+  var encoded=btoa(unescape(encodeURIComponent(msg))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  return fetch('https://www.googleapis.com/gmail/v1/users/me/messages/send',{
+    method:'POST',
+    headers:{Authorization:'Bearer '+S.gmailToken,'Content-Type':'application/json'},
+    body:JSON.stringify({raw:encoded})
+  });
+}
+
+// ── GEMINI AI MATCHING — BATCH ──
+async function geminiBatchMatch(pairs){
+  // pairs = [{buyerVals:[], sellerVals:[], idx:n}]
+  try{
+    var prompt='You are a B2B trade fair matchmaking assistant. For each pair below, determine if the buyer and seller have compatible business interests that could lead to a productive meeting. Consider semantic equivalence across languages (e.g. "Manzanas"="Apples", "Frutas frescas"="Fresh fruit", "Bio"="Organic", "Supermercados"="Supermarkets").\n\nAnswer with a JSON array of booleans, one per pair, in order. Example: [true,false,true]\n\nPairs:\n';
+    pairs.forEach(function(p,i){
+      prompt+=(i+1)+'. Buyer: '+p.buyerVals.join(', ')+' | Seller: '+p.sellerVals.join(', ')+'\n';
+    });
+    var resp=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+CONFIG.GEMINI_API_KEY,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0}})
+    });
+    var data=await resp.json();
+    var text=data.candidates[0].content.parts[0].text.trim();
+    var match=text.match(/\[[\s\S]*?\]/);
+    if(match){
+      var results=JSON.parse(match[0]);
+      return results;
+    }
+    return pairs.map(function(){return false;});
+  }catch(e){
+    console.error('Gemini batch error:',e);
+    return pairs.map(function(){return false;});
+  }
+}
+
+// ── NAV ──
+function goStep(n){
+  S.step=n;
+  document.querySelectorAll('.panel').forEach(function(p,i){p.classList.toggle('active',i===n);});
+  document.querySelectorAll('.step').forEach(function(s,i){s.classList.remove('active','done');if(i===n)s.classList.add('active');else if(i<n)s.classList.add('done');});
+  if(n===3)renderSchedule();
+  if(n===5)renderSendStep();
+}
+function updatePill(){document.getElementById('proj-pill').textContent=document.getElementById('ev-name').value||'No project';}
+function toast(msg,type){var a=document.getElementById('toast-area');var t=document.createElement('div');t.className='toast '+(type||'');t.textContent=msg;a.appendChild(t);setTimeout(function(){t.remove();},3500);}
+
+// ── SLOTS ──
+function genSlots(){
+  var date=document.getElementById('sg-date').value;
+  var from=document.getElementById('sg-from').value;
+  var to=document.getElementById('sg-to').value;
+  var dur=parseInt(document.getElementById('ev-dur').value)||20;
+  var brk=parseInt(document.getElementById('sg-break').value)||0;
+  if(!date||!from||!to){toast('Select date and time range','w');return;}
+  var dp=date.split('-');var ds=dp[2]+'/'+dp[1]+'/'+dp[0];
+  var fh=parseInt(from.split(':')[0]),fm=parseInt(from.split(':')[1]);
+  var th=parseInt(to.split(':')[0]),tm=parseInt(to.split(':')[1]);
+  var cur=fh*60+fm,end=th*60+tm,step=dur+brk,added=0;
+  while(cur+dur<=end){
+    var s=Math.floor(cur/60)+':'+(cur%60+'').padStart(2,'0');
+    var e=Math.floor((cur+dur)/60)+':'+((cur+dur)%60+'').padStart(2,'0');
+    var lbl=ds+' '+s+'-'+e;
+    if(!S.slots.includes(lbl)){S.slots.push(lbl);added++;}
+    cur+=step;
+  }
+  renderSlots();toast(added+' slots added','ok');
+}
+function addBreak(){
+  var date=document.getElementById('sg-date').value;
+  if(!date){toast('Select a date first','w');return;}
+  var dp=date.split('-');var ds=dp[2]+'/'+dp[1]+'/'+dp[0];
+  S.slots.push('— Break ('+ds+') —');renderSlots();
+}
+function addSlotManual(){var v=document.getElementById('slot-manual').value.trim();if(!v)return;if(!S.slots.includes(v)){S.slots.push(v);renderSlots();document.getElementById('slot-manual').value='';}}
+function removeSlot(i){S.slots.splice(i,1);renderSlots();}
+function renderSlots(){
+  document.getElementById('slot-list').innerHTML=S.slots.map(function(s,i){var ib=s.startsWith('—');return '<div class="si'+(ib?' brk':'')+'"><span>'+(ib?'☕':'🕐')+'</span><span class="st">'+s+'</span><span class="sdel" onclick="removeSlot('+i+')">×</span></div>';}).join('');
+  document.getElementById('slot-count').textContent='('+S.slots.filter(function(s){return!s.startsWith('—');}).length+' active)';
+}
+
+// ── TEMPLATE ──
+function downloadTemplate(type){
+  var wb=XLSX.utils.book_new();
+  var ws=XLSX.utils.aoa_to_sheet([HEADERS]);
+  ws['!cols']=HEADERS.map(function(){return{wch:24};});
+  XLSX.utils.book_append_sheet(wb,ws,type);
+  XLSX.writeFile(wb,'How2Match_'+type+'_Template.xlsx');
+  toast(type+' template downloaded','ok');
+}
+
+// ── FILE UPLOAD ──
+function triggerUp(type){document.getElementById('file-'+type).click();}
+function loadFile(type,input){
+  var file=input.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var wb=XLSX.read(e.target.result,{type:'binary'});
+    var ws=wb.Sheets[wb.SheetNames[0]];
+    var rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+    if(rows.length<2){toast('File appears empty','w');return;}
+    var headers=rows[0].map(function(h){return h.toString().trim();});
+    var data=rows.slice(1).filter(function(r){return r.some(function(c){return c!=='';});});
+    S[type]={h:headers,d:data};
+    document.getElementById(type+'-area').innerHTML='<div class="fok"><span class="fi">✓</span><div><div class="fn">'+file.name+'</div><div class="fm">'+data.length+' rows · '+headers.length+' cols</div></div><span class="fx" onclick="resetUpload(\''+type+'\')">×</span></div>';
+    checkBothLoaded();
+  };
+  reader.readAsBinaryString(file);
+}
+function loadHeaderImg(input){
+  var file=input.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    S.headerImgData=e.target.result;
+    document.getElementById('header-area').innerHTML='<div class="fok"><span class="fi">✓</span><div><div class="fn">'+file.name+'</div><div class="fm">Header loaded</div></div><span class="fx" onclick="resetHeader()">×</span></div>';
+    updatePreview();
+  };
+  reader.readAsDataURL(file);
+}
+function resetHeader(){S.headerImgData=null;document.getElementById('header-area').innerHTML='<div class="uzone" onclick="triggerUp(\'header-img\')" style="padding:16px"><span class="ui" style="font-size:20px">🖼</span><p style="font-size:12px">Upload event banner</p><small>PNG/JPG</small></div>';updatePreview();}
+function resetUpload(type){S[type]={h:[],d:[]};document.getElementById(type+'-area').innerHTML='<div class="uzone" onclick="triggerUp(\''+type+'\')"><span class="ui">📂</span><p>Upload '+type+'</p><small>.xlsx or .csv</small></div>';document.getElementById('cols-preview').style.display='none';}
+function checkBothLoaded(){
+  var b=S.buyers.h.length>0,s=S.sellers.h.length>0;
+  if(b||s){
+    document.getElementById('cols-preview').style.display='block';
+    if(b){document.getElementById('b-count').textContent=S.buyers.d.length;document.getElementById('b-cols').innerHTML=S.buyers.h.map(function(h){return '<span class="ctag">'+h+'</span>';}).join('');}
+    if(s){document.getElementById('s-count').textContent=S.sellers.d.length;document.getElementById('s-cols').innerHTML=S.sellers.h.map(function(h){return '<span class="ctag">'+h+'</span>';}).join('');}
+    if(b&&s&&S.rules.length===0){S.rules=[{bc:'',sc:'',type:'required'}];renderRules();}
+  }
+}
+
+// ── RULES ──
+function addRule(){S.rules.push({bc:'',sc:'',type:'required'});renderRules();}
+function removeRule(i){S.rules.splice(i,1);renderRules();}
+function updateRule(i,k,v){S.rules[i][k]=v;if(k==='type')renderRules();}
+function renderRules(){
+  var bh=S.buyers.h,sh=S.sellers.h;
+  var el=document.getElementById('rules-container');
+  if(!bh.length&&!sh.length){el.innerHTML='<div class="infobox iw">⚠ Upload files first.</div>';return;}
+  el.innerHTML=S.rules.map(function(r,i){
+    var bo=bh.map(function(h){return '<option value="'+h+'"'+(h===r.bc?' selected':'')+'>'+h+'</option>';}).join('');
+    var so=sh.map(function(h){return '<option value="'+h+'"'+(h===r.sc?' selected':'')+'>'+h+'</option>';}).join('');
+    return '<div class="rule-row"><span class="rbadge '+(r.type==='required'?'rb-req':'rb-pref')+'">'+(r.type==='required'?'REQUIRED':'PREFERRED')+'</span>'+
+      '<select onchange="updateRule('+i+',\'bc\',this.value)"><option value="">— buyer column —</option>'+bo+'</select>'+
+      '<span style="color:var(--char40)">↔</span>'+
+      '<select onchange="updateRule('+i+',\'sc\',this.value)"><option value="">— seller column —</option>'+so+'</select>'+
+      '<select style="width:130px;font-size:11px" onchange="updateRule('+i+',\'type\',this.value)">'+
+        '<option value="required"'+(r.type==='required'?' selected':'')+'>Required (blocks)</option>'+
+        '<option value="preferred"'+(r.type==='preferred'?' selected':'')+'>Preferred (+score)</option>'+
+      '</select>'+
+      '<span class="sdel" onclick="removeRule('+i+')">×</span></div>';
+  }).join('');
+}
+
+// ── MATCHING ──
+function clean(t){return t.toString().replace(/\u200B/g,'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();}
+function getVals(row,headers,col){var idx=headers.indexOf(col);if(idx<0)return[];var raw=row[idx]?row[idx].toString():'';return raw.split(',').map(function(p){return clean(p);}).filter(Boolean);}
+function overlap(av,bv){return av.filter(function(a){return bv.some(function(b){return a===b||a.includes(b)||b.includes(a);});});}
+
+async function runMatch(){
+  var reqRules=S.rules.filter(function(r){return r.bc&&r.sc&&r.type==='required';});
+  var prefRules=S.rules.filter(function(r){return r.bc&&r.sc&&r.type==='preferred';});
+  if(!reqRules.length&&!prefRules.length){toast('Define at least one rule','w');return;}
+  if(!S.buyers.d.length||!S.sellers.d.length){toast('Upload both files first','w');return;}
+
+  var matchBtn=document.querySelector('.btn.bn[onclick="runMatch()"]');
+  if(matchBtn){matchBtn.disabled=true;matchBtn.textContent='⏳ Processing...';}
+
+  var matches=[],reasons={};
+  var BATCH_SIZE=25;
+
+  if(S.aiOn){
+    // ── BATCH GEMINI MODE ──
+    document.getElementById('ai-progress').style.display='block';
+    var progressBar=document.getElementById('ai-pbar');
+    var progressText=document.getElementById('ai-prog-text');
+
+    // Build all pairs that need AI evaluation (those with no exact match on required rules)
+    var allPairs=[];
+    for(var bi=0;bi<S.buyers.d.length;bi++){
+      for(var si=0;si<S.sellers.d.length;si++){
+        allPairs.push({bi:bi,si:si});
+      }
+    }
+    var total=allPairs.length;
+    var aiResults={};
+
+    // Process required rules with batching
+    for(var ri=0;ri<reqRules.length;ri++){
+      var rule=reqRules[ri];
+      var pairsNeedingAI=[];
+      // First pass: find pairs with no exact match
+      allPairs.forEach(function(p){
+        var br=S.buyers.d[p.bi],sr=S.sellers.d[p.si];
+        var bv=getVals(br,S.buyers.h,rule.bc);
+        var sv=getVals(sr,S.sellers.h,rule.sc);
+        var ov=overlap(bv,sv);
+        var key=p.bi+'_'+p.si+'_'+ri;
+        if(ov.length>0){aiResults[key]='exact';}
+        else if(bv.length&&sv.length){pairsNeedingAI.push({bi:p.bi,si:p.si,ri:ri,buyerVals:bv,sellerVals:sv,key:key});}
+        else{aiResults[key]='no';}
+      });
+
+      // Batch process pairs needing AI
+      for(var b=0;b<pairsNeedingAI.length;b+=BATCH_SIZE){
+        var batch=pairsNeedingAI.slice(b,b+BATCH_SIZE);
+        var processed=b+batch.length;
+        var pct=Math.round(100*processed/Math.max(pairsNeedingAI.length,1));
+        progressBar.style.width=pct+'%';
+        progressText.textContent='Rule "'+(rule.bc)+'" — AI checking '+processed+' of '+pairsNeedingAI.length+' pairs...';
+        var results=await geminiBatchMatch(batch);
+        batch.forEach(function(p,idx){aiResults[p.key]=results[idx]?'ai-yes':'no';});
+        // Small pause to respect rate limits
+        if(b+BATCH_SIZE<pairsNeedingAI.length){await new Promise(function(r){setTimeout(r,1000);});}
+      }
+    }
+
+    progressText.textContent='Building matches...';
+
+    // Build final matches using AI results
+    for(var bi=0;bi<S.buyers.d.length;bi++){
+      for(var si=0;si<S.sellers.d.length;si++){
+        var br=S.buyers.d[bi],sr=S.sellers.d[si];
+        var matchedRules=[],ok=true;
+        for(var ri=0;ri<reqRules.length;ri++){
+          var rule=reqRules[ri];
+          var key=bi+'_'+si+'_'+ri;
+          var result=aiResults[key];
+          var bv=getVals(br,S.buyers.h,rule.bc);
+          var sv=getVals(sr,S.sellers.h,rule.sc);
+          if(result==='exact'){var ov=overlap(bv,sv);matchedRules.push({col:rule.bc+'↔'+rule.sc,vals:ov,type:'required'});}
+          else if(result==='ai-yes'){matchedRules.push({col:rule.bc+'↔'+rule.sc,vals:['🤖 AI: semantic match'],type:'required'});}
+          else{ok=false;break;}
+        }
+        if(!ok)continue;
+        var score=0;
+        for(var ri=0;ri<prefRules.length;ri++){
+          var rule=prefRules[ri];
+          var bv=getVals(br,S.buyers.h,rule.bc);
+          var sv=getVals(sr,S.sellers.h,rule.sc);
+          var ov=overlap(bv,sv);
+          if(ov.length>0){score++;matchedRules.push({col:rule.bc+'↔'+rule.sc,vals:ov,type:'preferred'});}
+        }
+        var bco=getColVal(br,S.buyers.h,'Company name');
+        var bn=getColVal(br,S.buyers.h,'Contact name');
+        var sco=getColVal(sr,S.sellers.h,'Company name');
+        var sn=getColVal(sr,S.sellers.h,'Contact name');
+        matches.push({buyer:bn,buyerCo:bco,seller:sn,sellerCo:sco,score:score,buyerRow:br,sellerRow:sr});
+        reasons[bco+'||'+sco]=matchedRules;
+      }
+    }
+    progressBar.style.width='100%';
+    progressText.textContent='✓ Done! '+matches.length+' matches found.';
+    setTimeout(function(){document.getElementById('ai-progress').style.display='none';},3000);
+
+  } else {
+    // ── EXACT MATCH MODE (no AI) ──
+    for(var bi=0;bi<S.buyers.d.length;bi++){
+      var br=S.buyers.d[bi];
+      for(var si=0;si<S.sellers.d.length;si++){
+        var sr=S.sellers.d[si];
+        var matchedRules=[],ok=true;
+        for(var ri=0;ri<reqRules.length;ri++){
+          var rule=reqRules[ri];
+          var bv=getVals(br,S.buyers.h,rule.bc);
+          var sv=getVals(sr,S.sellers.h,rule.sc);
+          var ov=overlap(bv,sv);
+          if(ov.length>0){matchedRules.push({col:rule.bc+'↔'+rule.sc,vals:ov,type:'required'});}
+          else{ok=false;break;}
+        }
+        if(!ok)continue;
+        var score=0;
+        for(var ri=0;ri<prefRules.length;ri++){
+          var rule=prefRules[ri];
+          var bv=getVals(br,S.buyers.h,rule.bc);
+          var sv=getVals(sr,S.sellers.h,rule.sc);
+          var ov=overlap(bv,sv);
+          if(ov.length>0){score++;matchedRules.push({col:rule.bc+'↔'+rule.sc,vals:ov,type:'preferred'});}
+        }
+        var bco=getColVal(br,S.buyers.h,'Company name');
+        var bn=getColVal(br,S.buyers.h,'Contact name');
+        var sco=getColVal(sr,S.sellers.h,'Company name');
+        var sn=getColVal(sr,S.sellers.h,'Contact name');
+        matches.push({buyer:bn,buyerCo:bco,seller:sn,sellerCo:sco,score:score,buyerRow:br,sellerRow:sr});
+        reasons[bco+'||'+sco]=matchedRules;
+      }
+    }
+  }
+
+  matches.sort(function(a,b){return b.score-a.score;});
+  S.matches=matches;S.matchReasons=reasons;
+  if(matchBtn){matchBtn.disabled=false;matchBtn.textContent='⚡ Generate matches →';}
+  buildSchedule();
+  goStep(3);
+  toast(matches.length+' matches found','ok');
+}
+function getColVal(row,headers,col){var idx=headers.indexOf(col);return idx>=0&&row[idx]?row[idx].toString().trim():row[0]?row[0].toString().trim():'';}
+
+// ── SCHEDULING ──
+function buildSchedule(){
+  var slots=S.slots.filter(function(s){return!s.startsWith('—');});
+  var tables=parseInt(document.getElementById('ev-tables').value)||10;
+  var maxM=parseInt(document.getElementById('ev-max').value)||99;
+  var minM=parseInt(document.getElementById('ev-min').value)||0;
+  var deskMode=document.getElementById('ev-desk-mode').value;
+  var grouping={},vendorCount={};
+  S.matches.forEach(function(m){
+    var bc=m.buyerCo||m.buyer,sc=m.sellerCo||m.seller;
+    if(!grouping[bc])grouping[bc]=[];
+    if(grouping[bc].indexOf(sc)<0)grouping[bc].push(sc);
+    vendorCount[sc]=(vendorCount[sc]||0)+1;
+  });
+  var buyers=Object.keys(grouping);
+  buyers.forEach(function(b){grouping[b].sort(function(a,c){return(vendorCount[a]||0)-(vendorCount[c]||0);});});
+  var schedule={};buyers.forEach(function(b){schedule[b]=new Array(slots.length).fill('');});
+  var candidates={};buyers.forEach(function(b){candidates[b]=grouping[b].slice(0,maxM);});
+  var vendorAvail=slots.map(function(){return{};});
+  var tableUsage=slots.map(function(){return 0;});
+  var buyerCount={};buyers.forEach(function(b){buyerCount[b]=0;});
+  var vendorMtgs={};
+  for(var s=0;s<slots.length;s++){
+    buyers.forEach(function(buyer){
+      if(buyerCount[buyer]>=maxM)return;
+      if(candidates[buyer].length>0&&tableUsage[s]<tables){
+        for(var k=0;k<candidates[buyer].length;k++){
+          var v=candidates[buyer][k];
+          if(!vendorAvail[s][v]&&(vendorMtgs[v]||0)<maxM){
+            schedule[buyer][s]=v;vendorAvail[s][v]=true;tableUsage[s]++;
+            buyerCount[buyer]++;vendorMtgs[v]=(vendorMtgs[v]||0)+1;
+            candidates[buyer].splice(k,1);break;
+          }
+        }
+      }
+    });
+  }
+  var noMatch=[];
+  buyers.forEach(function(b){if(buyerCount[b]<minM)noMatch.push({name:b,type:'Buyer',count:buyerCount[b],min:minM});});
+  Object.keys(vendorCount).forEach(function(v){if((vendorMtgs[v]||0)<minM)noMatch.push({name:v,type:'Seller',count:vendorMtgs[v]||0,min:minM});});
+  if(deskMode==='fixed'){var di=1;buyers.forEach(function(b){if(!S.desks[b])S.desks[b]=di++;});}
+  S.sched={buyers:buyers,slots:slots,grid:schedule};S.noMatch=noMatch;
+}
+
+// ── TOOLTIP ──
+var ttEl=document.getElementById('tooltip');
+document.addEventListener('mousemove',function(e){if(ttEl.style.display==='block'){ttEl.style.left=(e.clientX+14)+'px';ttEl.style.top=(e.clientY-10)+'px';}});
+function showTT(buyer,seller,e){
+  var key=buyer+'||'+seller;
+  var reasons=S.matchReasons[key]||[];
+  var html='<div class="tt-title">'+buyer.substring(0,30)+' × '+seller.substring(0,30)+'</div>';
+  if(!reasons.length){html+='<div>No detail available.</div>';}
+  reasons.forEach(function(r){html+='<div class="tt-row"><span>'+(r.type==='required'?'✅':'⭐')+'</span><div><strong>'+r.col+'</strong><br><span style="color:var(--blue40)">'+r.vals.join(', ')+'</span></div></div>';});
+  ttEl.innerHTML=html;ttEl.style.display='block';
+  ttEl.style.left=(e.clientX+14)+'px';ttEl.style.top=(e.clientY-10)+'px';
+}
+function hideTT(){ttEl.style.display='none';}
+
+// ── RENDER SCHEDULE ──
+function renderSchedule(){
+  if(!S.sched){document.getElementById('metrics').innerHTML='<div class="infobox ii" style="grid-column:1/-1">ℹ Run matching first.</div>';return;}
+  var sc=S.sched;
+  var total=0;sc.buyers.forEach(function(b){sc.slots.forEach(function(sl,i){if(sc.grid[b][i])total++;});});
+  var cov=sc.buyers.length?Math.round(100*sc.buyers.filter(function(b){return sc.slots.some(function(sl,i){return sc.grid[b][i];});}).length/sc.buyers.length):0;
+  document.getElementById('metrics').innerHTML=
+    '<div class="metric"><div class="v">'+total+'</div><div class="l">meetings assigned</div></div>'+
+    '<div class="metric"><div class="v">'+S.matches.length+'</div><div class="l">total matches</div></div>'+
+    '<div class="metric"><div class="v">'+sc.buyers.length+'</div><div class="l">active buyers</div></div>'+
+    '<div class="metric"><div class="v">'+cov+'%</div><div class="l">buyer coverage</div></div>';
+  var maxCols=Math.min(sc.buyers.length,7);var vis=sc.buyers.slice(0,maxCols);
+  var allRows=S.slots; // includes breaks
+  var html='<thead><tr><th style="width:135px">Slot</th>'+vis.map(function(b){return '<th title="'+b+'">'+b.substring(0,12)+(b.length>12?'…':'')+'</th>';}).join('')+'</tr></thead><tbody>';
+  var activeIdx=0;
+  allRows.forEach(function(row){
+    var isBreak=row.startsWith('—');
+    if(isBreak){
+      html+='<tr><td colspan="'+(vis.length+1)+'" style="background:#e8e8e8;color:var(--char60);font-size:10px;font-style:italic;padding:5px 8px;text-align:center;font-weight:700;letter-spacing:.05em">'+row+'</td></tr>';
+    } else {
+      var i=activeIdx++;
+      html+='<tr><td class="slbl">'+row+'</td>';
+      vis.forEach(function(b){
+        var v=sc.grid[b]&&sc.grid[b][i];
+        if(v){html+='<td class="hit" onmouseenter="showTT(\''+b.replace(/'/g,"\\'").replace(/"/g,'&quot;')+'\',\''+v.replace(/'/g,"\\'").replace(/"/g,'&quot;')+'\',event)" onmouseleave="hideTT()">'+v.substring(0,12)+(v.length>12?'…':'')+'</td>';}
+        else{html+='<td class="miss">—</td>';}
+      });
+      html+='</tr>';
+    }
+  });
+  document.getElementById('agenda-tbl').innerHTML=html+'</tbody>';
+  document.getElementById('macro-note').innerHTML=sc.buyers.length>maxCols?'<div style="font-size:10px;color:var(--char60);margin-top:5px">Showing '+maxCols+' of '+sc.buyers.length+' buyers. Export CSV for full view.</div>':'';
+  var deskHtml='<div class="infobox ii">ℹ Buyers keep their desk — sellers move to the buyer desk.</div>';
+  sc.buyers.forEach(function(b,bi){deskHtml+='<div class="send-row"><span style="flex:1;font-weight:700">'+b+'</span><span style="color:var(--char60);font-size:11px">Fixed desk:</span><input class="desk-in" type="number" min="1" value="'+(S.desks[b]||1)+'" onchange="updateDesk('+bi+',this.value)"></div>';});
+  document.getElementById('tab-desks').innerHTML=deskHtml;
+  window._buyerDeskMap=sc.buyers;
+  document.getElementById('tab-nm').innerHTML=S.noMatch.length?'<div class="infobox iw">⚠ '+S.noMatch.length+' below minimum.</div>'+S.noMatch.map(function(n){return '<div class="nm-item"><span class="badge '+(n.type==='Buyer'?'bb':'bbs')+'">'+n.type+'</span>'+n.name+' <span style="font-size:10px;color:var(--char60)">('+n.count+'/min '+n.min+')</span></div>';}).join(''):'<div class="infobox io">✓ All participants meet minimum requirements.</div>';
+  var errs=checkIntegrity();
+  document.getElementById('tab-int').innerHTML=errs.length?errs.map(function(e){return '<div class="infobox ie">⚠ '+e+'</div>';}).join(''):'<div class="infobox io">✓ No conflicts. Schedule valid.</div>';
+}
+function showTab(n,el){['tab-macro','tab-desks','tab-nm','tab-int'].forEach(function(t){document.getElementById(t).style.display='none';});document.getElementById('tab-'+n).style.display='block';document.querySelectorAll('.tab-bar .tab').forEach(function(t){t.classList.remove('active');});el.classList.add('active');}
+function checkIntegrity(){
+  if(!S.sched)return[];var sc=S.sched,errs=[];
+  sc.slots.forEach(function(slot,s){var seen={};sc.buyers.forEach(function(b){var v=sc.grid[b][s];if(v){if(seen[v])errs.push('Slot '+slot+': "'+v+'" double-booked.');else seen[v]=true;}});});
+  sc.buyers.forEach(function(b){var seen={};sc.slots.forEach(function(sl,s){var v=sc.grid[b][s];if(v){if(seen[v])errs.push('"'+b+'": "'+v+'" appears twice.');else seen[v]=true;}});});
+  return errs;
+}
+function updateDesk(idx,val){var b=window._buyerDeskMap&&window._buyerDeskMap[idx];if(b)S.desks[b]=val;}
+function exportCSV(){
+  if(!S.sched)return;
+  var sc=S.sched;
+  var rows=[['Slot'].concat(sc.buyers)];
+  sc.slots.forEach(function(slot,i){rows.push([slot].concat(sc.buyers.map(function(b){return sc.grid[b][i]||'';})));});
+  var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='schedule.csv';a.click();
+  toast('CSV exported','ok');
+}
+
+// ── TEMPLATE PREVIEW ──
+function switchTpl(tab){
+  S.tplTab=tab;
+  document.getElementById('tpl-b').style.display=tab==='buyer'?'block':'none';
+  document.getElementById('tpl-s').style.display=tab==='seller'?'block':'none';
+  document.getElementById('tplt-b').classList.toggle('active',tab==='buyer');
+  document.getElementById('tplt-s').classList.toggle('active',tab==='seller');
+  document.getElementById('prev-label').textContent=tab==='buyer'?'Buyer agenda':'Seller agenda';
+  updatePreview();
+}
+function updatePreview(){
+  var isBuyer=S.tplTab==='buyer';
+  var title=(isBuyer?document.getElementById('ttl-b').value:document.getElementById('ttl-s').value)||(isBuyer?'BUSINESS MEETINGS PROGRAMME':'YOUR MEETING SCHEDULE');
+  var intro=(isBuyer?document.getElementById('int-b').value:document.getElementById('int-s').value)||'Introductory text...';
+  document.getElementById('prev-title').textContent=title;
+  document.getElementById('prev-intro').textContent=intro;
+  document.getElementById('prev-img').innerHTML=S.headerImgData?'<img src="'+S.headerImgData+'">':'<span style="font-size:20px;color:var(--char40)">🖼</span>';
+  var cd=document.getElementById('col-date').value;
+  var ct=document.getElementById('col-thead').value;
+  var cols=[];
+  if(document.getElementById('col-time').checked)cols.push('TIME');
+  if(document.getElementById('col-company').checked)cols.push('COMPANY');
+  if(document.getElementById('col-contact').checked)cols.push('CONTACT NAME');
+  if(document.getElementById('col-desk').checked)cols.push('DESK');
+  document.getElementById('prev-thead').innerHTML=cols.map(function(c){return '<th style="background:'+ct+';color:white;padding:3px 7px;font-size:10px">'+c+'</th>';}).join('');
+  var tbody='',lastDate='';
+  var samples=[{slot:'25/03/2025 11:40-12:00',co:'Sample Company A',desk:1},{slot:'25/03/2025 12:00-12:20',co:'Sample Company B',desk:1},{slot:'25/03/2025 14:00-14:20',co:'Sample Company C',desk:isBuyer?1:3}];
+  if(S.sched&&S.sched.buyers.length>0){
+    var b=S.sched.buyers[0];samples=[];
+    S.sched.slots.slice(0,4).forEach(function(slot,i){var v=S.sched.grid[b][i];if(v)samples.push({slot:slot,co:v,desk:S.desks[b]||1});});
+  }
+  samples.forEach(function(r){
+    var dp=r.slot.split(' ')[0]||'';var tp=r.slot.split(' ')[1]||r.slot;
+    if(dp!==lastDate){tbody+='<tr><td colspan="'+cols.length+'" class="apdate" style="background:'+cd+';color:white">'+dp+'</td></tr>';lastDate=dp;}
+    var row='<tr>';
+    if(document.getElementById('col-time').checked)row+='<td style="padding:3px 7px;font-size:10px">'+tp+'</td>';
+    if(document.getElementById('col-company').checked)row+='<td style="padding:3px 7px;font-size:10px">'+r.co+'</td>';
+    if(document.getElementById('col-contact').checked)row+='<td style="padding:3px 7px;font-size:10px">Contact</td>';
+    if(document.getElementById('col-desk').checked)row+='<td style="padding:3px 7px;font-size:10px;text-align:center;font-weight:700;color:#094172">'+(isBuyer?'Desk '+r.desk:'→ '+r.desk)+'</td>';
+    tbody+=row+'</tr>';
+  });
+  document.getElementById('prev-tbody').innerHTML=tbody;
+}
+
+// ── TEST RUN ──
+function generateTestRun(){
+  if(!S.sched){toast('Generate schedule first','w');return;}
+  var sc=S.sched;
+  var participants=[];
+  sc.buyers.slice(0,2).forEach(function(b){
+    var meetings=[];
+    sc.slots.forEach(function(slot,i){var v=sc.grid[b][i];if(v)meetings.push({slot:slot,co:v,desk:S.desks[b]||1});});
+    participants.push({name:b,type:'Buyer',meetings:meetings});
+  });
+  var sellerMtgs={};
+  sc.slots.forEach(function(slot,i){sc.buyers.forEach(function(b){var v=sc.grid[b][i];if(v){if(!sellerMtgs[v])sellerMtgs[v]=[];sellerMtgs[v].push({slot:slot,co:b,desk:S.desks[b]||1});}});});
+  var fs=Object.keys(sellerMtgs)[0];
+  if(fs)participants.push({name:fs,type:'Seller',meetings:sellerMtgs[fs].slice(0,5)});
+  document.getElementById('testrun-content').innerHTML=participants.map(function(p){
+    var isBuyer=p.type==='Buyer';
+    var rows=p.meetings.slice(0,5).map(function(m){
+      var key=isBuyer?p.name+'||'+m.co:m.co+'||'+p.name;
+      var reasons=(S.matchReasons[key]||[]).map(function(r){return r.vals.join(', ');}).join(' · ');
+      return '<div class="mr"><span class="mr-time">'+m.slot+'</span><div style="flex:1"><div class="mr-co">'+m.co+'</div>'+(reasons?'<div class="mr-reason">'+reasons+'</div>':'')+'</div><span class="mr-desk">'+(isBuyer?'Desk '+m.desk:'→ Desk '+m.desk)+'</span></div>';
+    }).join('');
+    return '<div class="pc"><div class="pc-type">'+p.type+'</div><div class="pc-name">'+p.name+'</div>'+(p.meetings.length?rows:'<div style="font-size:11px;color:var(--char60)">No meetings assigned.</div>')+'</div>';
+  }).join('');
+  document.getElementById('approve-btn').style.display='inline-flex';
+  toast('Preview generated — review and approve','ok');
+}
+function approveRun(){
+  S.testApproved=true;
+  var btn=document.getElementById('send-all-btn');
+  btn.disabled=false;btn.textContent='📤 Send all agendas';
+  document.getElementById('approve-btn').textContent='✓ Approved';
+  document.getElementById('approve-btn').disabled=true;
+  toast('Approved — send unlocked','ok');
+}
+
+// ── SEND ──
+function renderSendStep(){
+  var bh=S.buyers.h,sh=S.sellers.h;
+  ['ecol-b','ncol-b'].forEach(function(id){document.getElementById(id).innerHTML='<option value="">— select —</option>'+bh.map(function(h){return '<option>'+h+'</option>';}).join('');});
+  ['ecol-s','ncol-s'].forEach(function(id){document.getElementById(id).innerHTML='<option value="">— select —</option>'+sh.map(function(h){return '<option>'+h+'</option>';}).join('');});
+  bh.forEach(function(h){if(/email/i.test(h))document.getElementById('ecol-b').value=h;if(/contact.?name/i.test(h))document.getElementById('ncol-b').value=h;});
+  sh.forEach(function(h){if(/email/i.test(h))document.getElementById('ecol-s').value=h;if(/contact.?name/i.test(h))document.getElementById('ncol-s').value=h;});
+  if(S.gmailToken)document.getElementById('gmail-connect-prompt').style.display='none';
+  updateEmailPreview();
+}
+function updateEmailPreview(){
+  var body=document.getElementById('email-body').value;
+  var ev=document.getElementById('ev-name').value||'the event';
+  document.getElementById('email-preview').innerHTML=(body.replace(/\{\{name\}\}/g,'[Name]').replace(/\{\{company\}\}/g,'[Company]').replace(/\{\{event\}\}/g,ev).replace(/\{\{n_meetings\}\}/g,'5').replace(/\{\{agenda_table\}\}/g,'[Agenda table]')).replace(/\n/g,'<br>');
+}
+function insertVar(v){var ta=document.getElementById('email-body');var pos=ta.selectionStart;ta.value=ta.value.substring(0,pos)+v+ta.value.substring(pos);updateEmailPreview();}
+
+function buildAgendaHTML(participant,meetings,isBuyer){
+  var cd=document.getElementById('col-date').value||'#094172';
+  var ct=document.getElementById('col-thead').value||'#0484d1';
+  var title=(isBuyer?document.getElementById('ttl-b').value:document.getElementById('ttl-s').value)||'MEETING PROGRAMME';
+  var intro=(isBuyer?document.getElementById('int-b').value:document.getElementById('int-s').value)||'';
+  var lastDate='';
+  var rows=meetings.map(function(m){
+    var dp=m.slot.split(' ')[0]||'';var tp=m.slot.split(' ')[1]||m.slot;
+    var dr=dp!==lastDate?'<tr><td colspan="4" style="background:'+cd+';color:white;padding:4px 8px;font-weight:700;font-size:11px">'+dp+'</td></tr>':'';
+    lastDate=dp;
+    return dr+'<tr><td style="padding:4px 8px;font-size:11px">'+tp+'</td><td style="padding:4px 8px;font-size:11px;font-weight:700">'+m.co+'</td><td style="padding:4px 8px;font-size:11px">'+m.contact+'</td><td style="padding:4px 8px;font-size:11px;text-align:center;font-weight:700;color:#094172">'+(isBuyer?'Desk '+m.desk:'→ Desk '+m.desk)+'</td></tr>';
+  }).join('');
+  return '<div style="font-family:Arial,sans-serif;max-width:600px">'+
+    (S.headerImgData?'<img src="'+S.headerImgData+'" style="width:100%;max-height:120px;object-fit:cover">':'')+
+    '<h2 style="text-align:center;padding:10px;font-size:14px;border-bottom:1px solid #eee">'+title+'</h2>'+
+    '<div style="background:#f4f8fb;padding:8px 14px;border-bottom:1px solid #eee;font-size:12px"><strong>'+(isBuyer?'Hosted Buyer':'Exhibitor / Seller')+':</strong> '+participant+' &nbsp;|&nbsp; <strong>'+(isBuyer?'Your desk':'Your schedule')+':</strong> '+(isBuyer?'Desk '+(S.desks[participant]||'—'):'Move to indicated desks')+'</div>'+
+    (intro?'<p style="font-size:11px;font-style:italic;text-align:center;padding:6px 12px;color:#555">'+intro+'</p>':'')+
+    '<table style="width:100%;border-collapse:collapse;font-size:11px">'+
+    '<tr><th style="background:'+ct+';color:white;padding:4px 8px;text-align:left">TIME</th><th style="background:'+ct+';color:white;padding:4px 8px;text-align:left">COMPANY</th><th style="background:'+ct+';color:white;padding:4px 8px;text-align:left">CONTACT</th><th style="background:'+ct+';color:white;padding:4px 8px;text-align:center">DESK</th></tr>'+
+    rows+'</table></div>';
+}
+
+async function sendTestEmailReal(){
+  if(!S.gmailToken){toast('Connect Gmail first','w');return;}
+  if(!S.sched){toast('Generate schedule first','w');return;}
+  var testEmail=document.getElementById('test-email').value.trim();
+  if(!testEmail||!testEmail.includes('@')){toast('Enter a valid email address','w');return;}
+  var status=document.getElementById('test-email-status');
+  status.style.display='block';
+  status.textContent='Sending test emails...';
+  var sc=S.sched;
+  var evName=document.getElementById('ev-name').value||'Test Event';
+  var subject=document.getElementById('email-subj').value.replace(/\{\{event\}\}/g,evName);
+  var bodyTemplate=document.getElementById('email-body').value;
+  var sent=0;
+  // Send 1 buyer test
+  if(sc.buyers.length>0){
+    var b=sc.buyers[0];
+    var meetings=[];
+    sc.slots.forEach(function(slot,i){var v=sc.grid[b][i];if(v)meetings.push({slot:slot,co:v,contact:'Contact',desk:S.desks[b]||1});});
+    var agendaHtml=buildAgendaHTML(b,meetings,true);
+    var body=bodyTemplate.replace(/\{\{name\}\}/g,b).replace(/\{\{company\}\}/g,b).replace(/\{\{event\}\}/g,evName).replace(/\{\{n_meetings\}\}/g,meetings.length).replace(/\{\{agenda_table\}\}/g,agendaHtml);
+    try{
+      var r=await sendGmailMessage(testEmail,'[BUYER TEST] '+subject,body);
+      if(r.ok){sent++;status.textContent='✓ Buyer test sent to '+testEmail+'...';}
+    }catch(e){status.textContent='Error sending buyer test: '+e.message;}
+  }
+  await new Promise(function(r){setTimeout(r,500);});
+  // Send 1 seller test
+  var sellerMtgs={};
+  sc.slots.forEach(function(slot,i){sc.buyers.forEach(function(b){var v=sc.grid[b][i];if(v){if(!sellerMtgs[v])sellerMtgs[v]=[];sellerMtgs[v].push({slot:slot,co:b,contact:'Contact',desk:S.desks[b]||1});}});});
+  var firstSeller=Object.keys(sellerMtgs)[0];
+  if(firstSeller){
+    var agendaHtml=buildAgendaHTML(firstSeller,sellerMtgs[firstSeller],false);
+    var body=bodyTemplate.replace(/\{\{name\}\}/g,firstSeller).replace(/\{\{company\}\}/g,firstSeller).replace(/\{\{event\}\}/g,evName).replace(/\{\{n_meetings\}\}/g,sellerMtgs[firstSeller].length).replace(/\{\{agenda_table\}\}/g,agendaHtml);
+    try{
+      var r=await sendGmailMessage(testEmail,'[SELLER TEST] '+subject,body);
+      if(r.ok){sent++;status.textContent='✓ Both test emails sent to '+testEmail+'. Check your inbox!';}
+    }catch(e){status.textContent='Buyer sent. Error on seller: '+e.message;}
+  }
+  toast(sent+' test email(s) sent to '+testEmail,'ok');
+}
+
+async function sendAllEmails(){
+  if(!S.testApproved){toast('Approve the test run first','w');return;}
+  if(!S.gmailToken){toast('Connect Gmail first','w');return;}
+  if(!S.sched){toast('Generate schedule first','w');return;}
+  var sc=S.sched;
+  var emailColB=document.getElementById('ecol-b').value;
+  var nameColB=document.getElementById('ncol-b').value;
+  var emailColS=document.getElementById('ecol-s').value;
+  var nameColS=document.getElementById('ncol-s').value;
+  var subject=document.getElementById('email-subj').value;
+  var bodyTemplate=document.getElementById('email-body').value;
+  var sendTo=document.getElementById('send-to').value;
+  var evName=document.getElementById('ev-name').value||'the event';
+  var tasks=[];
+
+  // Build buyer emails
+  if(sendTo==='all'||sendTo==='buyers'){
+    sc.buyers.forEach(function(bco){
+      var buyerRow=S.buyers.d.find(function(r){return (r[S.buyers.h.indexOf('Company name')]||'').toString().trim()===bco;});
+      if(!buyerRow)return;
+      var email=emailColB?buyerRow[S.buyers.h.indexOf(emailColB)]||'':'';
+      var name=nameColB?buyerRow[S.buyers.h.indexOf(nameColB)]||bco:bco;
+      if(!email)return;
+      var meetings=[];
+      sc.slots.forEach(function(slot,i){
+        var v=sc.grid[bco][i];
+        if(v){
+          var sellerRow=S.sellers.d.find(function(r){return (r[S.sellers.h.indexOf('Company name')]||'').toString().trim()===v;});
+          var contact=sellerRow&&nameColS?sellerRow[S.sellers.h.indexOf(nameColS)]||v:v;
+          meetings.push({slot:slot,co:v,contact:contact,desk:S.desks[bco]||1});
+        }
+      });
+      var agendaHtml=buildAgendaHTML(bco,meetings,true);
+      var body=bodyTemplate.replace(/\{\{name\}\}/g,name).replace(/\{\{company\}\}/g,bco).replace(/\{\{event\}\}/g,evName).replace(/\{\{n_meetings\}\}/g,meetings.length).replace(/\{\{agenda_table\}\}/g,agendaHtml);
+      tasks.push({to:email.toString(),subject:subject.replace(/\{\{event\}\}/g,evName),body:body});
+    });
+  }
+
+  // Build seller emails
+  if(sendTo==='all'||sendTo==='sellers'){
+    var sellerMtgs={};
+    sc.slots.forEach(function(slot,i){sc.buyers.forEach(function(b){var v=sc.grid[b][i];if(v){if(!sellerMtgs[v])sellerMtgs[v]=[];sellerMtgs[v].push({slot:slot,co:b,contact:'',desk:S.desks[b]||1});}});});
+    Object.keys(sellerMtgs).forEach(function(sco){
+      var sellerRow=S.sellers.d.find(function(r){return (r[S.sellers.h.indexOf('Company name')]||'').toString().trim()===sco;});
+      if(!sellerRow)return;
+      var email=emailColS?sellerRow[S.sellers.h.indexOf(emailColS)]||'':'';
+      var name=nameColS?sellerRow[S.sellers.h.indexOf(nameColS)]||sco:sco;
+      if(!email)return;
+      var agendaHtml=buildAgendaHTML(sco,sellerMtgs[sco],false);
+      var body=bodyTemplate.replace(/\{\{name\}\}/g,name).replace(/\{\{company\}\}/g,sco).replace(/\{\{event\}\}/g,evName).replace(/\{\{n_meetings\}\}/g,sellerMtgs[sco].length).replace(/\{\{agenda_table\}\}/g,agendaHtml);
+      tasks.push({to:email.toString(),subject:subject.replace(/\{\{event\}\}/g,evName),body:body});
+    });
+  }
+
+  if(!tasks.length){toast('No valid email addresses found in selected columns','w');return;}
+  document.getElementById('send-prog').style.display='block';
+  var pbar=document.getElementById('spbar');var status=document.getElementById('send-status');
+  var sent=0,failed=0;
+  var BATCH=50; // Gmail safe limit per hour
+  for(var i=0;i<tasks.length;i++){
+    var t=tasks[i];
+    // Auto-pause every 50 emails to respect Gmail rate limits
+    if(i>0&&i%BATCH===0){
+      var waitSecs=70;
+      for(var w=waitSecs;w>0;w--){
+        status.textContent='⏸ Pausing to respect Gmail limits ('+w+'s)... '+sent+' sent so far. Do not close this tab.';
+        await new Promise(function(r){setTimeout(r,1000);});
+      }
+    }
+    status.textContent='📤 Sending to '+t.to+' ('+(i+1)+'/'+tasks.length+')...';
+    pbar.style.width=Math.round(100*(i+1)/tasks.length)+'%';
+    try{
+      var resp=await sendGmailMessage(t.to,t.subject,t.body);
+      if(resp.ok){sent++;}else{failed++;console.warn('Failed:',t.to);}
+    }catch(e){failed++;console.error(e);}
+    await new Promise(function(r){setTimeout(r,400);});
+  }
+  status.textContent='✓ Done: '+sent+' sent'+(failed?' · '+failed+' failed':'');
+  toast(sent+' emails sent'+(failed?' ('+failed+' failed)':''),'ok');
+}
+
+function exportAllCSV(){
+  if(!S.sched){toast('Generate schedule first','w');return;}
+  var sc=S.sched;
+  var rows=[['Participant','Type','Slot','Counterpart','Desk','Match reasons']];
+  sc.buyers.forEach(function(b){
+    sc.slots.forEach(function(slot,i){
+      var v=sc.grid[b][i];
+      if(v){
+        var key=b+'||'+v;
+        var reasons=(S.matchReasons[key]||[]).map(function(r){return r.vals.join('/');}).join(' | ');
+        rows.push([b,'Buyer',slot,v,S.desks[b]||1,reasons]);
+        rows.push([v,'Seller',slot,b,S.desks[b]||1,reasons]);
+      }
+    });
+  });
+  var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='how2match_agendas.csv';a.click();
+  toast('All agendas exported','ok');
+}
+
+// ── INSTRUCTIONS ──
+function showLang(lang,el){
+  ['en','es','tr','ko','pt'].forEach(function(l){document.getElementById('lang-'+l).style.display='none';});
+  document.getElementById('lang-'+lang).style.display='block';
+  document.querySelectorAll('.lang-tab').forEach(function(t){t.classList.remove('active');});
+  el.classList.add('active');
+}
+
+// ── EXPORT ──
+function exportHTML(){
+  var html=document.documentElement.outerHTML;
+  var blob=new Blob([html],{type:'text/html'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='How2Match.html';a.click();
+  toast('HTML exported — share this file with colleagues','ok');
+}
+
+updatePreview();
+</script>
+</body>
+</html>
