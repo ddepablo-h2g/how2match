@@ -726,7 +726,7 @@ async function runDiscovery(){
           '- "confidence": "high", "medium" or "low"\n\n'+
           'Include ALL equivalences — translations, abbreviations, same concept different language. Terms that are identical need not be included. Return [] if nothing matches. Return only raw JSON, no markdown.';
 
-        var resp=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+CONFIG.GEMINI_API_KEY,{
+        var resp=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+CONFIG.GEMINI_API_KEY,{
           method:'POST',
           headers:{'Content-Type':'application/json'},
           body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.1}})
