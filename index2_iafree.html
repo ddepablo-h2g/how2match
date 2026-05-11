@@ -310,9 +310,9 @@ var CONFIG = {
       <div style="flex:1">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <div style="font-size:13px;font-weight:700;color:var(--navy)">🤖 Gemini AI semantic matching</div>
-          <label class="tswitch"><input type="checkbox" id="ai-toggle" onchange="S.aiOn=this.checked;document.getElementById('ai-status').textContent=this.checked?'ON — Gemini will interpret similar values':'OFF — exact text matching only'"><span class="tslider"></span></label>
+          <label class="tswitch" style="opacity:.4;pointer-events:none"><input type="checkbox" id="ai-toggle" disabled><span class="tslider"></span></label>
         </div>
-        <div id="ai-status" style="font-size:11px;font-weight:700;color:var(--char60);margin-bottom:8px">OFF — exact text matching only</div>
+        <div id="ai-status" style="font-size:11px;font-weight:700;color:var(--warn);margin-bottom:8px">🚧 Coming Soon — AI matching not yet active</div>
         <div style="font-size:11px;color:var(--char60);font-weight:300;margin-bottom:8px">When ON: <em>"Apples" ≈ "Fresh fruit" ≈ "Manzanas"</em> — Gemini interprets semantically similar values as matches.</div>
         <div style="height:1px;background:var(--border);margin-bottom:8px"></div>
         <div style="font-size:11px;color:var(--navy);font-weight:400"><strong>How comparison works (AI OFF):</strong> cells can contain comma-separated values (e.g. <em>"Spain, France, Portugal"</em>). A match occurs when any value from the buyer overlaps with any value from the seller. Values must be written identically.</div>
