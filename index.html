@@ -566,7 +566,7 @@ function checkCapacity(){
   var minM=parseInt(document.getElementById('ev-min').value)||0;
   var activeSlots=S.slots.filter(function(s){return!s.startsWith('—');}).length;
   var el=document.getElementById('capacity-check');
-  if(!nb||!ns||!activeSlots||!minM){el.style.display='none';return;}
+  if(!ns||!activeSlots||!minM){el.style.display='none';return;}
   var maxPossible=Math.min(activeSlots*tables, activeSlots*nb);
   var needed=ns*minM;
   el.style.display='block';
