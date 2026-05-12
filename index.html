@@ -31,7 +31,7 @@ body{font-family:'Lato',sans-serif;background:#f7f8fa;color:var(--dark);font-siz
 .gmail-status.connected{background:rgba(39,174,96,.2);border:1px solid rgba(39,174,96,.4)}
 .gmail-dot{width:6px;height:6px;border-radius:50%;background:var(--char40)}
 .gmail-dot.on{background:var(--success)}
-.stepnav{background:white;border-bottom:1px solid var(--border);display:flex;overflow-x:auto}
+.stepnav{background:white;border-bottom:1px solid var(--border);display:flex;overflow-x:auto;position:sticky;top:54px;z-index:199}
 .step{flex:1;min-width:80px;padding:9px 4px;text-align:center;font-size:10px;color:var(--char60);cursor:pointer;border-bottom:3px solid transparent;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:3px}
 .step:hover{color:var(--blue);background:#f0f7ff}
 .step.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:700}
@@ -201,7 +201,6 @@ var CONFIG = {
   <div class="step" id="sn3" onclick="goStep(3)"><div class="snum">4</div>Schedule</div>
   <div class="step" id="sn4" onclick="goStep(4)"><div class="snum">5</div>Template</div>
   <div class="step" id="sn5" onclick="goStep(5)"><div class="snum">6</div>Send</div>
-  <div class="step" id="sn6" onclick="goStep(6)"><div class="snum">?</div>Help</div>
 </div>
 
 <div class="main">
@@ -216,22 +215,27 @@ var CONFIG = {
       <div class="f"><label>Organiser</label><input type="text" id="ev-org" placeholder="Organisation name"></div>
     </div>
     <div class="r3">
-      <div class="f"><label>Start date</label><input type="date" id="ev-start"></div>
+      <div class="f"><label>Start date</label><input type="date" id="ev-start" oninput="syncStartDate()"></div>
       <div class="f"><label>End date</label><input type="date" id="ev-end"></div>
       <div class="f"><label>Meeting duration (min)</label><input type="number" id="ev-dur" value="20" min="5" max="120" step="5" oninput="markConfigChanged()"></div>
     </div>
     <div class="r4">
-      <div class="f"><label>Tables available</label><input type="number" id="ev-tables" value="10" min="1" max="500" oninput="markConfigChanged()"></div>
-      <div class="f"><label>Min meetings / person</label><input type="number" id="ev-min" value="2" min="0" oninput="markConfigChanged()"></div>
+      <div class="f"><label>Tables available</label><input type="number" id="ev-tables" value="10" min="1" max="500" oninput="markConfigChanged();checkCapacity()"></div>
+      <div class="f"><label>Min meetings / person</label><input type="number" id="ev-min" value="2" min="0" oninput="markConfigChanged();checkCapacity()"></div>
       <div class="f"><label>Max meetings / person</label><input type="number" id="ev-max" value="10" min="1" oninput="markConfigChanged()"></div>
       <div class="f"><label>Desk mode</label>
-        <select id="ev-desk-mode">
-          <option value="fixed">Fixed per buyer</option>
-          <option value="rotating">Rotating per slot</option>
-          <option value="manual">Manual</option>
+        <select id="ev-desk-mode" onchange="checkDeskMode()">
+          <option value="fixed">Fixed — buyer keeps same desk</option>
+          <option value="rotating">Rotating — desks shared per slot</option>
         </select>
+        <div id="desk-mode-hint" style="font-size:10px;color:var(--char60);margin-top:3px;display:none"></div>
       </div>
     </div>
+    <div class="r2">
+      <div class="f"><label>Expected number of buyers</label><input type="number" id="ev-nbuyers" value="0" min="0" oninput="checkCapacity()"></div>
+      <div class="f"><label>Expected number of sellers</label><input type="number" id="ev-nsellers" value="0" min="0" oninput="checkCapacity()"></div>
+    </div>
+    <div id="capacity-check" style="display:none;margin-top:4px"></div>
   </div>
   <div class="card">
     <div class="ctitle">Schedule builder</div>
@@ -364,6 +368,7 @@ var CONFIG = {
       <label style="display:flex;align-items:center;gap:5px;font-size:12px"><input type="checkbox" id="col-company" checked style="width:auto" onchange="updatePreview()"> COMPANY</label>
       <label style="display:flex;align-items:center;gap:5px;font-size:12px"><input type="checkbox" id="col-contact" checked style="width:auto" onchange="updatePreview()"> CONTACT NAME</label>
       <label style="display:flex;align-items:center;gap:5px;font-size:12px"><input type="checkbox" id="col-desk" checked style="width:auto" onchange="updatePreview()"> DESK</label>
+      <label style="display:flex;align-items:center;gap:5px;font-size:12px"><input type="checkbox" id="col-signature" style="width:auto" onchange="updatePreview()"> SIGNATURE</label>
     </div>
     <div class="slbl-t">Programme texts</div>
     <div class="tpl-tabs">
@@ -530,6 +535,739 @@ var S={
   headerImgData:null,step:0,testApproved:false,tplTab:'buyer',
   gmailToken:null,gmailUser:null,scheduleGenerated:false,configChanged:false
 };
+var HEADERS=['Company name','Contact name','Email','Language(s)','Region of interest','Criterion 1','Criterion 2','Criterion 3','Criterion 4','Criterion 5'];
+
+// ── CAPACITY CHECK (real-time in Event step) ──
+function syncStartDate(){
+  var v=document.getElementById('ev-start').value;
+  if(v)document.getElementById('sg-date').value=v;
+}
+
+function checkDeskMode(){
+  var mode=document.getElementById('ev-desk-mode').value;
+  var hint=document.getElementById('desk-mode-hint');
+  var nb=parseInt(document.getElementById('ev-nbuyers').value)||0;
+  var tables=parseInt(document.getElementById('ev-tables').value)||0;
+  if(mode==='fixed'&&tables>nb&&nb>0){
+    hint.textContent='💡 You have more tables than buyers — Rotating mode would use them more efficiently.';
+    hint.style.display='block';hint.style.color='var(--warn)';
+  } else if(mode==='rotating'){
+    hint.textContent='✓ Rotating: desks are shared per slot. Buyers may use different desks each meeting.';
+    hint.style.display='block';hint.style.color='var(--success)';
+  } else {
+    hint.style.display='none';
+  }
+}
+
+function checkCapacity(){
+  var nb=parseInt(document.getElementById('ev-nbuyers').value)||0;
+  var ns=parseInt(document.getElementById('ev-nsellers').value)||0;
+  var tables=parseInt(document.getElementById('ev-tables').value)||0;
+  var minM=parseInt(document.getElementById('ev-min').value)||0;
+  var activeSlots=S.slots.filter(function(s){return!s.startsWith('—');}).length;
+  var el=document.getElementById('capacity-check');
+  if(!nb||!ns||!activeSlots||!minM){el.style.display='none';return;}
+  var maxPossible=Math.min(activeSlots*tables, activeSlots*nb);
+  var needed=ns*minM;
+  el.style.display='block';
+  if(needed>maxPossible){
+    var maxAchievable=Math.floor(maxPossible/Math.max(ns,1));
+    el.innerHTML='<div class="infobox ie">⚠️ <div><strong>Capacity warning:</strong> With '+nb+' buyers, '+activeSlots+' slots and '+tables+' tables, max possible meetings = <strong>'+maxPossible+'</strong>. With '+ns+' sellers × min '+minM+' = <strong>'+needed+' needed</strong>. Consider reducing minimum to <strong>'+maxAchievable+'</strong> or adding <strong>'+Math.ceil((needed-maxPossible)/nb)+' more slots</strong>.</div></div>';
+  } else {
+    el.innerHTML='<div class="infobox io">✓ <div>Capacity OK: '+maxPossible+' possible meetings, '+needed+' needed for minimum '+minM+' per seller.</div></div>';
+  }
+  checkDeskMode();
+}
+
+// ── CONFIG CHANGE TRACKING ──
+function markConfigChanged(){
+  if(S.scheduleGenerated){
+    S.configChanged=true;
+    if(S.step===3){document.getElementById('regen-warning').style.display='block';}
+  }
+}
+
+// ── GMAIL OAUTH ──
+function connectGmail(){
+  var client=google.accounts.oauth2.initTokenClient({
+    client_id:CONFIG.GMAIL_CLIENT_ID,
+    scope:CONFIG.GMAIL_SCOPES,
+    callback:function(resp){
+      if(resp.error){toast('Gmail auth failed: '+resp.error,'err');return;}
+      S.gmailToken=resp.access_token;
+      fetchGmailUser();
+    }
+  });
+  client.requestAccessToken();
+}
+function fetchGmailUser(){
+  fetch('https://www.googleapis.com/gmail/v1/users/me/profile',{headers:{Authorization:'Bearer '+S.gmailToken}})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var email=d.emailAddress||d.email||'connected';
+      S.gmailUser=email;
+      document.getElementById('gmail-label').textContent='Gmail: '+email;
+      document.getElementById('gmail-dot').classList.add('on');
+      document.getElementById('gmail-status').classList.add('connected');
+      document.getElementById('gmail-connect-prompt').style.display='none';
+      toast('Gmail connected: '+email,'ok');
+    })
+    .catch(function(){
+      fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+S.gmailToken}})
+        .then(function(r){return r.json();})
+        .then(function(d){
+          var email=d.email||'connected';
+          S.gmailUser=email;
+          document.getElementById('gmail-label').textContent='Gmail: '+email;
+          document.getElementById('gmail-dot').classList.add('on');
+          document.getElementById('gmail-status').classList.add('connected');
+          document.getElementById('gmail-connect-prompt').style.display='none';
+          toast('Gmail connected: '+email,'ok');
+        })
+        .catch(function(){
+          S.gmailUser='connected';
+          document.getElementById('gmail-label').textContent='Gmail: connected';
+          document.getElementById('gmail-dot').classList.add('on');
+          document.getElementById('gmail-status').classList.add('connected');
+          document.getElementById('gmail-connect-prompt').style.display='none';
+          toast('Gmail connected','ok');
+        });
+    });
+}
+function sendGmailMessage(to,subject,body){
+  var encodedSubject='=?UTF-8?B?'+btoa(unescape(encodeURIComponent(subject)))+'?=';
+  var msg='To: '+to+'\r\nSubject: '+encodedSubject+'\r\nContent-Type: text/html; charset=utf-8\r\n\r\n'+body;
+  var encoded=btoa(unescape(encodeURIComponent(msg))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  return fetch('https://www.googleapis.com/gmail/v1/users/me/messages/send',{
+    method:'POST',
+    headers:{Authorization:'Bearer '+S.gmailToken,'Content-Type':'application/json'},
+    body:JSON.stringify({raw:encoded})
+  });
+}
+
+// ── NAV ──
+function goStep(n){
+  S.step=n;
+  document.querySelectorAll('.panel').forEach(function(p,i){p.classList.toggle('active',i===n);});
+  document.querySelectorAll('.step').forEach(function(s,i){s.classList.remove('active','done');if(i===n)s.classList.add('active');else if(i<n)s.classList.add('done');});
+  if(n===3){
+    renderSchedule();
+    document.getElementById('regen-warning').style.display=S.configChanged&&S.scheduleGenerated?'block':'none';
+  }
+  if(n===5)renderSendStep();
+}
+function updatePill(){document.getElementById('proj-pill').textContent=document.getElementById('ev-name').value||'No project';}
+function toast(msg,type){var a=document.getElementById('toast-area');var t=document.createElement('div');t.className='toast '+(type||'');t.textContent=msg;a.appendChild(t);setTimeout(function(){t.remove();},3500);}
+
+// ── SLOTS ──
+function genSlots(){
+  var date=document.getElementById('sg-date').value;
+  var from=document.getElementById('sg-from').value;
+  var to=document.getElementById('sg-to').value;
+  var dur=parseInt(document.getElementById('ev-dur').value)||20;
+  var brk=parseInt(document.getElementById('sg-break').value)||0;
+  if(!date||!from||!to){toast('Select date and time range','w');return;}
+  var dp=date.split('-');var ds=dp[2]+'/'+dp[1]+'/'+dp[0];
+  var fh=parseInt(from.split(':')[0]),fm=parseInt(from.split(':')[1]);
+  var th=parseInt(to.split(':')[0]),tm=parseInt(to.split(':')[1]);
+  var cur=fh*60+fm,end=th*60+tm,step=dur+brk,added=0;
+  while(cur+dur<=end){
+    var s=Math.floor(cur/60)+':'+(cur%60+'').padStart(2,'0');
+    var e=Math.floor((cur+dur)/60)+':'+((cur+dur)%60+'').padStart(2,'0');
+    var lbl=ds+' '+s+'-'+e;
+    if(!S.slots.includes(lbl)){S.slots.push(lbl);added++;}
+    cur+=step;
+  }
+  markConfigChanged();
+  checkCapacity();
+  renderSlots();toast(added+' slots added','ok');
+}
+function addBreak(){
+  var date=document.getElementById('sg-date').value;
+  if(!date){toast('Select a date first','w');return;}
+  var dp=date.split('-');var ds=dp[2]+'/'+dp[1]+'/'+dp[0];
+  S.slots.push('— Break ('+ds+') —');renderSlots();
+}
+function addSlotManual(){var v=document.getElementById('slot-manual').value.trim();if(!v)return;if(!S.slots.includes(v)){S.slots.push(v);markConfigChanged();checkCapacity();renderSlots();document.getElementById('slot-manual').value='';}}
+function removeSlot(i){S.slots.splice(i,1);markConfigChanged();checkCapacity();renderSlots();}
+function renderSlots(){
+  document.getElementById('slot-list').innerHTML=S.slots.map(function(s,i){var ib=s.startsWith('—');return '<div class="si'+(ib?' brk':'')+'"><span>'+(ib?'☕':'🕐')+'</span><span class="st">'+s+'</span><span class="sdel" onclick="removeSlot('+i+')">×</span></div>';}).join('');
+  document.getElementById('slot-count').textContent='('+S.slots.filter(function(s){return!s.startsWith('—');}).length+' active)';
+}
+
+// ── TEMPLATE ──
+function downloadTemplate(type){
+  var wb=XLSX.utils.book_new();
+  var ws=XLSX.utils.aoa_to_sheet([HEADERS]);
+  ws['!cols']=HEADERS.map(function(){return{wch:24};});
+  XLSX.utils.book_append_sheet(wb,ws,type);
+  XLSX.writeFile(wb,'How2Match_'+type+'_Template.xlsx');
+  toast(type+' template downloaded','ok');
+}
+
+// ── FILE UPLOAD ──
+function triggerUp(type){document.getElementById('file-'+type).click();}
+function loadFile(type,input){
+  var file=input.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var wb=XLSX.read(e.target.result,{type:'binary'});
+    var ws=wb.Sheets[wb.SheetNames[0]];
+    var rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+    if(rows.length<2){toast('File appears empty','w');return;}
+    var headers=rows[0].map(function(h){return h.toString().trim();});
+    var data=rows.slice(1).filter(function(r){return r.some(function(c){return c!=='';});});
+    S[type]={h:headers,d:data};
+    document.getElementById(type+'-area').innerHTML='<div class="fok"><span class="fi">✓</span><div><div class="fn">'+file.name+'</div><div class="fm">'+data.length+' rows · '+headers.length+' cols</div></div><span class="fx" onclick="resetUpload(\''+type+'\')">×</span></div>';
+    // Auto-fill buyer/seller counts
+    if(type==='buyers'){var nb=document.getElementById('ev-nbuyers');if(!parseInt(nb.value))nb.value=data.length;checkCapacity();}
+    if(type==='sellers'){var ns=document.getElementById('ev-nsellers');if(!parseInt(ns.value))ns.value=data.length;checkCapacity();}
+    checkBothLoaded();
+  };
+  reader.readAsBinaryString(file);
+}
+function loadHeaderImg(input){
+  var file=input.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    S.headerImgData=e.target.result;
+    document.getElementById('header-area').innerHTML='<div class="fok"><span class="fi">✓</span><div><div class="fn">'+file.name+'</div><div class="fm">Header loaded</div></div><span class="fx" onclick="resetHeader()">×</span></div>';
+    updatePreview();
+  };
+  reader.readAsDataURL(file);
+}
+function resetHeader(){S.headerImgData=null;document.getElementById('header-area').innerHTML='<div class="uzone" onclick="triggerUp(\'header-img\')" style="padding:16px"><span class="ui" style="font-size:20px">🖼</span><p style="font-size:12px">Upload event banner</p><small>PNG/JPG</small></div>';updatePreview();}
+function resetUpload(type){S[type]={h:[],d:[]};document.getElementById(type+'-area').innerHTML='<div class="uzone" onclick="triggerUp(\''+type+'\')"><span class="ui">📂</span><p>Upload '+type+'</p><small>.xlsx or .csv</small></div>';document.getElementById('cols-preview').style.display='none';}
+function checkBothLoaded(){
+  var b=S.buyers.h.length>0,s=S.sellers.h.length>0;
+  if(b||s){
+    document.getElementById('cols-preview').style.display='block';
+    if(b){document.getElementById('b-count').textContent=S.buyers.d.length;document.getElementById('b-cols').innerHTML=S.buyers.h.map(function(h){return '<span class="ctag">'+h+'</span>';}).join('');}
+    if(s){document.getElementById('s-count').textContent=S.sellers.d.length;document.getElementById('s-cols').innerHTML=S.sellers.h.map(function(h){return '<span class="ctag">'+h+'</span>';}).join('');}
+    if(b&&s&&S.rules.length===0){S.rules=[{bc:'',sc:'',type:'required'}];renderRules();}
+  }
+}
+
+// ── RULES ──
+function addRule(){S.rules.push({bc:'',sc:'',type:'required'});renderRules();}
+function removeRule(i){S.rules.splice(i,1);renderRules();}
+function updateRule(i,k,v){S.rules[i][k]=v;if(k==='type')renderRules();}
+function renderRules(){
+  var bh=S.buyers.h,sh=S.sellers.h;
+  var el=document.getElementById('rules-container');
+  if(!bh.length&&!sh.length){el.innerHTML='<div class="infobox iw">⚠ Upload files first.</div>';return;}
+  el.innerHTML=S.rules.map(function(r,i){
+    var bo=bh.map(function(h){return '<option value="'+h+'"'+(h===r.bc?' selected':'')+'>'+h+'</option>';}).join('');
+    var so=sh.map(function(h){return '<option value="'+h+'"'+(h===r.sc?' selected':'')+'>'+h+'</option>';}).join('');
+    return '<div class="rule-row"><span class="rbadge '+(r.type==='required'?'rb-req':'rb-pref')+'">'+(r.type==='required'?'REQUIRED':'PREFERRED')+'</span>'+
+      '<select onchange="updateRule('+i+',\'bc\',this.value)"><option value="">— buyer column —</option>'+bo+'</select>'+
+      '<span style="color:var(--char40)">↔</span>'+
+      '<select onchange="updateRule('+i+',\'sc\',this.value)"><option value="">— seller column —</option>'+so+'</select>'+
+      '<select style="width:130px;font-size:11px" onchange="updateRule('+i+',\'type\',this.value)">'+
+        '<option value="required"'+(r.type==='required'?' selected':'')+'>Required (blocks)</option>'+
+        '<option value="preferred"'+(r.type==='preferred'?' selected':'')+'>Preferred (+score)</option>'+
+      '</select>'+
+      '<span class="sdel" onclick="removeRule('+i+')">×</span></div>';
+  }).join('');
+}
+
+// ── MATCHING ──
+function clean(t){return t.toString().replace(/\u200B/g,'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();}
+function getVals(row,headers,col){var idx=headers.indexOf(col);if(idx<0)return[];var raw=row[idx]?row[idx].toString():'';return raw.split(',').map(function(p){return clean(p);}).filter(Boolean);}
+function overlap(av,bv){return av.filter(function(a){return bv.some(function(b){return a===b||a.includes(b)||b.includes(a);});});}
+
+function runMatch(){
+  var reqRules=S.rules.filter(function(r){return r.bc&&r.sc&&r.type==='required';});
+  var prefRules=S.rules.filter(function(r){return r.bc&&r.sc&&r.type==='preferred';});
+  if(!reqRules.length&&!prefRules.length){toast('Define at least one rule','w');return;}
+  if(!S.buyers.d.length||!S.sellers.d.length){toast('Upload both files first','w');return;}
+  // Reset all previous state
+  S.matches=[];S.matchReasons={};S.sched=null;S.noMatch=[];S.desks={};
+  var matches=[],reasons={};
+  for(var bi=0;bi<S.buyers.d.length;bi++){
+    var br=S.buyers.d[bi];
+    for(var si=0;si<S.sellers.d.length;si++){
+      var sr=S.sellers.d[si];
+      var matchedRules=[],ok=true;
+      for(var ri=0;ri<reqRules.length;ri++){
+        var rule=reqRules[ri];
+        var bv=getVals(br,S.buyers.h,rule.bc);
+        var sv=getVals(sr,S.sellers.h,rule.sc);
+        var ov=overlap(bv,sv);
+        if(ov.length>0){matchedRules.push({col:rule.bc+'↔'+rule.sc,vals:ov,type:'required'});}
+        else{ok=false;break;}
+      }
+      if(!ok)continue;
+      var score=0;
+      for(var ri=0;ri<prefRules.length;ri++){
+        var rule=prefRules[ri];
+        var bv=getVals(br,S.buyers.h,rule.bc);
+        var sv=getVals(sr,S.sellers.h,rule.sc);
+        var ov=overlap(bv,sv);
+        if(ov.length>0){score++;matchedRules.push({col:rule.bc+'↔'+rule.sc,vals:ov,type:'preferred'});}
+      }
+      var bco=getColVal(br,S.buyers.h,'Company name');
+      var bn=getColVal(br,S.buyers.h,'Contact name');
+      var sco=getColVal(sr,S.sellers.h,'Company name');
+      var sn=getColVal(sr,S.sellers.h,'Contact name');
+      matches.push({buyer:bn,buyerCo:bco,seller:sn,sellerCo:sco,score:score,buyerRow:br,sellerRow:sr});
+      reasons[bco+'||'+sco]=matchedRules;
+    }
+  }
+  matches.sort(function(a,b){return b.score-a.score;});
+  S.matches=matches;S.matchReasons=reasons;
+  S.scheduleGenerated=true;S.configChanged=false;
+  buildSchedule();
+  goStep(3);
+  toast(matches.length+' matches found','ok');
+}
+function getColVal(row,headers,col){var idx=headers.indexOf(col);return idx>=0&&row[idx]?row[idx].toString().trim():row[0]?row[0].toString().trim():'';}
+
+// ── SCHEDULING ──
+function buildSchedule(){
+  var slots=S.slots.filter(function(s){return!s.startsWith('—');});
+  var tables=parseInt(document.getElementById('ev-tables').value)||10;
+  var maxM=parseInt(document.getElementById('ev-max').value)||99;
+  var minM=parseInt(document.getElementById('ev-min').value)||0;
+  var deskMode=document.getElementById('ev-desk-mode').value;
+
+  // Capacity warning in schedule step
+  var uniqueSellers={};
+  S.matches.forEach(function(m){uniqueSellers[m.sellerCo||m.seller]=true;});
+  var nSellers=Object.keys(uniqueSellers).length;
+  var nBuyers=S.buyers.d.length;
+  var maxByBuyers=slots.length*nBuyers;
+  var realMax=Math.min(slots.length*tables,maxByBuyers);
+  var needed=nSellers*minM;
+  var capEl=document.getElementById('capacity-warning');
+  if(minM>0&&needed>realMax){
+    var maxAchievable=Math.floor(realMax/Math.max(nSellers,1));
+    capEl.innerHTML='<div class="infobox iw">⚠️ <div><strong>Capacity warning:</strong> Maximum possible meetings = '+realMax+'. With '+nSellers+' sellers × min '+minM+' = '+needed+' needed. Consider reducing minimum to <strong>'+maxAchievable+'</strong> or adding more slots.</div></div>';
+    capEl.style.display='block';
+  } else {capEl.style.display='none';}
+
+  var grouping={},vendorCount={};
+  S.matches.forEach(function(m){
+    var bc=m.buyerCo||m.buyer,sc=m.sellerCo||m.seller;
+    if(!grouping[bc])grouping[bc]=[];
+    if(grouping[bc].indexOf(sc)<0)grouping[bc].push(sc);
+    vendorCount[sc]=(vendorCount[sc]||0)+1;
+  });
+  var buyers=Object.keys(grouping);
+  buyers.forEach(function(b){grouping[b].sort(function(a,c){return(vendorCount[a]||0)-(vendorCount[c]||0);});});
+
+  var schedule={};buyers.forEach(function(b){schedule[b]=new Array(slots.length).fill('');});
+  var candidates={};buyers.forEach(function(b){candidates[b]=grouping[b].slice(0,maxM);});
+  var vendorAvail=slots.map(function(){return{};});
+  var tableUsage=slots.map(function(){return 0;});
+  var buyerCount={};buyers.forEach(function(b){buyerCount[b]=0;});
+  var vendorMtgs={};
+
+  // Desk assignment per mode
+  // FIXED: each buyer gets a permanent desk number
+  // ROTATING: desks assigned per slot per meeting
+  var slotDesks=slots.map(function(){return{};});  // slotDesks[slotIdx][buyerName] = deskNumber
+
+  if(deskMode==='fixed'){
+    var di=1;buyers.forEach(function(b){S.desks[b]=di++;});
+  }
+
+  for(var s=0;s<slots.length;s++){
+    var slotDeskCounter=1;
+    buyers.forEach(function(buyer){
+      if(buyerCount[buyer]>=maxM)return;
+      if(candidates[buyer].length>0&&tableUsage[s]<tables){
+        for(var k=0;k<candidates[buyer].length;k++){
+          var v=candidates[buyer][k];
+          if(!vendorAvail[s][v]&&(vendorMtgs[v]||0)<maxM){
+            schedule[buyer][s]=v;vendorAvail[s][v]=true;tableUsage[s]++;
+            buyerCount[buyer]++;vendorMtgs[v]=(vendorMtgs[v]||0)+1;
+            candidates[buyer].splice(k,1);
+            // Assign rotating desk for this slot
+            if(deskMode==='rotating'){
+              if(!slotDesks[s][buyer]){slotDesks[s][buyer]=slotDeskCounter++;} 
+            }
+            break;
+          }
+        }
+      }
+    });
+  }
+
+  var noMatch=[];
+  buyers.forEach(function(b){if(buyerCount[b]<minM)noMatch.push({name:b,type:'Buyer',count:buyerCount[b],min:minM});});
+  Object.keys(vendorCount).forEach(function(v){if((vendorMtgs[v]||0)<minM)noMatch.push({name:v,type:'Seller',count:vendorMtgs[v]||0,min:minM});});
+
+  S.sched={buyers:buyers,slots:slots,grid:schedule,slotDesks:slotDesks,deskMode:deskMode};
+  S.noMatch=noMatch;
+}
+
+// Helper: get desk for a buyer at a specific slot
+function getDeskForSlot(buyer,slotIdx){
+  var sc=S.sched;
+  if(!sc)return 1;
+  if(sc.deskMode==='rotating'){
+    return (sc.slotDesks&&sc.slotDesks[slotIdx]&&sc.slotDesks[slotIdx][buyer])||'—';
+  }
+  return S.desks[buyer]||1;
+}
+
+// ── TOOLTIP ──
+var ttEl=document.getElementById('tooltip');
+document.addEventListener('mousemove',function(e){if(ttEl.style.display==='block'){ttEl.style.left=(e.clientX+14)+'px';ttEl.style.top=(e.clientY-10)+'px';}});
+function showTT(buyer,seller,slotIdx,e){
+  var key=buyer+'||'+seller;
+  var reasons=S.matchReasons[key]||[];
+  var desk=getDeskForSlot(buyer,slotIdx);
+  var html='<div class="tt-title">'+buyer.substring(0,28)+' × '+seller.substring(0,28)+'</div>';
+  html+='<div class="tt-row"><span>🪑</span><div><strong>Desk '+desk+'</strong></div></div>';
+  if(!reasons.length){html+='<div>No match detail available.</div>';}
+  reasons.forEach(function(r){html+='<div class="tt-row"><span>'+(r.type==='required'?'✅':'⭐')+'</span><div><strong>'+r.col+'</strong><br><span style="color:var(--blue40)">'+r.vals.join(', ')+'</span></div></div>';});
+  ttEl.innerHTML=html;ttEl.style.display='block';
+  ttEl.style.left=(e.clientX+14)+'px';ttEl.style.top=(e.clientY-10)+'px';
+}
+function hideTT(){ttEl.style.display='none';}
+
+// ── RENDER SCHEDULE ──
+function renderSchedule(){
+  if(!S.sched){document.getElementById('metrics').innerHTML='<div class="infobox ii" style="grid-column:1/-1">ℹ Run matching first.</div>';return;}
+  var sc=S.sched;
+  var total=0;sc.buyers.forEach(function(b){sc.slots.forEach(function(sl,i){if(sc.grid[b][i])total++;});});
+  var cov=sc.buyers.length?Math.round(100*sc.buyers.filter(function(b){return sc.slots.some(function(sl,i){return sc.grid[b][i];});}).length/sc.buyers.length):0;
+  document.getElementById('metrics').innerHTML=
+    '<div class="metric"><div class="v">'+total+'</div><div class="l">meetings assigned</div></div>'+
+    '<div class="metric"><div class="v">'+S.matches.length+'</div><div class="l">total matches</div></div>'+
+    '<div class="metric"><div class="v">'+sc.buyers.length+'</div><div class="l">active buyers</div></div>'+
+    '<div class="metric"><div class="v">'+cov+'%</div><div class="l">buyer coverage</div></div>';
+  var maxCols=Math.min(sc.buyers.length,7);var vis=sc.buyers.slice(0,maxCols);
+  var allRows=S.slots;
+  var html='<thead><tr><th style="width:135px">Slot</th>'+vis.map(function(b){return '<th title="'+b+'">'+b.substring(0,12)+(b.length>12?'…':'')+'</th>';}).join('')+'</tr></thead><tbody>';
+  var activeIdx=0;
+  allRows.forEach(function(row){
+    var isBreak=row.startsWith('—');
+    if(isBreak){
+      html+='<tr><td colspan="'+(vis.length+1)+'" style="background:#e8e8e8;color:var(--char60);font-size:10px;font-style:italic;padding:5px 8px;text-align:center;font-weight:700;letter-spacing:.05em">'+row+'</td></tr>';
+    } else {
+      var i=activeIdx++;
+      html+='<tr><td class="slbl">'+row+'</td>';
+      vis.forEach(function(b){
+        var v=sc.grid[b]&&sc.grid[b][i];
+        var desk=getDeskForSlot(b,i);
+        if(v){
+          var bs=b.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+          var vs=v.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+          html+='<td class="hit" onmouseenter="showTT(\''+bs+'\',\''+vs+'\','+i+',event)" onmouseleave="hideTT()">'+v.substring(0,10)+(v.length>10?'…':'')+'<span style="font-size:9px;color:var(--blue60);margin-left:3px">D'+desk+'</span></td>';
+        } else{html+='<td class="miss">—</td>';}
+      });
+      html+='</tr>';
+    }
+  });
+  document.getElementById('agenda-tbl').innerHTML=html+'</tbody>';
+  document.getElementById('macro-note').innerHTML=sc.buyers.length>maxCols?'<div style="font-size:10px;color:var(--char60);margin-top:5px">Showing '+maxCols+' of '+sc.buyers.length+' buyers. Export CSV for full view.</div>':'';
+
+  // Desks tab
+  var isRotating=sc.deskMode==='rotating';
+  var deskHtml='<div class="infobox ii">ℹ '+(isRotating?'Rotating mode: desks are assigned per slot. Buyers move to available desks each meeting.':'Fixed mode: buyers keep their assigned desk throughout the event. Sellers move between desks.')+'</div>';
+  if(!isRotating){
+    sc.buyers.forEach(function(b,bi){deskHtml+='<div class="send-row"><span style="flex:1;font-weight:700">'+b+'</span><span style="color:var(--char60);font-size:11px">Fixed desk:</span><input class="desk-in" type="number" min="1" value="'+(S.desks[b]||1)+'" onchange="updateDesk('+bi+',this.value)"></div>';});
+  } else {
+    deskHtml+='<div style="font-size:11px;color:var(--char60);margin-top:8px">Desks are assigned automatically per slot to maximise table usage. See the macro schedule for desk numbers per meeting.</div>';
+  }
+  document.getElementById('tab-desks').innerHTML=deskHtml;
+  window._buyerDeskMap=sc.buyers;
+
+  document.getElementById('tab-nm').innerHTML=S.noMatch.length?'<div class="infobox iw">⚠ '+S.noMatch.length+' below minimum.</div>'+S.noMatch.map(function(n){return '<div class="nm-item"><span class="badge '+(n.type==='Buyer'?'bb':'bbs')+'">'+n.type+'</span>'+n.name+' <span style="font-size:10px;color:var(--char60)">('+n.count+'/min '+n.min+')</span></div>';}).join(''):'<div class="infobox io">✓ All participants meet minimum requirements.</div>';
+  var errs=checkIntegrity();
+  document.getElementById('tab-int').innerHTML=errs.length?errs.map(function(e){return '<div class="infobox ie">⚠ '+e+'</div>';}).join(''):'<div class="infobox io">✓ No conflicts. Schedule valid.</div>';
+}
+function showTab(n,el){['tab-macro','tab-desks','tab-nm','tab-int'].forEach(function(t){document.getElementById(t).style.display='none';});document.getElementById('tab-'+n).style.display='block';document.querySelectorAll('.tab-bar .tab').forEach(function(t){t.classList.remove('active');});el.classList.add('active');}
+function checkIntegrity(){
+  if(!S.sched)return[];var sc=S.sched,errs=[];
+  sc.slots.forEach(function(slot,s){var seen={};sc.buyers.forEach(function(b){var v=sc.grid[b][s];if(v){if(seen[v])errs.push('Slot '+slot+': "'+v+'" double-booked.');else seen[v]=true;}});});
+  sc.buyers.forEach(function(b){var seen={};sc.slots.forEach(function(sl,s){var v=sc.grid[b][s];if(v){if(seen[v])errs.push('"'+b+'": "'+v+'" appears twice.');else seen[v]=true;}});});
+  return errs;
+}
+function updateDesk(idx,val){var b=window._buyerDeskMap&&window._buyerDeskMap[idx];if(b)S.desks[b]=val;}
+
+// ── CSV EXPORT — one row per meeting ──
+function exportCSV(){
+  if(!S.sched)return;
+  var sc=S.sched;
+  var rows=[['Buyer','Seller','Slot','Desk','Match reasons']];
+  sc.slots.forEach(function(slot,i){
+    sc.buyers.forEach(function(b){
+      var v=sc.grid[b][i];
+      if(v){
+        var desk=getDeskForSlot(b,i);
+        var key=b+'||'+v;
+        var reasons=(S.matchReasons[key]||[]).map(function(r){return r.vals.join('/');}).join(' | ');
+        rows.push([b,v,slot,desk,reasons]);
+      }
+    });
+  });
+  var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='schedule.csv';a.click();
+  toast('CSV exported','ok');
+}
+
+// ── TEMPLATE PREVIEW ──
+function switchTpl(tab){
+  S.tplTab=tab;
+  document.getElementById('tpl-b').style.display=tab==='buyer'?'block':'none';
+  document.getElementById('tpl-s').style.display=tab==='seller'?'block':'none';
+  document.getElementById('tplt-b').classList.toggle('active',tab==='buyer');
+  document.getElementById('tplt-s').classList.toggle('active',tab==='seller');
+  document.getElementById('prev-label').textContent=tab==='buyer'?'Buyer agenda':'Seller agenda';
+  updatePreview();
+}
+function updatePreview(){
+  var isBuyer=S.tplTab==='buyer';
+  var title=(isBuyer?document.getElementById('ttl-b').value:document.getElementById('ttl-s').value)||(isBuyer?'BUSINESS MEETINGS PROGRAMME':'YOUR MEETING SCHEDULE');
+  var intro=(isBuyer?document.getElementById('int-b').value:document.getElementById('int-s').value)||'Introductory text...';
+  document.getElementById('prev-title').textContent=title;
+  document.getElementById('prev-intro').textContent=intro;
+  document.getElementById('prev-img').innerHTML=S.headerImgData?'<img src="'+S.headerImgData+'">':'<span style="font-size:20px;color:var(--char40)">🖼</span>';
+  var cd=document.getElementById('col-date').value;
+  var ct=document.getElementById('col-thead').value;
+  var cols=[];
+  if(document.getElementById('col-time').checked)cols.push('TIME');
+  if(document.getElementById('col-company').checked)cols.push('COMPANY');
+  if(document.getElementById('col-contact').checked)cols.push('CONTACT NAME');
+  if(document.getElementById('col-desk').checked)cols.push('DESK');
+  if(document.getElementById('col-signature').checked)cols.push('SIGNATURE');
+  document.getElementById('prev-thead').innerHTML=cols.map(function(c){
+    var w=c==='SIGNATURE'?'style="background:'+ct+';color:white;padding:3px 7px;font-size:10px;width:80px"':'style="background:'+ct+';color:white;padding:3px 7px;font-size:10px"';
+    return '<th '+w+'>'+c+'</th>';
+  }).join('');
+  var tbody='',lastDate='';
+  var samples=[{slot:'25/03/2025 11:40-12:00',co:'Sample Company A',desk:1},{slot:'25/03/2025 12:00-12:20',co:'Sample Company B',desk:1},{slot:'25/03/2025 14:00-14:20',co:'Sample Company C',desk:isBuyer?1:3}];
+  if(S.sched&&S.sched.buyers.length>0){
+    var b=S.sched.buyers[0];samples=[];
+    S.sched.slots.slice(0,4).forEach(function(slot,i){var v=S.sched.grid[b][i];if(v)samples.push({slot:slot,co:v,desk:getDeskForSlot(b,i)});});
+  }
+  samples.forEach(function(r){
+    var dp=r.slot.split(' ')[0]||'';var tp=r.slot.split(' ')[1]||r.slot;
+    if(dp!==lastDate){tbody+='<tr><td colspan="'+cols.length+'" class="apdate" style="background:'+cd+';color:white">'+dp+'</td></tr>';lastDate=dp;}
+    var row='<tr>';
+    if(document.getElementById('col-time').checked)row+='<td style="padding:3px 7px;font-size:10px">'+tp+'</td>';
+    if(document.getElementById('col-company').checked)row+='<td style="padding:3px 7px;font-size:10px">'+r.co+'</td>';
+    if(document.getElementById('col-contact').checked)row+='<td style="padding:3px 7px;font-size:10px">Contact</td>';
+    if(document.getElementById('col-desk').checked)row+='<td style="padding:3px 7px;font-size:10px;text-align:center;font-weight:700;color:#094172">'+(isBuyer?'Desk '+r.desk:'→ '+r.desk)+'</td>';
+    if(document.getElementById('col-signature').checked)row+='<td style="padding:3px 7px;font-size:10px;min-width:80px;border-bottom:1px solid #ccc">&nbsp;</td>';
+    tbody+=row+'</tr>';
+  });
+  document.getElementById('prev-tbody').innerHTML=tbody;
+}
+
+// ── TEST RUN ──
+function generateTestRun(){
+  if(!S.sched){toast('Generate schedule first','w');return;}
+  var sc=S.sched;
+  var participants=[];
+  sc.buyers.slice(0,2).forEach(function(b){
+    var meetings=[];
+    sc.slots.forEach(function(slot,i){var v=sc.grid[b][i];if(v)meetings.push({slot:slot,co:v,desk:getDeskForSlot(b,i)});});
+    participants.push({name:b,type:'Buyer',meetings:meetings});
+  });
+  var sellerMtgs={};
+  sc.slots.forEach(function(slot,i){sc.buyers.forEach(function(b){var v=sc.grid[b][i];if(v){if(!sellerMtgs[v])sellerMtgs[v]=[];sellerMtgs[v].push({slot:slot,co:b,desk:getDeskForSlot(b,i)});}});});
+  var fs=Object.keys(sellerMtgs)[0];
+  if(fs)participants.push({name:fs,type:'Seller',meetings:sellerMtgs[fs].slice(0,5)});
+  document.getElementById('testrun-content').innerHTML=participants.map(function(p){
+    var isBuyer=p.type==='Buyer';
+    var rows=p.meetings.slice(0,5).map(function(m){
+      var key=isBuyer?p.name+'||'+m.co:m.co+'||'+p.name;
+      var reasons=(S.matchReasons[key]||[]).map(function(r){return r.vals.join(', ');}).join(' · ');
+      return '<div class="mr"><span class="mr-time">'+m.slot+'</span><div style="flex:1"><div class="mr-co">'+m.co+'</div>'+(reasons?'<div class="mr-reason">'+reasons+'</div>':'')+'</div><span class="mr-desk">'+(isBuyer?'Desk '+m.desk:'→ Desk '+m.desk)+'</span></div>';
+    }).join('');
+    return '<div class="pc"><div class="pc-type">'+p.type+'</div><div class="pc-name">'+p.name+'</div>'+(p.meetings.length?rows:'<div style="font-size:11px;color:var(--char60)">No meetings assigned.</div>')+'</div>';
+  }).join('');
+  document.getElementById('approve-btn').style.display='inline-flex';
+  toast('Preview generated — review and approve','ok');
+}
+function approveRun(){
+  S.testApproved=true;
+  var btn=document.getElementById('send-all-btn');
+  btn.disabled=false;btn.textContent='📤 Send all agendas';
+  document.getElementById('approve-btn').textContent='✓ Approved';
+  document.getElementById('approve-btn').disabled=true;
+  toast('Approved — send unlocked','ok');
+}
+
+// ── BUILD AGENDA HTML ──
+function buildAgendaHTML(participant,meetings,isBuyer){
+  var cd=document.getElementById('col-date').value||'#094172';
+  var ct=document.getElementById('col-thead').value||'#0484d1';
+  var title=(isBuyer?document.getElementById('ttl-b').value:document.getElementById('ttl-s').value)||'MEETING PROGRAMME';
+  var intro=(isBuyer?document.getElementById('int-b').value:document.getElementById('int-s').value)||'';
+  var showSig=document.getElementById('col-signature').checked;
+  var colSpan=4+(showSig?1:0);
+  var lastDate='';
+  var rows=meetings.map(function(m){
+    var dp=m.slot.split(' ')[0]||'';var tp=m.slot.split(' ')[1]||m.slot;
+    var dr=dp!==lastDate?'<tr><td colspan="'+colSpan+'" style="background:'+cd+';color:white;padding:4px 8px;font-weight:700;font-size:11px">'+dp+'</td></tr>':'';
+    lastDate=dp;
+    var sig=showSig?'<td style="padding:4px 8px;font-size:11px;min-width:80px;border-bottom:1px solid #ddd">&nbsp;</td>':'';
+    return dr+'<tr><td style="padding:4px 8px;font-size:11px">'+tp+'</td><td style="padding:4px 8px;font-size:11px;font-weight:700">'+m.co+'</td><td style="padding:4px 8px;font-size:11px">'+(m.contact||'')+'</td><td style="padding:4px 8px;font-size:11px;text-align:center;font-weight:700;color:#094172">'+(isBuyer?'Desk '+m.desk:'→ Desk '+m.desk)+'</td>'+sig+'</tr>';
+  }).join('');
+  var sigHeader=showSig?'<th style="background:'+ct+';color:white;padding:4px 8px;text-align:center;width:80px">SIGNATURE</th>':'';
+  return '<div style="font-family:Arial,sans-serif;max-width:600px">'+
+    (S.headerImgData?'<img src="'+S.headerImgData+'" style="width:100%;max-height:120px;object-fit:cover">':'')+
+    '<h2 style="text-align:center;padding:10px;font-size:14px;border-bottom:1px solid #eee">'+title+'</h2>'+
+    '<div style="background:#f4f8fb;padding:8px 14px;border-bottom:1px solid #eee;font-size:12px"><strong>'+(isBuyer?'Hosted Buyer':'Exhibitor / Seller')+':</strong> '+participant+' &nbsp;|&nbsp; <strong>'+(isBuyer?'Your desk':'Your schedule')+':</strong> '+(isBuyer?'Desk '+(S.desks[participant]||'—'):'Move to indicated desks')+'</div>'+
+    (intro?'<p style="font-size:11px;font-style:italic;text-align:center;padding:6px 12px;color:#555">'+intro+'</p>':'')+
+    '<table style="width:100%;border-collapse:collapse;font-size:11px">'+
+    '<tr><th style="background:'+ct+';color:white;padding:4px 8px;text-align:left">TIME</th><th style="background:'+ct+';color:white;padding:4px 8px;text-align:left">COMPANY</th><th style="background:'+ct+';color:white;padding:4px 8px;text-align:left">CONTACT</th><th style="background:'+ct+';color:white;padding:4px 8px;text-align:center">DESK</th>'+sigHeader+'</tr>'+
+    rows+'</table></div>';
+}
+
+// ── SEND ──
+function renderSendStep(){
+  var bh=S.buyers.h,sh=S.sellers.h;
+  ['ecol-b','ncol-b'].forEach(function(id){document.getElementById(id).innerHTML='<option value="">— select —</option>'+bh.map(function(h){return '<option>'+h+'</option>';}).join('');});
+  ['ecol-s','ncol-s'].forEach(function(id){document.getElementById(id).innerHTML='<option value="">— select —</option>'+sh.map(function(h){return '<option>'+h+'</option>';}).join('');});
+  bh.forEach(function(h){if(/email/i.test(h))document.getElementById('ecol-b').value=h;if(/contact.?name/i.test(h))document.getElementById('ncol-b').value=h;});
+  sh.forEach(function(h){if(/email/i.test(h))document.getElementById('ecol-s').value=h;if(/contact.?name/i.test(h))document.getElementById('ncol-s').value=h;});
+  if(S.gmailToken)document.getElementById('gmail-connect-prompt').style.display='none';
+  updateEmailPreview();
+}
+function updateEmailPreview(){
+  var body=document.getElementById('email-body').value;
+  var ev=document.getElementById('ev-name').value||'the event';
+  document.getElementById('email-preview').innerHTML=(body.replace(/\{\{name\}\}/g,'[Name]').replace(/\{\{company\}\}/g,'[Company]').replace(/\{\{event\}\}/g,ev).replace(/\{\{n_meetings\}\}/g,'5').replace(/\{\{agenda_table\}\}/g,'[Agenda table]')).replace(/\n/g,'<br>');
+}
+function insertVar(v){var ta=document.getElementById('email-body');var pos=ta.selectionStart;ta.value=ta.value.substring(0,pos)+v+ta.value.substring(pos);updateEmailPreview();}
+
+async function sendTestEmailReal(){
+  if(!S.gmailToken){toast('Connect Gmail first','w');return;}
+  if(!S.sched){toast('Generate schedule first','w');return;}
+  var testEmail=document.getElementById('test-email').value.trim();
+  if(!testEmail||!testEmail.includes('@')){toast('Enter a valid email address','w');return;}
+  var status=document.getElementById('test-email-status');
+  status.style.display='block';status.textContent='Sending test emails...';
+  var sc=S.sched;
+  var evName=document.getElementById('ev-name').value||'Test Event';
+  var subject=document.getElementById('email-subj').value.replace(/\{\{event\}\}/g,evName);
+  var bodyTemplate=document.getElementById('email-body').value;
+  var sent=0;
+  if(sc.buyers.length>0){
+    var b=sc.buyers[0];
+    var meetings=[];
+    sc.slots.forEach(function(slot,i){var v=sc.grid[b][i];if(v)meetings.push({slot:slot,co:v,contact:'Contact',desk:getDeskForSlot(b,i)});});
+    var agendaHtml=buildAgendaHTML(b,meetings,true);
+    var body=bodyTemplate.replace(/\{\{name\}\}/g,b).replace(/\{\{company\}\}/g,b).replace(/\{\{event\}\}/g,evName).replace(/\{\{n_meetings\}\}/g,meetings.length).replace(/\{\{agenda_table\}\}/g,agendaHtml);
+    try{var r=await sendGmailMessage(testEmail,'[BUYER TEST] '+subject,body);if(r.ok){sent++;status.textContent='✓ Buyer test sent...';}}catch(e){status.textContent='Error: '+e.message;}
+  }
+  await new Promise(function(r){setTimeout(r,500);});
+  var sellerMtgs={};
+  sc.slots.forEach(function(slot,i){sc.buyers.forEach(function(b){var v=sc.grid[b][i];if(v){if(!sellerMtgs[v])sellerMtgs[v]=[];sellerMtgs[v].push({slot:slot,co:b,contact:'Contact',desk:getDeskForSlot(b,i)});}});});
+  var firstSeller=Object.keys(sellerMtgs)[0];
+  if(firstSeller){
+    var agendaHtml=buildAgendaHTML(firstSeller,sellerMtgs[firstSeller],false);
+    var body=bodyTemplate.replace(/\{\{name\}\}/g,firstSeller).replace(/\{\{company\}\}/g,firstSeller).replace(/\{\{event\}\}/g,evName).replace(/\{\{n_meetings\}\}/g,sellerMtgs[firstSeller].length).replace(/\{\{agenda_table\}\}/g,agendaHtml);
+    try{var r=await sendGmailMessage(testEmail,'[SELLER TEST] '+subject,body);if(r.ok){sent++;status.textContent='✓ Both test emails sent to '+testEmail+'. Check your inbox!';}}catch(e){status.textContent='Buyer sent. Error on seller: '+e.message;}
+  }
+  toast(sent+' test email(s) sent to '+testEmail,'ok');
+}
+
+async function sendAllEmails(){
+  if(!S.testApproved){toast('Approve the test run first','w');return;}
+  if(!S.gmailToken){toast('Connect Gmail first','w');return;}
+  if(!S.sched){toast('Generate schedule first','w');return;}
+  var sc=S.sched;
+  var emailColB=document.getElementById('ecol-b').value;
+  var nameColB=document.getElementById('ncol-b').value;
+  var emailColS=document.getElementById('ecol-s').value;
+  var nameColS=document.getElementById('ncol-s').value;
+  var subject=document.getElementById('email-subj').value;
+  var bodyTemplate=document.getElementById('email-body').value;
+  var sendTo=document.getElementById('send-to').value;
+  var evName=document.getElementById('ev-name').value||'the event';
+  var tasks=[];
+  if(sendTo==='all'||sendTo==='buyers'){
+    sc.buyers.forEach(function(bco){
+      var buyerRow=S.buyers.d.find(function(r){return (r[S.buyers.h.indexOf('Company name')]||'').toString().trim()===bco;});
+      if(!buyerRow)return;
+      var email=emailColB?buyerRow[S.buyers.h.indexOf(emailColB)]||'':'';
+      var name=nameColB?buyerRow[S.buyers.h.indexOf(nameColB)]||bco:bco;
+      if(!email)return;
+      var meetings=[];
+      sc.slots.forEach(function(slot,i){
+        var v=sc.grid[bco][i];
+        if(v){
+          var sellerRow=S.sellers.d.find(function(r){return (r[S.sellers.h.indexOf('Company name')]||'').toString().trim()===v;});
+          var contact=sellerRow&&nameColS?sellerRow[S.sellers.h.indexOf(nameColS)]||v:v;
+          meetings.push({slot:slot,co:v,contact:contact,desk:getDeskForSlot(bco,sc.slots.indexOf(slot))});
+        }
+      });
+      var agendaHtml=buildAgendaHTML(bco,meetings,true);
+      var body=bodyTemplate.replace(/\{\{name\}\}/g,name).replace(/\{\{company\}\}/g,bco).replace(/\{\{event\}\}/g,evName).replace(/\{\{n_meetings\}\}/g,meetings.length).replace(/\{\{agenda_table\}\}/g,agendaHtml);
+      tasks.push({to:email.toString(),subject:subject.replace(/\{\{event\}\}/g,evName),body:body});
+    });
+  }
+  if(sendTo==='all'||sendTo==='sellers'){
+    var sellerMtgs={};
+    sc.slots.forEach(function(slot,i){sc.buyers.forEach(function(b){var v=sc.grid[b][i];if(v){if(!sellerMtgs[v])sellerMtgs[v]=[];sellerMtgs[v].push({slot:slot,co:b,contact:'',desk:getDeskForSlot(b,i)});}});});
+    Object.keys(sellerMtgs).forEach(function(sco){
+      var sellerRow=S.sellers.d.find(function(r){return (r[S.sellers.h.indexOf('Company name')]||'').toString().trim()===sco;});
+      if(!sellerRow)return;
+      var email=emailColS?sellerRow[S.sellers.h.indexOf(emailColS)]||'':'';
+      var name=nameColS?sellerRow[S.sellers.h.indexOf(nameColS)]||sco:sco;
+      if(!email)return;
+      var agendaHtml=buildAgendaHTML(sco,sellerMtgs[sco],false);
+      var body=bodyTemplate.replace(/\{\{name\}\}/g,name).replace(/\{\{company\}\}/g,sco).replace(/\{\{event\}\}/g,evName).replace(/\{\{n_meetings\}\}/g,sellerMtgs[sco].length).replace(/\{\{agenda_table\}\}/g,agendaHtml);
+      tasks.push({to:email.toString(),subject:subject.replace(/\{\{event\}\}/g,evName),body:body});
+    });
+  }
+  if(!tasks.length){toast('No valid email addresses found','w');return;}
+  document.getElementById('send-prog').style.display='block';
+  var pbar=document.getElementById('spbar');var status=document.getElementById('send-status');
+  var sent=0,failed=0;
+  for(var i=0;i<tasks.length;i++){
+    var t=tasks[i];
+    if(i>0&&i%50===0){
+      for(var w=70;w>0;w--){
+        status.textContent='⏸ Pausing for Gmail limits ('+w+'s)... '+sent+' sent. Do not close this tab.';
+        await new Promise(function(r){setTimeout(r,1000);});
+      }
+    }
+    status.textContent='📤 Sending to '+t.to+' ('+(i+1)+'/'+tasks.length+')...';
+    pbar.style.width=Math.round(100*(i+1)/tasks.length)+'%';
+    try{var resp=await sendGmailMessage(t.to,t.subject,t.body);if(resp.ok){sent++;}else{failed++;}}catch(e){failed++;}
+    await new Promise(function(r){setTimeout(r,400);});
+  }
+  status.textContent='✓ Done: '+sent+' sent'+(failed?' · '+failed+' failed':'');
+  toast(sent+' emails sent'+(failed?' ('+failed+' failed)':''),'ok');
+}
+
+function exportAllCSV(){
+  if(!S.sched){toast('Generate schedule first','w');return;}
+  var sc=S.sched;
+  var rows=[['Buyer','Seller','Slot','Desk','Match reasons']];
+  sc.slots.forEach(function(slot,i){
+    sc.buyers.forEach(function(b){
+      var v=sc.grid[b][i];
+      if(v){
+        var desk=getDeskForSlot(b,i);
+        var key=b+'||'+v;
+        var reasons=(S.matchReasons[key]||[]).map(function(r){return r.vals.join('/');}).join(' | ');
+        rows.push([b,v,slot,desk,reasons]);
+      }
+    });
+  });
+  var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='how2match_agendas.csv';a.click();
+  toast('All agendas exported','ok');
+}
+
+function showLang(lang,el){
+  ['en','es','tr','ko','pt'].forEach(function(l){document.getElementById('lang-'+l).style.display='none';});
+  document.getElementById('lang-'+lang).style.display='block';
+  document.querySelectorAll('.lang-tab').forEach(function(t){t.classList.remove('active');});
+  el.classList.add('active');
+}
+
+updatePreview();
 var HEADERS=['Company name','Contact name','Email','Language(s)','Region of interest','Criterion 1','Criterion 2','Criterion 3','Criterion 4','Criterion 5'];
 
 // ── CONFIG CHANGE TRACKING ──
