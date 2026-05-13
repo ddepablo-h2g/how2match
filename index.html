@@ -97,7 +97,7 @@ input[type=color]{width:44px;height:32px;padding:2px;border:1px solid var(--bord
 .tab{padding:7px 13px;font-size:11px;font-weight:700;cursor:pointer;color:var(--char60);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
 .tab:hover{color:var(--blue)}.tab.active{color:var(--blue);border-bottom-color:var(--blue)}
 .aw{overflow-x:auto}
-.atbl{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed}
+.atbl{width:100%;border-collapse:collapse;font-size:11px;table-layout:auto}
 .atbl th{padding:5px 7px;text-align:left;font-weight:700;background:var(--navy);color:white;border:1px solid var(--navy80);font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .atbl td{padding:4px 7px;border:1px solid var(--border);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;position:relative}
 .atbl td.hit{background:#e8f5fe;color:var(--navy);font-weight:700;cursor:pointer}
@@ -191,6 +191,7 @@ var CONFIG = {
     <div class="gmail-status" id="gmail-status"><span class="gmail-dot" id="gmail-dot"></span><span id="gmail-label">Gmail: not connected</span></div>
     <button class="tbtn" onclick="connectGmail()">Connect Gmail</button>
     <button class="tbtn" onclick="if(confirm('Start a new project? You can restore it later.')){clearProject();location.reload();}">🆕 New</button>
+    <span id="save-indicator" style="font-size:10px;color:var(--navy40);display:none">💾 Saved</span>
     <button class="tbtn" onclick="goStep(6)">📖 Help</button>
     <button class="tbtn" onclick="goStep(7)">❓ FAQ</button>
   </div>
@@ -330,8 +331,11 @@ var CONFIG = {
 </div>
 
 <!-- STEP 3: SCHEDULE -->
-<div class="panel" id="p3">
-  <div class="card">
+<!-- STEP 3: SCHEDULE — full width -->
+</div><!-- /main -->
+<div id="p3-outer" style="padding:22px 18px;display:none">
+<div class="panel" id="p3" style="display:block">
+  <div class="card" style="max-width:none">
     <div class="ctitle">Generated schedule</div>
     <div class="csub">Hover any cell to see why buyer and seller matched.</div>
     <div id="capacity-warning" style="display:none;margin-bottom:12px"></div>
@@ -364,6 +368,9 @@ var CONFIG = {
   </div>
 </div>
 
+  </div>
+</div><!-- /p3-outer -->
+<div class="main">
 <!-- STEP 4: TEMPLATE -->
 <div class="panel" id="p4">
   <div class="card">
@@ -390,7 +397,7 @@ var CONFIG = {
       <div class="tpl-tab" id="tplt-s" onclick="switchTpl('seller')">🏪 Sellers version</div>
     </div>
     <div id="tpl-b">
-      <div class="infobox ii" style="font-size:11px">ℹ️ Buyers stay at their <strong>fixed desk</strong>. Sellers come to them.</div>
+      <div id="tpl-b-infobox" class="infobox ii" style="font-size:11px">ℹ️ Buyers stay at their <strong>fixed desk</strong>. Sellers come to them.</div>
       <div class="f"><label>Title (buyers)</label><input type="text" id="ttl-b" placeholder="BUSINESS MEETINGS PROGRAMME" oninput="updatePreview()"></div>
       <div class="f"><label>Intro text (buyers)</label><textarea id="int-b" rows="3" oninput="updatePreview()" placeholder="Please remain at your assigned desk. Sellers will come to you at each scheduled time."></textarea></div>
     </div>
@@ -858,6 +865,17 @@ function toggleEditMode(){
   }
   renderSchedule();
 }
+function blockSlot(buyer,slotIdx){
+  if(!S.sched)return;
+  if(!S.sched.blocked)S.sched.blocked={};
+  S.sched.blocked[buyer+'_'+slotIdx]=true;
+  renderSchedule();saveProject();
+}
+function unblockSlot(buyer,slotIdx){
+  if(!S.sched||!S.sched.blocked)return;
+  delete S.sched.blocked[buyer+'_'+slotIdx];
+  renderSchedule();saveProject();
+}
 function removeMeeting(buyer,slotIdx){
   if(!S.sched)return;
   S.sched.grid[buyer][slotIdx]='';
@@ -898,6 +916,8 @@ function searchParticipant(val){
 // ── LOCALSTORAGE ──
 function saveProject(){
   try{
+    var ind=document.getElementById('save-indicator');
+    if(ind){ind.style.display='inline';setTimeout(function(){ind.style.display='none';},2000);}
     var data={
       evName:document.getElementById('ev-name').value,
       evOrg:document.getElementById('ev-org').value,
@@ -1014,6 +1034,16 @@ function sendGmailMessage(to,subject,body){
 // ── NAV ──
 function goStep(n){
   S.step=n;
+  // Show/hide the p3 outer container (full width) vs main container
+  var main=document.querySelector('.main');
+  var p3outer=document.getElementById('p3-outer');
+  if(n===3){
+    main.style.display='none';
+    p3outer.style.display='block';
+  } else {
+    main.style.display='';
+    p3outer.style.display='none';
+  }
   document.querySelectorAll('.panel').forEach(function(p,i){p.classList.toggle('active',i===n);});
   document.querySelectorAll('.step').forEach(function(s,i){s.classList.remove('active','done');if(i===n)s.classList.add('active');else if(i<n)s.classList.add('done');});
   if(n===3){
@@ -1321,9 +1351,9 @@ function renderSchedule(){
   var vis=sc.buyers; // show ALL buyers with horizontal scroll
   var isEdit=S.editMode;
   var allRows=S.slots;
-  var html='<thead><tr><th style="width:135px;position:sticky;left:0;z-index:2">Slot</th>'+vis.map(function(b){
+  var html='<thead><tr><th style="width:140px;position:sticky;left:0;z-index:2;background:var(--navy)">Slot</th>'+vis.map(function(b){
     var del=isEdit?'<span onclick="removeBuyer(\''+b.replace(/'/g,"\\'")+'\')" style="cursor:pointer;color:#ff6b6b;font-size:10px;margin-left:4px" title="Remove all meetings">✕</span>':'';
-    return '<th style="min-width:100px" title="'+b+'">'+b.substring(0,10)+(b.length>10?'…':'')+del+'</th>';
+    return '<th style="min-width:130px;max-width:180px" title="'+b+'">'+b+del+'</th>';
   }).join('')+'</tr></thead><tbody>';
   var activeIdx=0;
   allRows.forEach(function(row){
@@ -1340,11 +1370,22 @@ function renderSchedule(){
           var bs=b.replace(/'/g,"\\'").replace(/"/g,'&quot;');
           var vs=v.replace(/'/g,"\\'").replace(/"/g,'&quot;');
           if(isEdit){
-            html+='<td class="hit" style="position:relative">'+v.substring(0,10)+(v.length>10?'…':'')+'<span style="position:absolute;top:2px;right:2px;cursor:pointer;color:#ff6b6b;font-size:10px;line-height:1" onclick="removeMeeting(\''+bs+'\','+i+')">✕</span></td>';
+            html+='<td class="hit" style="position:relative">'+v.substring(0,14)+(v.length>14?'…':'')+'<span style="position:absolute;top:2px;right:2px;cursor:pointer;color:#ff6b6b;font-size:10px;line-height:1" onclick="removeMeeting(\''+bs+'\','+i+')">✕</span></td>';
           } else {
-            html+='<td class="hit" onmouseenter="showTT(\''+bs+'\',\''+vs+'\','+i+',event)" onmouseleave="hideTT()">'+v.substring(0,10)+(v.length>10?'…':'')+'<span style="font-size:9px;color:var(--blue60);margin-left:3px">D'+desk+'</span></td>';
+            html+='<td class="hit" onmouseenter="showTT(\''+bs+'\',\''+vs+'\','+i+',event)" onmouseleave="hideTT()">'+v.substring(0,14)+(v.length>14?'…':'')+'<span style="font-size:9px;color:var(--blue60);margin-left:3px">D'+desk+'</span></td>';
           }
-        } else{html+='<td class="miss">—</td>';}
+        } else {
+          if(isEdit){
+            var isBlocked=S.sched.blocked&&S.sched.blocked[b+'_'+i];
+            if(isBlocked){
+              html+='<td style="background:#ffe0e0;cursor:pointer;font-size:9px;text-align:center;color:#c00" onclick="unblockSlot(\''+b.replace(/'/g,"\\'")+'\','+i+')" title="Click to unblock">🚫 Blocked</td>';
+            } else {
+              html+='<td class="miss" style="cursor:pointer" onclick="blockSlot(\''+b.replace(/'/g,"\\'")+'\','+i+')" title="Click to block this slot">—</td>';
+            }
+          } else {
+            html+='<td class="miss">—</td>';
+          }
+        }
       });
       html+='</tr>';
     }
@@ -1415,6 +1456,18 @@ function switchTpl(tab){
   updatePreview();
 }
 function updatePreview(){
+  // Update infobox based on desk mode
+  var deskMode=document.getElementById('ev-desk-mode').value;
+  var infobox=document.getElementById('tpl-b-infobox');
+  if(infobox){
+    if(deskMode==='rotating'){
+      infobox.innerHTML='ℹ️ <strong>Rotating mode:</strong> buyers move between desks each slot. Sellers go to the desk indicated.';
+      infobox.className='infobox iw';
+    } else {
+      infobox.innerHTML='ℹ️ Buyers stay at their <strong>fixed desk</strong>. Sellers come to them.';
+      infobox.className='infobox ii';
+    }
+  }
   var isBuyer=S.tplTab==='buyer';
   var title=(isBuyer?document.getElementById('ttl-b').value:document.getElementById('ttl-s').value)||(isBuyer?'BUSINESS MEETINGS PROGRAMME':'YOUR MEETING SCHEDULE');
   var intro=(isBuyer?document.getElementById('int-b').value:document.getElementById('int-s').value)||'Introductory text...';
