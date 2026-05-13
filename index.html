@@ -19,7 +19,7 @@
 body{font-family:'Lato',sans-serif;background:#f7f8fa;color:var(--dark);font-size:14px;min-height:100vh}
 .topbar{background:var(--navy);padding:0 24px;height:54px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:200}
 .brand{display:flex;align-items:center;gap:8px;text-decoration:none}
-.brand-icon{width:30px;height:30px;background:var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.brand-icon{width:44px;height:44px;background:transparent;border-radius:6px;display:flex;align-items:center;justify-content:center}
 .brand-icon svg{width:16px;height:16px;fill:none;stroke:white;stroke-width:2.5;stroke-linecap:round}
 .brand-name{font-size:17px;font-weight:700;color:white;letter-spacing:-.4px}
 .brand-name span{color:var(--blue60)}
@@ -183,13 +183,14 @@ var CONFIG = {
 
 <div class="topbar">
   <a class="brand" href="#">
-    <div class="brand-icon"><svg viewBox="0 0 24 24"><path d="M7 16l-4-4 4-4M17 8l4 4-4 4M14 4l-4 16"/></svg></div>
+    <div class="brand-icon" style="background:transparent;overflow:hidden;border-radius:0"><img src="data:image/png;base64,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" style="width:44px;height:44px;object-fit:cover;mix-blend-mode:lighten"></div>
     <span class="brand-name">HOW2<span>MATCH</span></span>
   </a>
   <span class="proj-pill" id="proj-pill">No project</span>
   <div class="topbar-right">
     <div class="gmail-status" id="gmail-status"><span class="gmail-dot" id="gmail-dot"></span><span id="gmail-label">Gmail: not connected</span></div>
     <button class="tbtn" onclick="connectGmail()">Connect Gmail</button>
+    <button class="tbtn" onclick="if(confirm('Start a new project? You can restore it later.')){clearProject();location.reload();}">🆕 New</button>
     <button class="tbtn" onclick="goStep(6)">📖 Help</button>
     <button class="tbtn" onclick="goStep(7)">❓ FAQ</button>
   </div>
@@ -248,6 +249,11 @@ var CONFIG = {
       <div class="sf"><label>Break between (min)</label><input type="number" id="sg-break" value="0" min="0" max="120" style="width:75px"></div>
       <button class="btn bp bsm" onclick="genSlots()" style="margin-top:auto">⚡ Generate</button>
       <button class="btn bg bsm" onclick="addBreak()" style="margin-top:auto">☕ Add break</button>
+    </div>
+    <div id="break-name-row" style="display:none;gap:8px;margin-bottom:8px;align-items:center">
+      <input type="text" id="break-name-input" placeholder="Break name (e.g. Lunch, Coffee break, Welcome Conference...)" style="flex:1">
+      <button class="btn bp bsm" onclick="confirmBreak()">+ Add</button>
+      <button class="btn bg bsm" onclick="document.getElementById('break-name-row').style.display='none'">Cancel</button>
     </div>
     <div class="slbl-t">Slots <span id="slot-count" style="color:var(--blue)">(0 active)</span></div>
     <div class="slots-area" id="slot-list"></div>
@@ -333,6 +339,13 @@ var CONFIG = {
       <div class="infobox iw">⚠️ <div><strong>Configuration changed.</strong> Your event settings (slots, tables or minimums) have been modified since the last schedule was generated. Go back to Matching and click <strong>Generate matches</strong> again to update the schedule.</div></div>
     </div>
     <div class="metrics-grid" id="metrics"></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+      <button class="btn bo bsm" id="edit-mode-btn" onclick="toggleEditMode()">✏️ Edit schedule</button>
+      <div id="search-participant-box" style="display:none;flex:1;min-width:200px;max-width:340px;position:relative">
+        <input type="text" id="search-participant" placeholder="Search participant to remove all their meetings..." style="font-size:11px;padding:5px 10px;width:100%" oninput="searchParticipant(this.value)">
+        <div id="search-results" style="position:absolute;top:100%;left:0;right:0;background:white;border:1px solid var(--border);border-radius:4px;z-index:100;max-height:180px;overflow-y:auto;display:none"></div>
+      </div>
+    </div>
     <div class="tab-bar">
       <div class="tab active" id="tb-macro" onclick="showTab('macro',this)">Macro schedule</div>
       <div class="tab" id="tb-desks" onclick="showTab('desks',this)">Desks</div>
@@ -707,8 +720,8 @@ Thank you for your participation.</textarea></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>What is the Macro Schedule?</strong><br>The master view for the organiser — slots as rows, buyers as columns, assigned seller in each cell. In Fixed mode the desk appears in each buyer's column header. In Rotating mode it appears in each cell. Export as CSV for your records.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>What is Integrity?</strong><br>The Integrity check verifies that no seller is double-booked (assigned to two meetings in the same slot) and no buyer has the same seller twice.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Can I upload my own Excel without using the template?</strong><br>Yes, but we strongly recommend working from the provided templates and normalising your data first — consistent spelling, comma-separated values, and matching column names across buyer and seller files. Inconsistent data = missed matches.</div></div>
-      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>A participant has specific availability constraints. What do I do?</strong><br>The tool does not currently support individual slot exclusions. Handle these adjustments manually after generating the schedule — edit the CSV or the agenda before sending.</div></div>
-      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Are agendas sent as PDF?</strong><br>No — agendas are sent as formatted HTML inside the email body. To share a PDF version, export the CSV and format it manually in Google Sheets or Excel.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>A participant has specific availability constraints. What do I do?</strong><br>The tool does not support individual slot exclusions during matching. For special cases — a participant who misses a flight, knows another participant already, or is unavailable during a specific slot — use the <strong>✏️ Edit schedule</strong> button in Step 4 to manually remove those meetings after generating the schedule.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Are agendas sent as PDF?</strong><br>No — agendas are sent as formatted HTML inside the email body, which works on all email clients. If you need PDF attachments, export the CSV from Step 6, format it in Google Sheets, and use Google Sheets + Apps Script with your own Gmail to send them. Note: this approach only works with Gmail — Outlook does not have a native equivalent.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Gmail sending limits and permissions?</strong><br>When you click Connect Gmail, you authorise the tool to send emails on your behalf. Google allows up to 100 emails per hour. The tool auto-pauses every 50 emails. Do not close the browser during sending. Your Gmail credentials are never stored — the connection expires when you close the browser.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>What about AI matching?</strong><br>AI matching (Gemini) is coming soon. When active, it will interpret semantically equivalent values across languages — "Cítricos", "Lemon" and "Limón" would all match automatically, eliminating the need for manual data normalisation.</div></div>
     </div>
@@ -722,7 +735,7 @@ Thank you for your participation.</textarea></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Qué es el Macro Schedule?</strong><br>Vista maestra para el organizador — slots en filas, compradores en columnas. En Fixed la mesa aparece en la cabecera de columna. En Rotating aparece en cada celda. Expórtalo como CSV.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Qué es la Integridad?</strong><br>Verifica que ningún vendedor esté reservado doble y que ningún comprador tenga el mismo vendedor dos veces.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Puedo subir mi propio Excel?</strong><br>Sí, pero normaliza los datos antes — ortografía consistente, valores separados por comas, nombres de columnas coincidentes. Datos inconsistentes = matches perdidos.</div></div>
-      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Un participante no puede en un slot concreto. ¿Qué hago?</strong><br>La herramienta no admite exclusiones individuales. Ajusta manualmente el schedule tras generarlo.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Un participante no puede en un slot concreto. ¿Qué hago?</strong><br>La herramienta no admite exclusiones individuales de slots durante el matching. Para casos especiales — un participante que pierde el vuelo, que ya conoce a otro, o que no está disponible en un horario concreto — usa el botón <strong>✏️ Edit schedule</strong> en el Paso 4 para eliminar manualmente esas reuniones tras generar el schedule.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Las agendas se envían como PDF?</strong><br>No — como HTML en el cuerpo del email. Para PDF, exporta el CSV y fórmatealo en Google Sheets o Excel.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Permisos y límites de Gmail</strong><br>Connect Gmail autoriza el envío en tu nombre. Máximo 100/hora, pausas cada 50. Las credenciales nunca se almacenan — la conexión expira al cerrar el navegador.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Y la IA?</strong><br>Próximamente. Gemini AI interpretará valores equivalentes entre idiomas — "Cítricos", "Lemon" y "Limón" coincidirán automáticamente.</div></div>
@@ -763,7 +776,8 @@ var S={
   slots:[],buyers:{h:[],d:[]},sellers:{h:[],d:[]},
   rules:[],sched:null,matches:[],matchReasons:{},noMatch:[],desks:{},
   headerImgData:null,step:0,testApproved:false,tplTab:'buyer',
-  gmailToken:null,gmailUser:null,scheduleGenerated:false,configChanged:false
+  gmailToken:null,gmailUser:null,scheduleGenerated:false,configChanged:false,
+  editMode:false
 };
 var HEADERS=['Company name','Contact name','Email','Language(s)','Region of interest','Criterion 1','Criterion 2','Criterion 3','Criterion 4','Criterion 5'];
 
@@ -826,6 +840,110 @@ function checkCapacity(){
   el.innerHTML=html;
   checkDeskMode();
 }
+
+// ── EDIT MODE ──
+function toggleEditMode(){
+  S.editMode=!S.editMode;
+  var btn=document.getElementById('edit-mode-btn');
+  var box=document.getElementById('search-participant-box');
+  if(S.editMode){
+    btn.textContent='✓ Done editing';btn.className='btn bsuc bsm';
+    box.style.display='flex';
+    toast('Edit mode ON — click ✕ on any cell to remove a meeting','ok');
+  } else {
+    btn.textContent='✏️ Edit schedule';btn.className='btn bo bsm';
+    box.style.display='none';
+    document.getElementById('search-results').style.display='none';
+    toast('Edit mode OFF','ok');
+  }
+  renderSchedule();
+}
+function removeMeeting(buyer,slotIdx){
+  if(!S.sched)return;
+  S.sched.grid[buyer][slotIdx]='';
+  renderSchedule();toast('Meeting removed','ok');saveProject();
+}
+function removeBuyer(buyer){
+  if(!S.sched)return;
+  S.sched.slots.forEach(function(sl,i){S.sched.grid[buyer][i]='';});
+  document.getElementById('search-participant').value='';
+  document.getElementById('search-results').style.display='none';
+  renderSchedule();toast('All meetings removed for '+buyer,'ok');saveProject();
+}
+function removeSeller(seller){
+  if(!S.sched)return;
+  S.sched.buyers.forEach(function(b){
+    S.sched.slots.forEach(function(sl,i){if(S.sched.grid[b][i]===seller)S.sched.grid[b][i]='';});
+  });
+  document.getElementById('search-participant').value='';
+  document.getElementById('search-results').style.display='none';
+  renderSchedule();toast('All meetings removed for '+seller,'ok');saveProject();
+}
+function searchParticipant(val){
+  var res=document.getElementById('search-results');
+  if(!val||!S.sched){res.style.display='none';return;}
+  val=val.toLowerCase();
+  var matches=[];
+  S.sched.buyers.forEach(function(b){if(b.toLowerCase().includes(val))matches.push({name:b,type:'Buyer'});});
+  var sellers={};
+  S.sched.buyers.forEach(function(b){S.sched.slots.forEach(function(sl,i){var v=S.sched.grid[b][i];if(v)sellers[v]=true;});});
+  Object.keys(sellers).forEach(function(s){if(s.toLowerCase().includes(val))matches.push({name:s,type:'Seller'});});
+  if(!matches.length){res.style.display='none';return;}
+  res.innerHTML=matches.slice(0,8).map(function(m){
+    var fn=m.type==='Buyer'?'removeBuyer':'removeSeller';
+    return '<div style="padding:6px 10px;cursor:pointer;font-size:11px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--gray)" onmouseenter="this.style.background=&quot;#f0f7ff&quot;" onmouseleave="this.style.background=&quot;white&quot;" onclick="'+fn+'(\''+m.name.replace(/'/g,"\'")+'\')"><span class="badge '+(m.type==="Buyer"?"bb":"bbs")+'">'+m.type+'</span>'+m.name+'<span style="margin-left:auto;color:var(--danger);font-size:10px">Remove all meetings</span></div>';
+  }).join('');
+  res.style.display='block';
+}
+// ── LOCALSTORAGE ──
+function saveProject(){
+  try{
+    var data={
+      evName:document.getElementById('ev-name').value,
+      evOrg:document.getElementById('ev-org').value,
+      evStart:document.getElementById('ev-start').value,
+      evEnd:document.getElementById('ev-end').value,
+      evDur:document.getElementById('ev-dur').value,
+      evTables:document.getElementById('ev-tables').value,
+      evMin:document.getElementById('ev-min').value,
+      evMax:document.getElementById('ev-max').value,
+      evDeskMode:document.getElementById('ev-desk-mode').value,
+      evNBuyers:document.getElementById('ev-nbuyers').value,
+      evNSellers:document.getElementById('ev-nsellers').value,
+      slots:S.slots,buyers:S.buyers,sellers:S.sellers,rules:S.rules,
+      matches:S.matches,matchReasons:S.matchReasons,sched:S.sched,
+      noMatch:S.noMatch,desks:S.desks,savedAt:new Date().toISOString()
+    };
+    localStorage.setItem('how2match_project',JSON.stringify(data));
+  }catch(e){console.warn('Save failed:',e);}
+}
+function loadProject(){
+  try{
+    var raw=localStorage.getItem('how2match_project');
+    if(!raw)return false;
+    var data=JSON.parse(raw);
+    document.getElementById('ev-name').value=data.evName||'';
+    document.getElementById('ev-org').value=data.evOrg||'';
+    document.getElementById('ev-start').value=data.evStart||'';
+    document.getElementById('ev-end').value=data.evEnd||'';
+    document.getElementById('ev-dur').value=data.evDur||20;
+    document.getElementById('ev-tables').value=data.evTables||10;
+    document.getElementById('ev-min').value=data.evMin||2;
+    document.getElementById('ev-max').value=data.evMax||10;
+    document.getElementById('ev-desk-mode').value=data.evDeskMode||'fixed';
+    document.getElementById('ev-nbuyers').value=data.evNBuyers||0;
+    document.getElementById('ev-nsellers').value=data.evNSellers||0;
+    S.slots=data.slots||[];S.buyers=data.buyers||{h:[],d:[]};
+    S.sellers=data.sellers||{h:[],d:[]};S.rules=data.rules||[];
+    S.matches=data.matches||[];S.matchReasons=data.matchReasons||{};
+    S.sched=data.sched||null;S.noMatch=data.noMatch||[];S.desks=data.desks||{};
+    S.scheduleGenerated=!!data.sched;
+    updatePill();renderSlots();checkBothLoaded();renderRules();
+    if(S.sched)renderSchedule();
+    return data.savedAt;
+  }catch(e){console.warn('Load failed:',e);return false;}
+}
+function clearProject(){localStorage.removeItem('how2match_project');toast('Project cleared','ok');}
 
 // ── CONFIG CHANGE TRACKING ──
 function markConfigChanged(){
@@ -931,10 +1049,19 @@ function genSlots(){
   renderSlots();toast(added+' slots added','ok');
 }
 function addBreak(){
+  var row=document.getElementById('break-name-row');
+  row.style.display='flex';
+  document.getElementById('break-name-input').value='';
+  document.getElementById('break-name-input').focus();
+}
+function confirmBreak(){
+  var name=document.getElementById('break-name-input').value.trim()||'Break';
   var date=document.getElementById('sg-date').value;
-  if(!date){toast('Select a date first','w');return;}
-  var dp=date.split('-');var ds=dp[2]+'/'+dp[1]+'/'+dp[0];
-  S.slots.push('— Break ('+ds+') —');renderSlots();
+  var ds=date?( function(){var dp=date.split('-');return dp[2]+'/'+dp[1]+'/'+dp[0];}() ):'';
+  var label='— '+name+(ds?' ('+ds+')':'')+'  —';
+  S.slots.push(label);
+  document.getElementById('break-name-row').style.display='none';
+  renderSlots();
 }
 function addSlotManual(){var v=document.getElementById('slot-manual').value.trim();if(!v)return;if(!S.slots.includes(v)){S.slots.push(v);markConfigChanged();checkCapacity();renderSlots();document.getElementById('slot-manual').value='';}}
 function removeSlot(i){S.slots.splice(i,1);markConfigChanged();checkCapacity();renderSlots();}
@@ -1068,6 +1195,7 @@ function runMatch(){
   buildSchedule();
   goStep(3);
   toast(matches.length+' matches found','ok');
+  saveProject();
 }
 function getColVal(row,headers,col){var idx=headers.indexOf(col);return idx>=0&&row[idx]?row[idx].toString().trim():row[0]?row[0].toString().trim():'';}
 
@@ -1190,9 +1318,13 @@ function renderSchedule(){
     '<div class="metric"><div class="v">'+S.matches.length+'</div><div class="l">total matches</div></div>'+
     '<div class="metric"><div class="v">'+sc.buyers.length+'</div><div class="l">active buyers</div></div>'+
     '<div class="metric"><div class="v">'+cov+'%</div><div class="l">buyer coverage</div></div>';
-  var maxCols=Math.min(sc.buyers.length,7);var vis=sc.buyers.slice(0,maxCols);
+  var vis=sc.buyers; // show ALL buyers with horizontal scroll
+  var isEdit=S.editMode;
   var allRows=S.slots;
-  var html='<thead><tr><th style="width:135px">Slot</th>'+vis.map(function(b){return '<th title="'+b+'">'+b.substring(0,12)+(b.length>12?'…':'')+'</th>';}).join('')+'</tr></thead><tbody>';
+  var html='<thead><tr><th style="width:135px;position:sticky;left:0;z-index:2">Slot</th>'+vis.map(function(b){
+    var del=isEdit?'<span onclick="removeBuyer(\''+b.replace(/'/g,"\\'")+'\')" style="cursor:pointer;color:#ff6b6b;font-size:10px;margin-left:4px" title="Remove all meetings">✕</span>':'';
+    return '<th style="min-width:100px" title="'+b+'">'+b.substring(0,10)+(b.length>10?'…':'')+del+'</th>';
+  }).join('')+'</tr></thead><tbody>';
   var activeIdx=0;
   allRows.forEach(function(row){
     var isBreak=row.startsWith('—');
@@ -1207,14 +1339,18 @@ function renderSchedule(){
         if(v){
           var bs=b.replace(/'/g,"\\'").replace(/"/g,'&quot;');
           var vs=v.replace(/'/g,"\\'").replace(/"/g,'&quot;');
-          html+='<td class="hit" onmouseenter="showTT(\''+bs+'\',\''+vs+'\','+i+',event)" onmouseleave="hideTT()">'+v.substring(0,10)+(v.length>10?'…':'')+'<span style="font-size:9px;color:var(--blue60);margin-left:3px">D'+desk+'</span></td>';
+          if(isEdit){
+            html+='<td class="hit" style="position:relative">'+v.substring(0,10)+(v.length>10?'…':'')+'<span style="position:absolute;top:2px;right:2px;cursor:pointer;color:#ff6b6b;font-size:10px;line-height:1" onclick="removeMeeting(\''+bs+'\','+i+')">✕</span></td>';
+          } else {
+            html+='<td class="hit" onmouseenter="showTT(\''+bs+'\',\''+vs+'\','+i+',event)" onmouseleave="hideTT()">'+v.substring(0,10)+(v.length>10?'…':'')+'<span style="font-size:9px;color:var(--blue60);margin-left:3px">D'+desk+'</span></td>';
+          }
         } else{html+='<td class="miss">—</td>';}
       });
       html+='</tr>';
     }
   });
   document.getElementById('agenda-tbl').innerHTML=html+'</tbody>';
-  document.getElementById('macro-note').innerHTML=sc.buyers.length>maxCols?'<div style="font-size:10px;color:var(--char60);margin-top:5px">Showing '+maxCols+' of '+sc.buyers.length+' buyers. Export CSV for full view.</div>':'';
+  document.getElementById('macro-note').innerHTML='';
 
   // Desks tab
   var isRotating=sc.deskMode==='rotating';
@@ -1614,6 +1750,27 @@ function showLang(lang,el){
 }
 
 updatePreview();
+
+// ── RESTORE PROJECT ON LOAD ──
+(function(){
+  try{
+    var raw=localStorage.getItem('how2match_project');
+    if(!raw)return;
+    var data=JSON.parse(raw);
+    if(!data.savedAt)return;
+    var saved=new Date(data.savedAt);
+    var evName=data.evName||'Unnamed project';
+    var msg=document.createElement('div');
+    msg.style.cssText='position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:white;border:1px solid var(--border);border-radius:8px;padding:14px 20px;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.15);font-size:12px;max-width:400px;text-align:center';
+    msg.innerHTML='<div style="font-weight:700;color:var(--navy);margin-bottom:6px">📂 Saved project found</div>'+
+      '<div style="color:var(--char60);margin-bottom:10px"><strong>'+evName+'</strong> &middot; Saved '+saved.toLocaleDateString()+' '+saved.toLocaleTimeString().substring(0,5)+'</div>'+
+      '<div style="display:flex;gap:8px;justify-content:center">'+
+      '<button onclick="var s=loadProject();this.closest(\'div[style]\').remove();if(s)toast(\'Project restored\',\'ok\');" style="padding:6px 14px;background:var(--blue);color:white;border:none;border-radius:4px;cursor:pointer;font-weight:700;font-size:11px">↩ Restore</button>'+
+      '<button onclick="this.closest(\'div[style]\').remove();" style="padding:6px 14px;background:var(--gray);color:var(--dark);border:none;border-radius:4px;cursor:pointer;font-size:11px">Start fresh</button>'+
+      '</div>';
+    document.body.appendChild(msg);
+  }catch(e){}
+})();
 </script>
 </body>
 </html>
