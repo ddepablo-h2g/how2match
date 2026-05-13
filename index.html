@@ -117,7 +117,7 @@ input[type=color]{width:44px;height:32px;padding:2px;border:1px solid var(--bord
 .ie{background:#fde8e8;border-left:3px solid var(--danger);color:#7a1a1a}
 .slbl-t{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--char60);margin-bottom:6px;margin-top:16px}
 .slbl-t:first-child{margin-top:0}
-.ap{border:1px solid var(--border);border-radius:6px;overflow:hidden;background:white;font-family:Arial,sans-serif;max-width:560px}
+.ap{border:1px solid var(--border);border-radius:6px;overflow:hidden;background:white;font-family:Arial,sans-serif;max-width:600px;overflow-x:auto}
 .aph{width:100%;min-height:68px;background:var(--gray);display:flex;align-items:center;justify-content:center;overflow:hidden}
 .aph img{width:100%;max-height:100px;object-fit:cover}
 .ap-title{font-size:12px;font-weight:700;text-align:center;padding:7px;border-bottom:1px solid var(--border)}
@@ -191,6 +191,7 @@ var CONFIG = {
     <div class="gmail-status" id="gmail-status"><span class="gmail-dot" id="gmail-dot"></span><span id="gmail-label">Gmail: not connected</span></div>
     <button class="tbtn" onclick="connectGmail()">Connect Gmail</button>
     <button class="tbtn" onclick="goStep(6)">📖 Help</button>
+    <button class="tbtn" onclick="goStep(7)">❓ FAQ</button>
   </div>
 </div>
 
@@ -475,8 +476,8 @@ Thank you for your participation.</textarea></div>
 <!-- STEP 6: HELP -->
 <div class="panel" id="p6">
   <div class="card">
-    <div class="ctitle">How to use How2Match</div>
-    <div class="csub">Select your language below.</div>
+    <div class="ctitle">📖 How to use How2Match</div>
+    <div class="csub">Step-by-step instructions. Select your language below.</div>
     <div class="lang-tabs">
       <button class="lang-tab active" onclick="showLang('en',this)">🇬🇧 English</button>
       <button class="lang-tab" onclick="showLang('es',this)">🇪🇸 Español</button>
@@ -485,42 +486,302 @@ Thank you for your participation.</textarea></div>
       <button class="lang-tab" onclick="showLang('pt',this)">🇵🇹 Português</button>
     </div>
     <div id="lang-en">
-      <div class="infobox ii" style="flex-direction:column;align-items:flex-start;gap:6px"><div><strong>ℹ️ What is How2Match?</strong></div><div>A B2B matchmaking tool for trade fairs and business events. It connects <strong>hosted buyers</strong> (invited purchasing companies) with <strong>exhibitors / sellers</strong> (companies showcasing at the event) based on criteria you define. Builds an optimised meeting schedule and sends each participant their personalised agenda by email. Buyers and sellers are referred to together as <strong>participants</strong>.</div></div>
+      <div class="infobox ii" style="flex-direction:column;align-items:flex-start;gap:6px"><div><strong>ℹ️ What is How2Match?</strong></div><div>A B2B matchmaking tool designed for trade fairs and business events. It connects <strong>hosted buyers</strong> (invited purchasing companies) with <strong>exhibitors / sellers</strong> (companies showcasing at the event) based on criteria you define — products, markets, languages, etc. The tool builds an optimised meeting schedule and sends each participant their personalised agenda by email. Buyers and sellers are referred to together as <strong>participants</strong>.</div></div>
       <div class="infobox iw">⚠️ <strong>Gmail sending limits:</strong> Google allows up to 100 emails/hour. For events with 100+ participants, the tool auto-pauses every 50 emails. Do not close the browser tab while sending.</div>
-      <div class="instr-section"><h3>Step 1 — Event setup</h3><div class="instr-step"><div class="instr-num">1</div><div>Enter the event name, organiser and dates.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Set <strong>available tables</strong>, <strong>min meetings</strong> (buyers are usually committed to a minimum; sellers need a minimum to justify participation) and <strong>max meetings</strong>.</div></div><div class="instr-step"><div class="instr-num">3</div><div>Use the <strong>Schedule builder</strong> to generate time slots. Repeat for afternoon sessions or other days. Use <strong>Add break</strong> to insert lunch or coffee break rows.</div></div></div>
-      <div class="instr-section"><h3>Step 2 — Participant data</h3><div class="instr-step"><div class="instr-num">1</div><div>Download the <strong>Buyers template</strong> and <strong>Sellers template</strong>. Fill one row per company.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Values in matching columns must be <strong>comma-separated</strong> and <strong>spelled identically</strong> in both files. Example: <em>Spain, France, Portugal</em>. A typo = no match.</div></div><div class="instr-step"><div class="instr-num">3</div><div>Upload each file. The tool auto-detects your column headers.</div></div></div>
-      <div class="instr-section"><h3>Step 3 — Matching rules</h3><div class="instr-step"><div class="instr-num">1</div><div>Map buyer columns to seller columns. Example: buyer "Region of interest" ↔ seller "Region of interest".</div></div><div class="instr-step"><div class="instr-num">2</div><div><strong>Required:</strong> both must share at least one value — if not, no meeting. <strong>Preferred:</strong> boosts score when values overlap, but does not block the match.</div></div><div class="instr-step"><div class="instr-num">3</div><div>Click <strong>Generate matches</strong>.</div></div></div>
-      <div class="instr-section"><h3>Step 4 — Review schedule</h3><div class="instr-step"><div class="instr-num">1</div><div>Hover any cell to see why that buyer–seller pair was matched.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Participants below the minimum appear in the <strong>No match</strong> tab. If many participants are below minimum, you may need more slots or a lower minimum — the tool will warn you automatically.</div></div><div class="instr-step"><div class="instr-num">3</div><div>Go to <strong>Desks</strong> to assign desk numbers. Check <strong>Integrity</strong> for conflicts.</div></div></div>
-      <div class="instr-section"><h3>Steps 5 & 6 — Template and Send</h3><div class="instr-step"><div class="instr-num">1</div><div>Upload your event banner and edit buyer/seller templates separately.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Click <strong>Connect Gmail</strong>, generate a preview, approve it, then click <strong>Send all agendas</strong>.</div></div></div>
+      <div class="instr-section"><h3>Step 1 — Event setup</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Enter the event name, organiser and dates.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div>Set <strong>available tables</strong> (physical meeting spaces at the fair), <strong>min meetings</strong> (buyers are usually committed to attend a minimum; sellers need a minimum to justify their participation) and <strong>max meetings</strong>.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div>Enter the <strong>expected number of buyers and sellers</strong> — the tool will calculate capacity in real time and warn you if the numbers don't add up.</div></div>
+        <div class="instr-step"><div class="instr-num">4</div><div>Choose <strong>Desk mode</strong>: Fixed (each buyer keeps the same desk) or Rotating (desks shared per slot — required when buyers > tables).</div></div>
+        <div class="instr-step"><div class="instr-num">5</div><div>Use the <strong>Schedule builder</strong> to generate time slots. Set date, start time, end time and any break between meetings. Click Generate. Repeat for afternoon sessions or other days. Use <strong>Add break</strong> to insert lunch or coffee break rows.</div></div>
+      </div>
+      <div class="instr-section"><h3>Step 2 — Participant data</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Download the <strong>Buyers template</strong> (hosted buyers) and <strong>Sellers template</strong> (exhibitors). Fill one row per company.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div>Values in matching columns must be <strong>comma-separated</strong> and <strong>spelled identically</strong> in both files. Example: <em>Spain, France, Portugal</em> or <em>Apples, Citrus, Berries</em>. A typo or missing comma = no match.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div>You can rename the <strong>Criterion 1–5</strong> column headers to match your event (e.g. "Product", "Region", "Certification"). Upload each file — the tool auto-detects your headers.</div></div>
+      </div>
+      <div class="instr-section"><h3>Step 3 — Matching rules</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Map buyer columns to seller columns. Example: buyer "Region of interest" ↔ seller "Region of interest".</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div><strong>Required:</strong> both must share at least one value — if not, no meeting is scheduled. <strong>Preferred:</strong> boosts the match score when values overlap, but does not block the match.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div>Avoid using numeric ranges (e.g. "€50,000–200,000") as Required criteria — exact text match is very unlikely. Use them as Preferred instead.</div></div>
+        <div class="instr-step"><div class="instr-num">4</div><div>Click <strong>Generate matches</strong>.</div></div>
+      </div>
+      <div class="instr-section"><h3>Step 4 — Review schedule</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>The macro schedule shows all meetings. <strong>Hover any cell</strong> to see why that buyer–seller pair was matched and which desk they will use.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div>Participants below the minimum appear in the <strong>No match</strong> tab with a warning.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div>In Fixed mode, go to <strong>Desks</strong> to assign or edit the fixed desk number for each buyer. Buyers stay at their desk — sellers move between tables.</div></div>
+        <div class="instr-step"><div class="instr-num">4</div><div>Check <strong>Integrity</strong> to confirm no double-bookings.</div></div>
+        <div class="instr-step"><div class="instr-num">5</div><div>Export the macro schedule as <strong>CSV</strong> for your records. In Fixed mode, the desk appears in each buyer's column header. In Rotating mode, the desk appears in each cell.</div></div>
+      </div>
+      <div class="instr-section"><h3>Step 5 — Agenda template</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Upload your event banner image (logo/header).</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div>Edit the <strong>Buyers version</strong> and <strong>Sellers version</strong> separately. Buyers see "stay at your desk, sellers come to you." Sellers see "move to desk X at each time."</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div>Enable the <strong>Signature</strong> column if you want participants to sign each meeting as proof of attendance.</div></div>
+      </div>
+      <div class="instr-section"><h3>Step 6 — Send agendas</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Click <strong>Connect Gmail</strong> in the top bar and authorise with your Google account.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div>Select the email and name columns from your uploaded files.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div>Enter your own email in the <strong>Send test</strong> box and click Send test — you will receive 1 buyer agenda and 1 seller agenda to verify format and delivery.</div></div>
+        <div class="instr-step"><div class="instr-num">4</div><div>Click <strong>Generate preview</strong>, review the sample agendas, then click <strong>Approve</strong> to unlock bulk sending.</div></div>
+        <div class="instr-step"><div class="instr-num">5</div><div>Click <strong>Send all agendas</strong>. Each participant receives their personalised agenda directly from your Gmail. The tool auto-pauses every 50 emails to respect Gmail limits.</div></div>
+      </div>
     </div>
     <div id="lang-es" style="display:none">
-      <div class="infobox ii" style="flex-direction:column;align-items:flex-start;gap:6px"><div><strong>ℹ️ ¿Qué es How2Match?</strong></div><div>Herramienta de matchmaking B2B para ferias. Conecta <strong>compradores invitados</strong> con <strong>expositores / vendedores</strong> según criterios que tú defines. Genera un calendario de reuniones y envía a cada participante su agenda por email.</div></div>
-      <div class="infobox iw">⚠️ <strong>Límite Gmail:</strong> hasta 100 emails/hora. La herramienta hace pausas automáticas cada 50 emails. No cierres el navegador durante el envío.</div>
-      <div class="instr-section"><h3>Paso 1 — Evento</h3><div class="instr-step"><div class="instr-num">1</div><div>Introduce nombre, organizador y fechas.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Configura mesas disponibles, mínimo y máximo de reuniones.</div></div><div class="instr-step"><div class="instr-num">3</div><div>Genera slots con el generador. Repite para tarde u otros días. Añade pausas con <strong>Add break</strong>.</div></div></div>
-      <div class="instr-section"><h3>Paso 2 — Datos</h3><div class="instr-step"><div class="instr-num">1</div><div>Descarga plantillas de Compradores y Vendedores. Una fila por empresa.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Los valores en columnas de matching deben separarse con <strong>comas</strong> y estar escritos <strong>idénticamente</strong> en ambos archivos. Un error tipográfico = sin match.</div></div><div class="instr-step"><div class="instr-num">3</div><div>Sube cada archivo.</div></div></div>
-      <div class="instr-section"><h3>Paso 3 — Matching</h3><div class="instr-step"><div class="instr-num">1</div><div>Conecta columnas de compradores con columnas de vendedores.</div></div><div class="instr-step"><div class="instr-num">2</div><div><strong>Obligatorio:</strong> sin coincidencia = sin reunión. <strong>Preferible:</strong> mejora el score pero no bloquea.</div></div><div class="instr-step"><div class="instr-num">3</div><div>Haz clic en <strong>Generar matches</strong>.</div></div></div>
-      <div class="instr-section"><h3>Paso 4 — Agenda</h3><div class="instr-step"><div class="instr-num">1</div><div>Pasa el ratón sobre cualquier celda para ver por qué coincidió ese par.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Los participantes por debajo del mínimo aparecen en <strong>Sin match</strong>. Si hay muchos, necesitas más slots o reducir el mínimo — la herramienta te avisará automáticamente.</div></div><div class="instr-step"><div class="instr-num">3</div><div>Asigna mesas en la pestaña <strong>Mesas</strong>. Verifica <strong>Integridad</strong>.</div></div></div>
-      <div class="instr-section"><h3>Pasos 5 y 6 — Plantilla y Envío</h3><div class="instr-step"><div class="instr-num">1</div><div>Sube la cabecera y edita las plantillas de compradores y vendedores por separado.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Conecta Gmail, genera previsualización, aprueba y envía.</div></div></div>
+      <div class="infobox ii" style="flex-direction:column;align-items:flex-start;gap:6px"><div><strong>ℹ️ ¿Qué es How2Match?</strong></div><div>Una herramienta de matchmaking B2B para ferias y eventos de negocio. Conecta <strong>compradores invitados</strong> (empresas compradoras que acuden por invitación) con <strong>expositores / vendedores</strong> (empresas que exponen en la feria) según criterios que tú defines. Genera un calendario optimizado de reuniones y envía a cada participante su agenda personalizada por email. Compradores y vendedores se llaman conjuntamente <strong>participantes</strong>.</div></div>
+      <div class="infobox iw">⚠️ <strong>Límite de envío Gmail:</strong> Google permite hasta 100 emails/hora. Para eventos con más de 100 participantes, la herramienta hace pausas automáticas cada 50 emails. No cierres el navegador durante el envío.</div>
+      <div class="instr-section"><h3>Paso 1 — Configuración del evento</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Introduce el nombre del evento, organizador y fechas.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div>Configura las <strong>mesas disponibles</strong>, el <strong>mínimo de reuniones</strong> (los compradores suelen tener un mínimo comprometido; los vendedores necesitan un mínimo para justificar su participación) y el <strong>máximo</strong>.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div>Introduce el <strong>número esperado de compradores y vendedores</strong> — la herramienta calculará la capacidad en tiempo real.</div></div>
+        <div class="instr-step"><div class="instr-num">4</div><div>Elige el <strong>modo de mesa</strong>: Fixed (cada comprador tiene mesa fija) o Rotating (mesas compartidas por slot — obligatorio cuando compradores > mesas).</div></div>
+        <div class="instr-step"><div class="instr-num">5</div><div>Usa el <strong>generador de slots</strong>: selecciona fecha, hora de inicio y fin, y minutos de descanso entre reuniones. Haz clic en Generar. Repite para bloques de tarde u otros días. Usa <strong>Add break</strong> para insertar pausas.</div></div>
+      </div>
+      <div class="instr-section"><h3>Paso 2 — Datos de participantes</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Descarga las plantillas de <strong>Compradores</strong> y <strong>Vendedores</strong>. Rellena una fila por empresa.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div>Los valores en columnas de matching deben separarse con <strong>comas</strong> y estar escritos <strong>idénticamente</strong> en ambos archivos. Un error tipográfico = sin match.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div>Puedes renombrar las columnas <strong>Criterion 1–5</strong> según tu evento (ej. "Producto", "Región"). Sube cada archivo — la herramienta detecta los headers automáticamente.</div></div>
+      </div>
+      <div class="instr-section"><h3>Paso 3 — Reglas de matching</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Conecta columnas de compradores con columnas de vendedores. Ejemplo: "Región de interés" ↔ "Región de interés".</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div><strong>Obligatorio:</strong> sin valor común = sin reunión. <strong>Preferible:</strong> mejora el score cuando coincide, pero no bloquea el match.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div>Evita usar rangos numéricos como criterio Obligatorio — úsalos como Preferible.</div></div>
+        <div class="instr-step"><div class="instr-num">4</div><div>Haz clic en <strong>Generar matches</strong>.</div></div>
+      </div>
+      <div class="instr-section"><h3>Paso 4 — Revisar la agenda</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Pasa el ratón sobre cualquier celda para ver por qué coincidieron y en qué mesa.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div>Los participantes por debajo del mínimo aparecen en la pestaña <strong>Sin match</strong>.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div>En modo Fixed, asigna mesas en la pestaña <strong>Desks</strong>. Verifica la pestaña <strong>Integrity</strong>.</div></div>
+        <div class="instr-step"><div class="instr-num">4</div><div>Exporta el macro schedule como <strong>CSV</strong> para tus registros.</div></div>
+      </div>
+      <div class="instr-section"><h3>Paso 5 — Plantilla de agenda</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Sube la imagen de cabecera del evento.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div>Edita por separado la versión de <strong>Compradores</strong> y de <strong>Vendedores</strong>.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div>Activa la columna <strong>Signature</strong> si quieres que los participantes firmen cada reunión como prueba de asistencia.</div></div>
+      </div>
+      <div class="instr-section"><h3>Paso 6 — Enviar agendas</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Haz clic en <strong>Connect Gmail</strong> y autoriza con tu cuenta de Google.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div>Selecciona las columnas de email y nombre de cada archivo.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div>Pon tu email en el campo de <strong>test</strong> y envía — recibirás 1 agenda de comprador y 1 de vendedor para verificar.</div></div>
+        <div class="instr-step"><div class="instr-num">4</div><div>Genera previsualización, apruébala y haz clic en <strong>Enviar todas las agendas</strong>. La herramienta hace pausas automáticas cada 50 emails.</div></div>
+      </div>
     </div>
     <div id="lang-tr" style="display:none">
-      <div class="infobox ii" style="flex-direction:column;align-items:flex-start;gap:6px"><div><strong>ℹ️ How2Match nedir?</strong></div><div>Ticaret fuarları için B2B eşleştirme aracı. <strong>Hosted alıcıları</strong> ile <strong>fuarcılar/satıcıları</strong> tanımladığınız kriterlere göre eşleştirir. Her katılımcıya kişiselleştirilmiş programını e-posta ile gönderir.</div></div>
-      <div class="infobox iw">⚠️ <strong>Gmail limiti:</strong> saatte 100 e-posta. Araç her 50 e-postada otomatik duraklar. Gönderim sırasında tarayıcıyı kapatmayın.</div>
-      <div class="instr-section"><h3>Adım 1 — Etkinlik</h3><div class="instr-step"><div class="instr-num">1</div><div>Adı, organizatörü ve tarihleri girin.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Masaları, minimum ve maksimum toplantı sayısını ayarlayın.</div></div><div class="instr-step"><div class="instr-num">3</div><div>Slot oluşturucuyu kullanın. Öğleden sonra veya diğer günler için tekrarlayın.</div></div></div>
-      <div class="instr-section"><h3>Adım 2 — Veri</h3><div class="instr-step"><div class="instr-num">1</div><div>Şablonları indirin ve her şirket için bir satır doldurun.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Değerler <strong>virgülle</strong> ayrılmalı ve her iki dosyada <strong>aynı şekilde yazılmalıdır</strong>. Yazım hatası = eşleşme yok.</div></div><div class="instr-step"><div class="instr-num">3</div><div>Her dosyayı yükleyin.</div></div></div>
-      <div class="instr-section"><h3>Adım 3 — Eşleştirme</h3><div class="instr-step"><div class="instr-num">1</div><div>Alıcı sütunlarını satıcı sütunlarıyla eşleyin.</div></div><div class="instr-step"><div class="instr-num">2</div><div><strong>Zorunlu:</strong> örtüşme yoksa toplantı yok. <strong>Tercihli:</strong> puanı artırır.</div></div><div class="instr-step"><div class="instr-num">3</div><div><strong>Eşleşme oluştur</strong>'a tıklayın.</div></div></div>
-      <div class="instr-section"><h3>Adımlar 4–6</h3><div class="instr-step"><div class="instr-num">1</div><div>Programı inceleyin. Minimum altındaki katılımcılar için araç otomatik uyarı verir.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Şablonları düzenleyin, Gmail'e bağlanın, önizleyin, onaylayın ve gönderin.</div></div></div>
+      <div class="infobox ii" style="flex-direction:column;align-items:flex-start;gap:6px"><div><strong>ℹ️ How2Match nedir?</strong></div><div>Ticaret fuarları için B2B eşleştirme aracı. <strong>Hosted alıcıları</strong> ile <strong>fuarcılar/satıcıları</strong> tanımladığınız kriterlere göre eşleştirir. Optimum bir toplantı takvimi oluşturur ve her katılımcıya kişiselleştirilmiş programını e-posta ile gönderir. Alıcılar ve satıcılar birlikte <strong>katılımcılar</strong> olarak adlandırılır.</div></div>
+      <div class="infobox iw">⚠️ <strong>Gmail gönderim limiti:</strong> Google saatte 100 e-postaya izin verir. Araç her 50 e-postada otomatik duraklar. Gönderim sırasında tarayıcıyı kapatmayın.</div>
+      <div class="instr-section"><h3>Adım 1 — Etkinlik kurulumu</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Etkinlik adını, organizatörü ve tarihleri girin.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div><strong>Mevcut masaları</strong>, <strong>minimum toplantı sayısını</strong> ve <strong>maksimum</strong> sayıyı ayarlayın.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div>Beklenen alıcı ve satıcı sayısını girin — araç kapasiteyi gerçek zamanlı hesaplar.</div></div>
+        <div class="instr-step"><div class="instr-num">4</div><div><strong>Masa modunu</strong> seçin: Fixed (sabit masa) veya Rotating (slot başına paylaşılan — alıcı > masa ise zorunlu).</div></div>
+        <div class="instr-step"><div class="instr-num">5</div><div><strong>Program oluşturucuyu</strong> kullanarak zaman dilimleri oluşturun. Öğleden sonra veya farklı günler için tekrarlayın. Mola eklemek için <strong>Add break</strong>'i kullanın.</div></div>
+      </div>
+      <div class="instr-section"><h3>Adım 2 — Katılımcı verileri</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div><strong>Alıcılar</strong> ve <strong>Satıcılar</strong> şablonlarını indirin. Her şirket için bir satır doldurun.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div>Değerler <strong>virgülle</strong> ayrılmalı ve her iki dosyada <strong>aynı şekilde yazılmalıdır</strong>. Yazım hatası = eşleşme yok.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div><strong>Criterion 1–5</strong> sütun başlıklarını etkinliğinize göre yeniden adlandırabilirsiniz. Her dosyayı yükleyin.</div></div>
+      </div>
+      <div class="instr-section"><h3>Adım 3 — Eşleştirme kuralları</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Alıcı sütunlarını satıcı sütunlarıyla eşleyin.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div><strong>Zorunlu:</strong> ortak değer yoksa toplantı yok. <strong>Tercihli:</strong> puanı artırır ama engellemez.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div><strong>Eşleşme oluştur</strong>'a tıklayın.</div></div>
+      </div>
+      <div class="instr-section"><h3>Adımlar 4–6 — Program, Şablon ve Gönderim</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Programı inceleyin. Hücrelerin üzerine gelerek eşleşme nedenini ve masa numarasını görün.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div>Şablonları düzenleyin. İsterseniz <strong>Signature</strong> sütununu etkinleştirin.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div><strong>Connect Gmail</strong>'e tıklayın, test e-postası gönderin, önizleyin, onaylayın ve <strong>Tüm programları gönder</strong>'e tıklayın.</div></div>
+      </div>
     </div>
     <div id="lang-ko" style="display:none">
-      <div class="infobox ii" style="flex-direction:column;align-items:flex-start;gap:6px"><div><strong>ℹ️ How2Match란?</strong></div><div>무역 박람회를 위한 B2B 매칭 도구입니다. <strong>호스티드 바이어</strong>와 <strong>전시업체/판매자</strong>를 연결하고, 최적화된 미팅 일정을 생성하며, 각 참가자에게 맞춤형 일정을 이메일로 전송합니다.</div></div>
-      <div class="infobox iw">⚠️ <strong>Gmail 한도:</strong> 시간당 100개. 도구가 50개마다 자동 일시 중지됩니다. 발송 중 브라우저를 닫지 마세요.</div>
-      <div class="instr-section"><h3>1–3단계</h3><div class="instr-step"><div class="instr-num">1</div><div>행사 이름, 날짜, 테이블 수, 최소/최대 미팅 수를 설정하고 시간 슬롯을 생성하세요.</div></div><div class="instr-step"><div class="instr-num">2</div><div>템플릿을 다운로드하여 채우세요. 값은 <strong>쉼표로 구분</strong>하고 두 파일에서 <strong>동일하게 작성</strong>해야 합니다.</div></div><div class="instr-step"><div class="instr-num">3</div><div>매칭 규칙을 추가하고 <strong>매칭 생성</strong>을 클릭하세요.</div></div></div>
-      <div class="instr-section"><h3>4–6단계</h3><div class="instr-step"><div class="instr-num">1</div><div>일정을 검토하세요. 최솟값 미달 시 자동 경고가 표시됩니다.</div></div><div class="instr-step"><div class="instr-num">2</div><div>템플릿을 편집하고, Gmail을 연결하고, 미리보기 후 승인하여 전송하세요.</div></div></div>
+      <div class="infobox ii" style="flex-direction:column;align-items:flex-start;gap:6px"><div><strong>ℹ️ How2Match란?</strong></div><div>무역 박람회와 비즈니스 행사를 위한 B2B 매칭 도구입니다. <strong>호스티드 바이어</strong>(초청 구매 기업)와 <strong>전시업체/판매자</strong>(행사 참가 기업)를 정의한 기준에 따라 연결합니다. 최적화된 미팅 일정을 생성하고 각 참가자에게 맞춤형 일정을 이메일로 전송합니다. 구매자와 판매자는 통칭 <strong>참가자</strong>라고 합니다.</div></div>
+      <div class="infobox iw">⚠️ <strong>Gmail 발송 한도:</strong> Google은 시간당 최대 100개의 이메일을 허용합니다. 도구가 50개마다 자동으로 일시 중지됩니다. 발송 중에는 브라우저 탭을 닫지 마세요.</div>
+      <div class="instr-section"><h3>1단계 — 행사 설정</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>행사 이름, 주최자, 날짜를 입력하세요.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div><strong>사용 가능한 테이블 수</strong>, <strong>최소 미팅 수</strong>, <strong>최대 미팅 수</strong>를 설정하세요.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div>예상 구매자 및 판매자 수를 입력하세요 — 도구가 실시간으로 용량을 계산합니다.</div></div>
+        <div class="instr-step"><div class="instr-num">4</div><div><strong>데스크 모드</strong>를 선택하세요: Fixed(고정) 또는 Rotating(공유, 구매자 > 테이블인 경우 필수).</div></div>
+        <div class="instr-step"><div class="instr-num">5</div><div><strong>일정 생성기</strong>로 시간 슬롯을 생성하세요. 오후 세션이나 다른 날에 대해 반복하세요.</div></div>
+      </div>
+      <div class="instr-section"><h3>2단계 — 참가자 데이터</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div><strong>구매자</strong> 및 <strong>판매자</strong> 템플릿을 다운로드하고 회사당 한 행씩 채우세요.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div>값은 <strong>쉼표로 구분</strong>하고 두 파일에서 <strong>동일하게 작성</strong>해야 합니다. 오타 = 매칭 없음.</div></div>
+      </div>
+      <div class="instr-section"><h3>3–6단계 — 매칭, 일정, 템플릿, 발송</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>매칭 규칙을 추가하고 <strong>매칭 생성</strong>을 클릭하세요.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div>일정을 검토하세요. 셀 위에 마우스를 올려 매칭 이유와 테이블 번호를 확인하세요.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div>템플릿을 편집하고, Gmail을 연결하고, 테스트 이메일을 보내고, 미리보기를 승인한 후 <strong>모든 일정 전송</strong>을 클릭하세요.</div></div>
+      </div>
     </div>
     <div id="lang-pt" style="display:none">
-      <div class="infobox ii" style="flex-direction:column;align-items:flex-start;gap:6px"><div><strong>ℹ️ O que é o How2Match?</strong></div><div>Ferramenta de matchmaking B2B para feiras. Conecta <strong>compradores convidados</strong> com <strong>expositores/vendedores</strong> com base em critérios definidos. Gera agenda de reuniões e envia a cada participante a sua agenda personalizada por e-mail.</div></div>
-      <div class="infobox iw">⚠️ <strong>Limite Gmail:</strong> até 100 e-mails/hora. A ferramenta pausa automaticamente a cada 50. Não feche o browser durante o envio.</div>
-      <div class="instr-section"><h3>Passos 1–3</h3><div class="instr-step"><div class="instr-num">1</div><div>Configure o evento, gere slots de tempo e defina mesas e mínimos.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Preencha os templates com valores separados por <strong>vírgulas</strong>, escritos <strong>de forma idêntica</strong> nos dois ficheiros. Um erro tipográfico = sem match.</div></div><div class="instr-step"><div class="instr-num">3</div><div>Adicione regras de matching e clique em <strong>Gerar matches</strong>.</div></div></div>
-      <div class="instr-section"><h3>Passos 4–6</h3><div class="instr-step"><div class="instr-num">1</div><div>Revise a agenda. A ferramenta avisa automaticamente se a capacidade for insuficiente.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Edite os templates, conecte o Gmail, gere uma pré-visualização, aprove e envie.</div></div></div>
+      <div class="infobox ii" style="flex-direction:column;align-items:flex-start;gap:6px"><div><strong>ℹ️ O que é o How2Match?</strong></div><div>Uma ferramenta de matchmaking B2B para feiras e eventos de negócios. Conecta <strong>compradores convidados</strong> com <strong>expositores / vendedores</strong> com base em critérios definidos. Gera uma agenda de reuniões otimizada e envia a cada participante a sua agenda personalizada por e-mail. Compradores e vendedores são chamados conjuntamente de <strong>participantes</strong>.</div></div>
+      <div class="infobox iw">⚠️ <strong>Limite de envio Gmail:</strong> O Google permite até 100 e-mails por hora. A ferramenta faz pausas automáticas a cada 50 e-mails. Não feche o browser durante o envio.</div>
+      <div class="instr-section"><h3>Passo 1 — Configuração do evento</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Insira o nome do evento, organizador e datas.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div>Configure as <strong>mesas disponíveis</strong>, o <strong>mínimo de reuniões</strong> e o <strong>máximo</strong>.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div>Insira o número esperado de compradores e vendedores — a ferramenta calcula a capacidade em tempo real.</div></div>
+        <div class="instr-step"><div class="instr-num">4</div><div>Escolha o <strong>modo de mesa</strong>: Fixed (mesa fixa) ou Rotating (partilhada por slot — obrigatório se compradores > mesas).</div></div>
+        <div class="instr-step"><div class="instr-num">5</div><div>Use o <strong>gerador de slots</strong> para criar horários. Repita para blocos da tarde ou outros dias. Use <strong>Add break</strong> para pausas.</div></div>
+      </div>
+      <div class="instr-section"><h3>Passo 2 — Dados dos participantes</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Baixe os templates de <strong>Compradores</strong> e <strong>Vendedores</strong>. Uma linha por empresa.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div>Os valores devem ser separados por <strong>vírgulas</strong> e escritos de forma <strong>idêntica</strong> nos dois ficheiros. Um erro = sem match.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div>Pode renomear as colunas <strong>Criterion 1–5</strong> conforme o seu evento. Carregue cada ficheiro.</div></div>
+      </div>
+      <div class="instr-section"><h3>Passos 3–6 — Matching, Agenda, Template e Envio</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Adicione regras de matching e clique em <strong>Gerar matches</strong>.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div>Revise a agenda. Passe o mouse sobre qualquer célula para ver o motivo e a mesa.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div>Edite os templates (ative <strong>Signature</strong> se necessário), conecte o Gmail, envie um teste, aprove e clique em <strong>Enviar todas as agendas</strong>.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 7: FAQ -->
+<div class="panel" id="p7" style="display:none">
+  <div class="card">
+    <div class="ctitle">❓ Frequently Asked Questions</div>
+    <div class="csub">Select your language below.</div>
+    <div class="lang-tabs">
+      <button class="lang-tab active" onclick="showFaqLang('en',this)">🇬🇧 English</button>
+      <button class="lang-tab" onclick="showFaqLang('es',this)">🇪🇸 Español</button>
+      <button class="lang-tab" onclick="showFaqLang('tr',this)">🇹🇷 Türkçe</button>
+      <button class="lang-tab" onclick="showFaqLang('ko',this)">🇰🇷 한국어</button>
+      <button class="lang-tab" onclick="showFaqLang('pt',this)">🇵🇹 Português</button>
+    </div>
+    <div id="faq-en">
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>What are Buyers, Sellers and Participants?</strong><br>Buyers (hosted buyers) are invited purchasing companies attending the fair with a minimum meeting commitment. Sellers (exhibitors) are companies showcasing their products or services — they need a minimum number of meetings to justify their participation. Together they are called Participants.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>What is a Slot?</strong><br>A time slot is one meeting period — e.g. 9:00–9:20. Each slot can host as many simultaneous meetings as there are tables available.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>What is a Break?</strong><br>A non-meeting period (lunch, coffee) inserted in the schedule. It appears in the macro schedule view but no meetings are assigned to it.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>What is a Criterion?</strong><br>A column used for matching — e.g. "Product category" or "Region of interest". You can rename the Criterion 1–5 columns in the template to reflect your event's specific needs.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Required vs Preferred criteria?</strong><br><strong>Required:</strong> if buyer and seller share no common value in this column, no meeting is scheduled between them. <strong>Preferred:</strong> shared values increase the match score and prioritise the meeting, but a meeting can still happen without overlap.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Fixed vs Rotating desk mode?</strong><br><strong>Fixed:</strong> each buyer has a permanent desk for the entire event. Sellers move between desks. Use when you have as many tables as buyers.<br><strong>Rotating:</strong> desks are shared per slot — only buyers with a meeting at that time occupy a desk. Required when buyers > tables. Maximises table usage.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>What is the Macro Schedule?</strong><br>The master view for the organiser — slots as rows, buyers as columns, assigned seller in each cell. In Fixed mode the desk appears in each buyer's column header. In Rotating mode it appears in each cell. Export as CSV for your records.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>What is Integrity?</strong><br>The Integrity check verifies that no seller is double-booked (assigned to two meetings in the same slot) and no buyer has the same seller twice.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Can I upload my own Excel without using the template?</strong><br>Yes, but we strongly recommend working from the provided templates and normalising your data first — consistent spelling, comma-separated values, and matching column names across buyer and seller files. Inconsistent data = missed matches.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>A participant has specific availability constraints. What do I do?</strong><br>The tool does not currently support individual slot exclusions. Handle these adjustments manually after generating the schedule — edit the CSV or the agenda before sending.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Are agendas sent as PDF?</strong><br>No — agendas are sent as formatted HTML inside the email body. To share a PDF version, export the CSV and format it manually in Google Sheets or Excel.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Gmail sending limits and permissions?</strong><br>When you click Connect Gmail, you authorise the tool to send emails on your behalf. Google allows up to 100 emails per hour. The tool auto-pauses every 50 emails. Do not close the browser during sending. Your Gmail credentials are never stored — the connection expires when you close the browser.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>What about AI matching?</strong><br>AI matching (Gemini) is coming soon. When active, it will interpret semantically equivalent values across languages — "Cítricos", "Lemon" and "Limón" would all match automatically, eliminating the need for manual data normalisation.</div></div>
+    </div>
+    <div id="faq-es" style="display:none">
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Qué son compradores, vendedores y participantes?</strong><br>Los <strong>compradores</strong> son empresas compradoras invitadas con un mínimo de reuniones comprometido. Los <strong>vendedores</strong> son expositores que necesitan un mínimo para justificar su participación. Juntos se denominan <strong>participantes</strong>.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Qué es un slot?</strong><br>Un período de reunión (ej. 9:00–9:20). En cada slot pueden celebrarse tantas reuniones simultáneas como mesas haya disponibles.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Qué es una pausa?</strong><br>Un período sin reuniones (comida, café). Aparece en el macro schedule pero no se le asignan reuniones.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Qué es un criterio?</strong><br>Una columna usada para el matching (ej. "Categoría de producto"). Puedes renombrar las columnas Criterion 1–5 según tu evento.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Obligatorio vs Preferible?</strong><br><strong>Obligatorio:</strong> sin valor común = sin reunión. <strong>Preferible:</strong> valores comunes aumentan el score pero no bloquean la reunión.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Fixed vs Rotating?</strong><br><strong>Fixed:</strong> cada comprador tiene mesa fija. Vendedores se mueven. Usa cuando mesas ≥ compradores.<br><strong>Rotating:</strong> mesas compartidas por slot. Obligatorio cuando compradores > mesas. Maximiza el uso del espacio.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Qué es el Macro Schedule?</strong><br>Vista maestra para el organizador — slots en filas, compradores en columnas. En Fixed la mesa aparece en la cabecera de columna. En Rotating aparece en cada celda. Expórtalo como CSV.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Qué es la Integridad?</strong><br>Verifica que ningún vendedor esté reservado doble y que ningún comprador tenga el mismo vendedor dos veces.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Puedo subir mi propio Excel?</strong><br>Sí, pero normaliza los datos antes — ortografía consistente, valores separados por comas, nombres de columnas coincidentes. Datos inconsistentes = matches perdidos.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Un participante no puede en un slot concreto. ¿Qué hago?</strong><br>La herramienta no admite exclusiones individuales. Ajusta manualmente el schedule tras generarlo.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Las agendas se envían como PDF?</strong><br>No — como HTML en el cuerpo del email. Para PDF, exporta el CSV y fórmatealo en Google Sheets o Excel.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Permisos y límites de Gmail</strong><br>Connect Gmail autoriza el envío en tu nombre. Máximo 100/hora, pausas cada 50. Las credenciales nunca se almacenan — la conexión expira al cerrar el navegador.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Y la IA?</strong><br>Próximamente. Gemini AI interpretará valores equivalentes entre idiomas — "Cítricos", "Lemon" y "Limón" coincidirán automáticamente.</div></div>
+    </div>
+    <div id="faq-tr" style="display:none">
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Alıcı, Satıcı ve Katılımcı nedir?</strong><br><strong>Alıcılar</strong> minimum toplantı taahhüdü olan davetli satın alma şirketleridir. <strong>Satıcılar</strong> katılımlarını meşrulaştırmak için minimum toplantıya ihtiyaç duyan fuarcılardır. İkisi birlikte <strong>katılımcılar</strong>dır.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Slot nedir?</strong><br>Bir toplantı zaman dilimi (örn. 9:00–9:20). Her slotta mevcut masa sayısı kadar eşzamanlı toplantı yapılabilir.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Zorunlu ve Tercihli kriter farkı?</strong><br><strong>Zorunlu:</strong> ortak değer yoksa toplantı planlanmaz. <strong>Tercihli:</strong> ortak değerler skoru artırır ama toplantıyı engellemez.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Fixed ve Rotating farkı?</strong><br><strong>Fixed:</strong> sabit masa. <strong>Rotating:</strong> masalar slot başına paylaşılır. Alıcı sayısı > masa sayısı ise Rotating zorunludur.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>PDF olarak gönderilir mi?</strong><br>Hayır — e-posta gövdesinde HTML. PDF için CSV indirip Google Sheets'te biçimlendirin.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Gmail izinleri ve limitleri?</strong><br>Saatte 100 e-posta. Her 50'de otomatik duraklar. Kimlik bilgileri asla saklanmaz — tarayıcı kapatıldığında bağlantı sona erer.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Yapay Zeka eşleştirme?</strong><br>Yakında. Gemini AI ile "Narenciye", "Lemon" ve "Limón" otomatik eşleşecek — manuel normalleştirmeye gerek kalmayacak.</div></div>
+    </div>
+    <div id="faq-ko" style="display:none">
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>구매자, 판매자, 참가자란?</strong><br><strong>구매자</strong>는 최소 미팅 약속이 있는 초청 구매 기업입니다. <strong>판매자</strong>는 참가를 정당화하기 위한 최솟값이 필요한 전시업체입니다. 둘을 합쳐 <strong>참가자</strong>라고 합니다.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>슬롯이란?</strong><br>하나의 미팅 시간 단위(예: 9:00–9:20). 각 슬롯에서 테이블 수만큼 동시 미팅이 가능합니다.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>필수 vs 선호 기준?</strong><br><strong>필수:</strong> 공통 값 없으면 미팅 없음. <strong>선호:</strong> 공통 값이 점수를 높이지만 미팅을 막지 않습니다.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Fixed vs Rotating?</strong><br><strong>Fixed:</strong> 고정 테이블. <strong>Rotating:</strong> 슬롯별 공유. 구매자 > 테이블이면 Rotating 필수입니다.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>PDF로 전송되나요?</strong><br>아니요 — 이메일 본문에 HTML로 전송됩니다. PDF는 CSV를 내보내 Google Sheets에서 만드세요.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>AI 매칭은?</strong><br>곧 출시. Gemini AI로 "감귤류", "Lemon", "Limón"이 자동 매칭됩니다.</div></div>
+    </div>
+    <div id="faq-pt" style="display:none">
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>O que são compradores, vendedores e participantes?</strong><br><strong>Compradores</strong> são empresas convidadas com compromisso mínimo de reuniões. <strong>Vendedores</strong> são expositores que precisam de um mínimo para justificar a participação. Em conjunto chamam-se <strong>participantes</strong>.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>O que é um slot?</strong><br>Um período de reunião (ex. 9:00–9:20). Cada slot permite tantas reuniões simultâneas quantas mesas disponíveis.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Obrigatório vs Preferível?</strong><br><strong>Obrigatório:</strong> sem valor comum = sem reunião. <strong>Preferível:</strong> aumenta o score mas não bloqueia.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Fixed vs Rotating?</strong><br><strong>Fixed:</strong> mesa fixa por comprador. <strong>Rotating:</strong> mesas partilhadas por slot. Obrigatório se compradores > mesas.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>As agendas são PDF?</strong><br>Não — HTML no corpo do e-mail. Para PDF, exporte o CSV e formate no Google Sheets.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Limites e permissões Gmail?</strong><br>Até 100 e-mails/hora, pausas a cada 50. As credenciais nunca são guardadas — a ligação expira ao fechar o browser.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>E a IA?</strong><br>Em breve. Gemini AI vai interpretar "Cítricos", "Lemon" e "Limón" como equivalentes automaticamente.</div></div>
+    </div>
+  </div>
+</div>
+    <div id="lang-en">
+      <div class="infobox ii" style="flex-direction:column;align-items:flex-start;gap:6px"><div><strong>ℹ️ What is How2Match?</strong></div><div>A B2B matchmaking tool for trade fairs. It connects <strong>hosted buyers</strong> (invited purchasing companies) with <strong>exhibitors / sellers</strong> (companies showcasing at the event). Builds an optimised meeting schedule and sends each participant their personalised agenda by email. Buyers and sellers together are called <strong>participants</strong>.</div></div>
+      <div class="infobox iw">⚠️ <strong>Gmail sending limits:</strong> Google allows up to 100 emails/hour. The tool auto-pauses every 50 emails. Do not close the browser tab while sending.</div>
+      <div class="instr-section"><h3>Step 1 — Event setup</h3><div class="instr-step"><div class="instr-num">1</div><div>Enter event name, organiser, dates, tables, min/max meetings and expected buyer/seller counts.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Use the <strong>Schedule builder</strong> to generate time slots. Repeat for afternoon sessions. Use <strong>Add break</strong> for lunch/coffee rows.</div></div></div>
+      <div class="instr-section"><h3>Step 2 — Participant data</h3><div class="instr-step"><div class="instr-num">1</div><div>Download and fill the <strong>Buyers</strong> and <strong>Sellers</strong> templates. One row per company.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Values must be <strong>comma-separated</strong> and <strong>spelled identically</strong> in both files. A typo = no match.</div></div></div>
+      <div class="instr-section"><h3>Steps 3–6</h3><div class="instr-step"><div class="instr-num">1</div><div>Add matching rules and click <strong>Generate matches</strong>.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Review the schedule. Hover cells to see match reason and desk number.</div></div><div class="instr-step"><div class="instr-num">3</div><div>Edit templates, connect Gmail, generate preview, approve and send.</div></div></div>
+      <div class="instr-section"><h3>❓ FAQ</h3>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>What are Buyers, Sellers and Participants?</strong><br>Buyers (hosted buyers) are invited purchasing companies. Sellers (exhibitors) are companies showcasing products/services. Together they are Participants.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>What is a Slot?</strong><br>A time slot is one meeting period (e.g. 9:00–9:20). Each slot can host as many simultaneous meetings as tables available.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>What is a Break?</strong><br>A non-meeting period (lunch, coffee) inserted in the schedule. Appears in the macro view but no meetings are assigned.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>What is a Criterion?</strong><br>A column used for matching (e.g. "Product category", "Region"). Rename the Criterion 1–5 columns in the template to match your event.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Required vs Preferred criteria?</strong><br><strong>Required:</strong> no common value = no meeting scheduled. <strong>Preferred:</strong> common values boost the match score but don't block the meeting.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Fixed vs Rotating desk mode?</strong><br><strong>Fixed:</strong> each buyer has a permanent desk. Sellers move. Use when tables ≥ buyers.<br><strong>Rotating:</strong> desks are shared per slot — only buyers with a meeting occupy a desk. Required when buyers > tables.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>What is the Macro Schedule?</strong><br>The master organiser view — slots as rows, buyers as columns, assigned seller in each cell. Export as CSV for records.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>What is Integrity?</strong><br>Checks that no seller is double-booked in the same slot and no buyer has the same seller twice.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Can I upload my own Excel?</strong><br>Yes, but normalise your data first — consistent spelling, comma-separated values, matching column names in both files. Inconsistent data = missed matches.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>A participant has slot constraints. What do I do?</strong><br>The tool does not support individual slot exclusions. Adjust the schedule manually after generating — edit the CSV or agenda before sending.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Are agendas sent as PDF?</strong><br>No — agendas are sent as HTML in the email body. For PDF, export the CSV and format it in Google Sheets or Excel.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Gmail permissions and limits?</strong><br>Connect Gmail authorises the tool to send on your behalf. Google allows 100 emails/hour. The tool auto-pauses every 50. Credentials are never stored — the connection expires when you close the browser.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>What about AI matching?</strong><br>Coming soon. When active, Gemini AI will interpret equivalent values across languages — "Cítricos", "Lemon" and "Limón" will match automatically, eliminating manual normalisation.</div></div>
+      </div>
+    </div>
+    <div id="lang-es" style="display:none">
+      <div class="infobox ii" style="flex-direction:column;align-items:flex-start;gap:6px"><div><strong>ℹ️ ¿Qué es How2Match?</strong></div><div>Herramienta de matchmaking B2B para ferias. Conecta <strong>compradores invitados</strong> con <strong>expositores/vendedores</strong> según criterios definidos. Genera agenda de reuniones y envía a cada participante su agenda personalizada por email.</div></div>
+      <div class="infobox iw">⚠️ <strong>Límite Gmail:</strong> hasta 100 emails/hora. Pausas automáticas cada 50. No cierres el navegador durante el envío.</div>
+      <div class="instr-section"><h3>Pasos 1–6</h3><div class="instr-step"><div class="instr-num">1</div><div>Configura el evento, genera slots, sube archivos, añade reglas y genera matches.</div></div><div class="instr-step"><div class="instr-num">2</div><div>Revisa la agenda, edita plantillas, conecta Gmail, aprueba y envía.</div></div></div>
+      <div class="instr-section"><h3>❓ Preguntas frecuentes</h3>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Qué son compradores, vendedores y participantes?</strong><br>Los <strong>compradores</strong> son empresas compradoras invitadas. Los <strong>vendedores</strong> son expositores. Juntos son los <strong>participantes</strong>.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Qué es un slot?</strong><br>Un período de reunión (ej. 9:00–9:20). En cada slot pueden celebrarse tantas reuniones simultáneas como mesas disponibles.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Qué es una pausa?</strong><br>Un período sin reuniones (comida, café). Aparece en el macro schedule pero no se le asignan reuniones.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Qué es un criterio?</strong><br>Una columna usada para el matching (ej. "Categoría de producto"). Renombra las columnas Criterion 1–5 según las necesidades de tu evento.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Obligatorio vs Preferible?</strong><br><strong>Obligatorio:</strong> sin valor común = sin reunión. <strong>Preferible:</strong> valores comunes aumentan el score pero no bloquean la reunión.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Fixed vs Rotating?</strong><br><strong>Fixed:</strong> cada comprador tiene mesa fija. <strong>Rotating:</strong> mesas compartidas por slot. Obligatorio cuando compradores > mesas.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Qué es el Macro Schedule?</strong><br>Vista maestra para el organizador — slots en filas, compradores en columnas. Expórtalo como CSV.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Qué es la Integridad?</strong><br>Verifica que ningún vendedor esté reservado doble y que ningún comprador tenga el mismo vendedor dos veces.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Puedo subir mi propio Excel?</strong><br>Sí, pero normaliza los datos previamente — ortografía consistente y valores separados por comas. Datos inconsistentes = matches perdidos.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Un participante no puede en un slot concreto. ¿Qué hago?</strong><br>La herramienta no admite exclusiones individuales de slots. Ajusta manualmente el schedule tras generarlo.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Las agendas se envían como PDF?</strong><br>No — como HTML en el cuerpo del email. Para PDF, exporta el CSV y fórmatealo en Google Sheets o Excel.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Permisos y límites de Gmail</strong><br>Connect Gmail autoriza el envío en tu nombre. Máximo 100/hora, pausas cada 50. Las credenciales nunca se almacenan.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Y la IA?</strong><br>Próximamente. Gemini AI interpretará valores equivalentes entre idiomas — "Cítricos", "Lemon" y "Limón" coincidirán automáticamente.</div></div>
+      </div>
+    </div>
+    <div id="lang-tr" style="display:none">
+      <div class="infobox ii" style="flex-direction:column;align-items:flex-start;gap:6px"><div><strong>ℹ️ How2Match nedir?</strong></div><div>Ticaret fuarları için B2B eşleştirme aracı. <strong>Hosted alıcıları</strong> ile <strong>fuarcılar/satıcıları</strong> eşleştirir. Her katılımcıya kişiselleştirilmiş program gönderir.</div></div>
+      <div class="infobox iw">⚠️ <strong>Gmail limiti:</strong> saatte 100. Her 50'de otomatik duraklar.</div>
+      <div class="instr-section"><h3>❓ Sık Sorulan Sorular</h3>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Alıcı, Satıcı, Katılımcı nedir?</strong><br><strong>Alıcılar</strong> davetli satın alma şirketleri, <strong>Satıcılar</strong> fuarcılardır. İkisi birlikte <strong>katılımcılar</strong>dır.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Slot nedir?</strong><br>Bir toplantı zaman dilimi (örn. 9:00–9:20). Her slotta mevcut masa sayısı kadar eşzamanlı toplantı olabilir.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Zorunlu vs Tercihli kriter?</strong><br><strong>Zorunlu:</strong> ortak değer yoksa toplantı yok. <strong>Tercihli:</strong> skoru artırır ama engellemez.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Fixed vs Rotating?</strong><br><strong>Fixed:</strong> sabit masa. <strong>Rotating:</strong> masalar slot başına paylaşılır. Alıcı > masa ise Rotating zorunludur.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>PDF olarak gönderilir mi?</strong><br>Hayır — e-posta gövdesinde HTML. PDF için CSV indirip Google Sheets'te biçimlendirin.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Yapay Zeka?</strong><br>Yakında. Gemini AI ile "Narenciye", "Lemon", "Limón" otomatik eşleşecek.</div></div>
+      </div>
+    </div>
+    <div id="lang-ko" style="display:none">
+      <div class="infobox ii" style="flex-direction:column;align-items:flex-start;gap:6px"><div><strong>ℹ️ How2Match란?</strong></div><div>무역 박람회를 위한 B2B 매칭 도구. <strong>호스티드 바이어</strong>와 <strong>전시업체/판매자</strong>를 연결하고 맞춤형 일정을 이메일로 전송합니다.</div></div>
+      <div class="infobox iw">⚠️ <strong>Gmail 한도:</strong> 시간당 100개. 50개마다 자동 일시 중지.</div>
+      <div class="instr-section"><h3>❓ 자주 묻는 질문</h3>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>구매자, 판매자, 참가자란?</strong><br><strong>구매자</strong>는 초청 구매 기업, <strong>판매자</strong>는 전시업체입니다. 둘을 합쳐 <strong>참가자</strong>라고 합니다.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>슬롯이란?</strong><br>하나의 미팅 시간 단위(예: 9:00–9:20). 각 슬롯에서 테이블 수만큼 동시 미팅 가능합니다.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>필수 vs 선호 기준?</strong><br><strong>필수:</strong> 공통 값 없으면 미팅 없음. <strong>선호:</strong> 점수를 높이지만 미팅을 막지 않습니다.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Fixed vs Rotating?</strong><br><strong>Fixed:</strong> 고정 테이블. <strong>Rotating:</strong> 슬롯별 공유. 구매자 수 > 테이블 수이면 Rotating 필수입니다.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>PDF로 전송되나요?</strong><br>아니요 — 이메일 본문에 HTML로 전송됩니다. PDF는 CSV를 내보내 Google Sheets에서 만드세요.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>AI 매칭은?</strong><br>곧 출시. Gemini AI로 "감귤류", "Lemon", "Limón"이 자동 매칭됩니다.</div></div>
+      </div>
+    </div>
+    <div id="lang-pt" style="display:none">
+      <div class="infobox ii" style="flex-direction:column;align-items:flex-start;gap:6px"><div><strong>ℹ️ O que é o How2Match?</strong></div><div>Ferramenta de matchmaking B2B para feiras. Conecta <strong>compradores convidados</strong> com <strong>expositores/vendedores</strong>. Gera agenda e envia a cada participante a sua agenda por e-mail.</div></div>
+      <div class="infobox iw">⚠️ <strong>Limite Gmail:</strong> 100 e-mails/hora. Pausa automática a cada 50.</div>
+      <div class="instr-section"><h3>❓ Perguntas Frequentes</h3>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>O que são compradores, vendedores e participantes?</strong><br><strong>Compradores</strong> são empresas convidadas. <strong>Vendedores</strong> são expositores. Em conjunto chamam-se <strong>participantes</strong>.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>O que é um slot?</strong><br>Um período de reunião (ex. 9:00–9:20). Cada slot permite tantas reuniões simultâneas quantas mesas disponíveis.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Obrigatório vs Preferível?</strong><br><strong>Obrigatório:</strong> sem valor comum = sem reunião. <strong>Preferível:</strong> aumenta o score mas não bloqueia.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Fixed vs Rotating?</strong><br><strong>Fixed:</strong> mesa fixa por comprador. <strong>Rotating:</strong> mesas partilhadas por slot. Obrigatório se compradores > mesas.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>As agendas são PDF?</strong><br>Não — HTML no corpo do e-mail. Para PDF, exporte o CSV e formate no Google Sheets.</div></div>
+        <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>E a IA?</strong><br>Em breve. Gemini AI vai interpretar "Cítricos", "Lemon" e "Limón" como equivalentes automaticamente.</div></div>
+      </div>
     </div>
   </div>
 </div>
@@ -548,9 +809,10 @@ function checkDeskMode(){
   var hint=document.getElementById('desk-mode-hint');
   var nb=parseInt(document.getElementById('ev-nbuyers').value)||0;
   var tables=parseInt(document.getElementById('ev-tables').value)||0;
-  if(mode==='fixed'&&tables>nb&&nb>0){
-    hint.textContent='💡 You have more tables than buyers — Rotating mode would use them more efficiently.';
-    hint.style.display='block';hint.style.color='var(--warn)';
+  if(nb>0&&tables>0&&nb>tables){
+    hint.textContent='⚠️ You have more buyers ('+nb+') than tables ('+tables+') — Rotating mode is required. In Fixed mode some buyers would have no desk.';
+    hint.style.display='block';hint.style.color='var(--danger)';
+    document.getElementById('ev-desk-mode').value='rotating';
   } else if(mode==='rotating'){
     hint.textContent='✓ Rotating: desks are shared per slot. Buyers may use different desks each meeting.';
     hint.style.display='block';hint.style.color='var(--success)';
@@ -566,16 +828,33 @@ function checkCapacity(){
   var minM=parseInt(document.getElementById('ev-min').value)||0;
   var activeSlots=S.slots.filter(function(s){return!s.startsWith('—');}).length;
   var el=document.getElementById('capacity-check');
-  if(!nb||!ns||!activeSlots||!minM){el.style.display='none';return;}
-  var maxPossible=Math.min(activeSlots*tables, activeSlots*nb);
+  if(!ns||!minM){el.style.display='none';checkDeskMode();return;}
+  var effectiveTables=nb>0?Math.min(tables,nb):tables;
+  var maxPossible=activeSlots>0?activeSlots*effectiveTables:0;
   var needed=ns*minM;
+  var minSlotsNeeded=effectiveTables>0?Math.ceil(needed/effectiveTables):0;
   el.style.display='block';
-  if(needed>maxPossible){
-    var maxAchievable=Math.floor(maxPossible/Math.max(ns,1));
-    el.innerHTML='<div class="infobox ie">⚠️ <div><strong>Capacity warning:</strong> With '+nb+' buyers, '+activeSlots+' slots and '+tables+' tables, max possible meetings = <strong>'+maxPossible+'</strong>. With '+ns+' sellers × min '+minM+' = <strong>'+needed+' needed</strong>. Consider reducing minimum to <strong>'+maxAchievable+'</strong> or adding <strong>'+Math.ceil((needed-maxPossible)/nb)+' more slots</strong>.</div></div>';
+  var html='<div style="background:#f4f8fb;border:1px solid var(--border);border-radius:6px;padding:12px 16px;font-size:12px">';
+  html+='<div style="font-weight:700;color:var(--navy);margin-bottom:8px">📊 Capacity check</div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">';
+  if(activeSlots>0){
+    html+='<div style="background:white;border-radius:4px;padding:8px;text-align:center"><div style="font-size:18px;font-weight:700;color:var(--navy)">'+maxPossible+'</div><div style="font-size:10px;color:var(--char60)">max possible meetings<br>'+activeSlots+' slots × '+effectiveTables+' tables</div></div>';
   } else {
-    el.innerHTML='<div class="infobox io">✓ <div>Capacity OK: '+maxPossible+' possible meetings, '+needed+' needed for minimum '+minM+' per seller.</div></div>';
+    html+='<div style="background:white;border-radius:4px;padding:8px;text-align:center"><div style="font-size:18px;font-weight:700;color:var(--char40)">—</div><div style="font-size:10px;color:var(--char60)">add slots to calculate</div></div>';
   }
+  html+='<div style="background:white;border-radius:4px;padding:8px;text-align:center"><div style="font-size:18px;font-weight:700;color:var(--navy)">'+needed+'</div><div style="font-size:10px;color:var(--char60)">meetings needed<br>'+ns+' sellers × min '+minM+'</div></div>';
+  html+='</div>';
+  if(minSlotsNeeded>0){
+    html+='<div style="font-size:11px;color:var(--char60);margin-bottom:6px">📅 Min slots needed (perfect match): <strong>'+minSlotsNeeded+'</strong> &nbsp;·&nbsp; Current slots: <strong>'+(activeSlots||0)+'</strong>'+(activeSlots<minSlotsNeeded?' <span style="color:var(--danger)">↑ need '+(minSlotsNeeded-activeSlots)+' more</span>':' <span style="color:var(--success)">✓</span>')+'</div>';
+  }
+  if(maxPossible>0&&needed>maxPossible){
+    var maxAchievable=Math.floor(maxPossible/Math.max(ns,1));
+    html+='<div class="infobox ie" style="margin-bottom:0">⚠️ <div><strong>Not enough capacity.</strong> Need '+needed+', max '+maxPossible+'. Reduce minimum to <strong>'+maxAchievable+'</strong> or add <strong>'+Math.max(0,minSlotsNeeded-activeSlots)+'</strong> more slots.</div></div>';
+  } else if(maxPossible>0){
+    html+='<div class="infobox io" style="margin-bottom:0">✓ Capacity OK — '+maxPossible+' possible, '+needed+' needed.</div>';
+  }
+  html+='</div>';
+  el.innerHTML=html;
   checkDeskMode();
 }
 
@@ -873,25 +1152,26 @@ function buildSchedule(){
   }
 
   for(var s=0;s<slots.length;s++){
-    var slotDeskCounter=1;
-    buyers.forEach(function(buyer){
-      if(buyerCount[buyer]>=maxM)return;
-      if(candidates[buyer].length>0&&tableUsage[s]<tables){
-        for(var k=0;k<candidates[buyer].length;k++){
-          var v=candidates[buyer][k];
-          if(!vendorAvail[s][v]&&(vendorMtgs[v]||0)<maxM){
-            schedule[buyer][s]=v;vendorAvail[s][v]=true;tableUsage[s]++;
-            buyerCount[buyer]++;vendorMtgs[v]=(vendorMtgs[v]||0)+1;
-            candidates[buyer].splice(k,1);
-            // Assign rotating desk for this slot
-            if(deskMode==='rotating'){
-              if(!slotDesks[s][buyer]){slotDesks[s][buyer]=slotDeskCounter++;} 
+    (function(slotIdx){
+      var slotDeskCounter=1;
+      buyers.forEach(function(buyer){
+        if(buyerCount[buyer]>=maxM)return;
+        if(candidates[buyer].length>0&&tableUsage[slotIdx]<tables){
+          for(var k=0;k<candidates[buyer].length;k++){
+            var v=candidates[buyer][k];
+            if(!vendorAvail[slotIdx][v]&&(vendorMtgs[v]||0)<maxM){
+              schedule[buyer][slotIdx]=v;vendorAvail[slotIdx][v]=true;tableUsage[slotIdx]++;
+              buyerCount[buyer]++;vendorMtgs[v]=(vendorMtgs[v]||0)+1;
+              candidates[buyer].splice(k,1);
+              if(deskMode==='rotating'){
+                slotDesks[slotIdx][buyer]=slotDeskCounter++;
+              }
+              break;
             }
-            break;
           }
         }
-      }
-    });
+      });
+    })(s);
   }
 
   var noMatch=[];
@@ -989,24 +1269,31 @@ function checkIntegrity(){
 }
 function updateDesk(idx,val){var b=window._buyerDeskMap&&window._buyerDeskMap[idx];if(b)S.desks[b]=val;}
 
-// ── CSV EXPORT — one row per meeting ──
+// ── CSV EXPORT — macro schedule ──
 function exportCSV(){
   if(!S.sched)return;
   var sc=S.sched;
-  var rows=[['Buyer','Seller','Slot','Desk','Match reasons']];
+  var isRotating=sc.deskMode==='rotating';
+  // Header row — for fixed, desk is in buyer column header
+  var buyerHeaders=sc.buyers.map(function(b){
+    return isRotating?b:b+' (Desk '+( S.desks[b]||1)+')';
+  });
+  var rows=[['Slot'].concat(buyerHeaders)];
   sc.slots.forEach(function(slot,i){
+    var row=[slot];
     sc.buyers.forEach(function(b){
       var v=sc.grid[b][i];
       if(v){
         var desk=getDeskForSlot(b,i);
-        var key=b+'||'+v;
-        var reasons=(S.matchReasons[key]||[]).map(function(r){return r.vals.join('/');}).join(' | ');
-        rows.push([b,v,slot,desk,reasons]);
+        row.push(isRotating?v+' (D'+desk+')':v);
+      } else {
+        row.push('');
       }
     });
+    rows.push(row);
   });
   var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
-  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='schedule.csv';a.click();
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='schedule_macro.csv';a.click();
   toast('CSV exported','ok');
 }
 
@@ -1338,552 +1625,15 @@ function sendGmailMessage(to,subject,body){
 }
 
 // ── NAV ──
-function goStep(n){
-  S.step=n;
-  document.querySelectorAll('.panel').forEach(function(p,i){p.classList.toggle('active',i===n);});
-  document.querySelectorAll('.step').forEach(function(s,i){s.classList.remove('active','done');if(i===n)s.classList.add('active');else if(i<n)s.classList.add('done');});
-  if(n===3){
-    renderSchedule();
-    document.getElementById('regen-warning').style.display=S.configChanged&&S.scheduleGenerated?'block':'none';
-  }
-  if(n===5)renderSendStep();
+function showFaqLang(lang,el){
+  ['en','es','tr','ko','pt'].forEach(function(l){document.getElementById('faq-'+l).style.display='none';});
+  document.getElementById('faq-'+lang).style.display='block';
+  el.parentElement.querySelectorAll('.lang-tab').forEach(function(t){t.classList.remove('active');});
+  el.classList.add('active');
 }
-function updatePill(){document.getElementById('proj-pill').textContent=document.getElementById('ev-name').value||'No project';}
 function toast(msg,type){var a=document.getElementById('toast-area');var t=document.createElement('div');t.className='toast '+(type||'');t.textContent=msg;a.appendChild(t);setTimeout(function(){t.remove();},3500);}
 
 // ── SLOTS ──
-function genSlots(){
-  var date=document.getElementById('sg-date').value;
-  var from=document.getElementById('sg-from').value;
-  var to=document.getElementById('sg-to').value;
-  var dur=parseInt(document.getElementById('ev-dur').value)||20;
-  var brk=parseInt(document.getElementById('sg-break').value)||0;
-  if(!date||!from||!to){toast('Select date and time range','w');return;}
-  var dp=date.split('-');var ds=dp[2]+'/'+dp[1]+'/'+dp[0];
-  var fh=parseInt(from.split(':')[0]),fm=parseInt(from.split(':')[1]);
-  var th=parseInt(to.split(':')[0]),tm=parseInt(to.split(':')[1]);
-  var cur=fh*60+fm,end=th*60+tm,step=dur+brk,added=0;
-  while(cur+dur<=end){
-    var s=Math.floor(cur/60)+':'+(cur%60+'').padStart(2,'0');
-    var e=Math.floor((cur+dur)/60)+':'+((cur+dur)%60+'').padStart(2,'0');
-    var lbl=ds+' '+s+'-'+e;
-    if(!S.slots.includes(lbl)){S.slots.push(lbl);added++;}
-    cur+=step;
-  }
-  markConfigChanged();
-  renderSlots();toast(added+' slots added','ok');
-}
-function addBreak(){
-  var date=document.getElementById('sg-date').value;
-  if(!date){toast('Select a date first','w');return;}
-  var dp=date.split('-');var ds=dp[2]+'/'+dp[1]+'/'+dp[0];
-  S.slots.push('— Break ('+ds+') —');renderSlots();
-}
-function addSlotManual(){var v=document.getElementById('slot-manual').value.trim();if(!v)return;if(!S.slots.includes(v)){S.slots.push(v);markConfigChanged();renderSlots();document.getElementById('slot-manual').value='';}}
-function removeSlot(i){S.slots.splice(i,1);markConfigChanged();renderSlots();}
-function renderSlots(){
-  document.getElementById('slot-list').innerHTML=S.slots.map(function(s,i){var ib=s.startsWith('—');return '<div class="si'+(ib?' brk':'')+'"><span>'+(ib?'☕':'🕐')+'</span><span class="st">'+s+'</span><span class="sdel" onclick="removeSlot('+i+')">×</span></div>';}).join('');
-  document.getElementById('slot-count').textContent='('+S.slots.filter(function(s){return!s.startsWith('—');}).length+' active)';
-}
-
-// ── TEMPLATE ──
-function downloadTemplate(type){
-  var wb=XLSX.utils.book_new();
-  var ws=XLSX.utils.aoa_to_sheet([HEADERS]);
-  ws['!cols']=HEADERS.map(function(){return{wch:24};});
-  XLSX.utils.book_append_sheet(wb,ws,type);
-  XLSX.writeFile(wb,'How2Match_'+type+'_Template.xlsx');
-  toast(type+' template downloaded','ok');
-}
-
-// ── FILE UPLOAD ──
-function triggerUp(type){document.getElementById('file-'+type).click();}
-function loadFile(type,input){
-  var file=input.files[0];if(!file)return;
-  var reader=new FileReader();
-  reader.onload=function(e){
-    var wb=XLSX.read(e.target.result,{type:'binary'});
-    var ws=wb.Sheets[wb.SheetNames[0]];
-    var rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
-    if(rows.length<2){toast('File appears empty','w');return;}
-    var headers=rows[0].map(function(h){return h.toString().trim();});
-    var data=rows.slice(1).filter(function(r){return r.some(function(c){return c!=='';});});
-    S[type]={h:headers,d:data};
-    document.getElementById(type+'-area').innerHTML='<div class="fok"><span class="fi">✓</span><div><div class="fn">'+file.name+'</div><div class="fm">'+data.length+' rows · '+headers.length+' cols</div></div><span class="fx" onclick="resetUpload(\''+type+'\')">×</span></div>';
-    checkBothLoaded();
-  };
-  reader.readAsBinaryString(file);
-}
-function loadHeaderImg(input){
-  var file=input.files[0];if(!file)return;
-  var reader=new FileReader();
-  reader.onload=function(e){
-    S.headerImgData=e.target.result;
-    document.getElementById('header-area').innerHTML='<div class="fok"><span class="fi">✓</span><div><div class="fn">'+file.name+'</div><div class="fm">Header loaded</div></div><span class="fx" onclick="resetHeader()">×</span></div>';
-    updatePreview();
-  };
-  reader.readAsDataURL(file);
-}
-function resetHeader(){S.headerImgData=null;document.getElementById('header-area').innerHTML='<div class="uzone" onclick="triggerUp(\'header-img\')" style="padding:16px"><span class="ui" style="font-size:20px">🖼</span><p style="font-size:12px">Upload event banner</p><small>PNG/JPG</small></div>';updatePreview();}
-function resetUpload(type){S[type]={h:[],d:[]};document.getElementById(type+'-area').innerHTML='<div class="uzone" onclick="triggerUp(\''+type+'\')"><span class="ui">📂</span><p>Upload '+type+'</p><small>.xlsx or .csv</small></div>';document.getElementById('cols-preview').style.display='none';}
-function checkBothLoaded(){
-  var b=S.buyers.h.length>0,s=S.sellers.h.length>0;
-  if(b||s){
-    document.getElementById('cols-preview').style.display='block';
-    if(b){document.getElementById('b-count').textContent=S.buyers.d.length;document.getElementById('b-cols').innerHTML=S.buyers.h.map(function(h){return '<span class="ctag">'+h+'</span>';}).join('');}
-    if(s){document.getElementById('s-count').textContent=S.sellers.d.length;document.getElementById('s-cols').innerHTML=S.sellers.h.map(function(h){return '<span class="ctag">'+h+'</span>';}).join('');}
-    if(b&&s&&S.rules.length===0){S.rules=[{bc:'',sc:'',type:'required'}];renderRules();}
-  }
-}
-
-// ── RULES ──
-function addRule(){S.rules.push({bc:'',sc:'',type:'required'});renderRules();}
-function removeRule(i){S.rules.splice(i,1);renderRules();}
-function updateRule(i,k,v){S.rules[i][k]=v;if(k==='type')renderRules();}
-function renderRules(){
-  var bh=S.buyers.h,sh=S.sellers.h;
-  var el=document.getElementById('rules-container');
-  if(!bh.length&&!sh.length){el.innerHTML='<div class="infobox iw">⚠ Upload files first.</div>';return;}
-  el.innerHTML=S.rules.map(function(r,i){
-    var bo=bh.map(function(h){return '<option value="'+h+'"'+(h===r.bc?' selected':'')+'>'+h+'</option>';}).join('');
-    var so=sh.map(function(h){return '<option value="'+h+'"'+(h===r.sc?' selected':'')+'>'+h+'</option>';}).join('');
-    return '<div class="rule-row"><span class="rbadge '+(r.type==='required'?'rb-req':'rb-pref')+'">'+(r.type==='required'?'REQUIRED':'PREFERRED')+'</span>'+
-      '<select onchange="updateRule('+i+',\'bc\',this.value)"><option value="">— buyer column —</option>'+bo+'</select>'+
-      '<span style="color:var(--char40)">↔</span>'+
-      '<select onchange="updateRule('+i+',\'sc\',this.value)"><option value="">— seller column —</option>'+so+'</select>'+
-      '<select style="width:130px;font-size:11px" onchange="updateRule('+i+',\'type\',this.value)">'+
-        '<option value="required"'+(r.type==='required'?' selected':'')+'>Required (blocks)</option>'+
-        '<option value="preferred"'+(r.type==='preferred'?' selected':'')+'>Preferred (+score)</option>'+
-      '</select>'+
-      '<span class="sdel" onclick="removeRule('+i+')">×</span></div>';
-  }).join('');
-}
-
-// ── MATCHING ──
-function clean(t){return t.toString().replace(/\u200B/g,'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();}
-function getVals(row,headers,col){var idx=headers.indexOf(col);if(idx<0)return[];var raw=row[idx]?row[idx].toString():'';return raw.split(',').map(function(p){return clean(p);}).filter(Boolean);}
-function overlap(av,bv){return av.filter(function(a){return bv.some(function(b){return a===b||a.includes(b)||b.includes(a);});});}
-
-function runMatch(){
-  var reqRules=S.rules.filter(function(r){return r.bc&&r.sc&&r.type==='required';});
-  var prefRules=S.rules.filter(function(r){return r.bc&&r.sc&&r.type==='preferred';});
-  if(!reqRules.length&&!prefRules.length){toast('Define at least one rule','w');return;}
-  if(!S.buyers.d.length||!S.sellers.d.length){toast('Upload both files first','w');return;}
-  var matches=[],reasons={};
-  for(var bi=0;bi<S.buyers.d.length;bi++){
-    var br=S.buyers.d[bi];
-    for(var si=0;si<S.sellers.d.length;si++){
-      var sr=S.sellers.d[si];
-      var matchedRules=[],ok=true;
-      for(var ri=0;ri<reqRules.length;ri++){
-        var rule=reqRules[ri];
-        var bv=getVals(br,S.buyers.h,rule.bc);
-        var sv=getVals(sr,S.sellers.h,rule.sc);
-        var ov=overlap(bv,sv);
-        if(ov.length>0){matchedRules.push({col:rule.bc+'↔'+rule.sc,vals:ov,type:'required'});}
-        else{ok=false;break;}
-      }
-      if(!ok)continue;
-      var score=0;
-      for(var ri=0;ri<prefRules.length;ri++){
-        var rule=prefRules[ri];
-        var bv=getVals(br,S.buyers.h,rule.bc);
-        var sv=getVals(sr,S.sellers.h,rule.sc);
-        var ov=overlap(bv,sv);
-        if(ov.length>0){score++;matchedRules.push({col:rule.bc+'↔'+rule.sc,vals:ov,type:'preferred'});}
-      }
-      var bco=getColVal(br,S.buyers.h,'Company name');
-      var bn=getColVal(br,S.buyers.h,'Contact name');
-      var sco=getColVal(sr,S.sellers.h,'Company name');
-      var sn=getColVal(sr,S.sellers.h,'Contact name');
-      matches.push({buyer:bn,buyerCo:bco,seller:sn,sellerCo:sco,score:score,buyerRow:br,sellerRow:sr});
-      reasons[bco+'||'+sco]=matchedRules;
-    }
-  }
-  matches.sort(function(a,b){return b.score-a.score;});
-  S.matches=matches;S.matchReasons=reasons;
-  S.scheduleGenerated=true;S.configChanged=false;
-  buildSchedule();
-  goStep(3);
-  toast(matches.length+' matches found','ok');
-}
-function getColVal(row,headers,col){var idx=headers.indexOf(col);return idx>=0&&row[idx]?row[idx].toString().trim():row[0]?row[0].toString().trim():'';}
-
-// ── SCHEDULING ──
-function buildSchedule(){
-  var slots=S.slots.filter(function(s){return!s.startsWith('—');});
-  var tables=parseInt(document.getElementById('ev-tables').value)||10;
-  var maxM=parseInt(document.getElementById('ev-max').value)||99;
-  var minM=parseInt(document.getElementById('ev-min').value)||0;
-  var deskMode=document.getElementById('ev-desk-mode').value;
-
-  // ── CAPACITY WARNING ──
-  var maxPossible=slots.length*tables;
-  // Count unique sellers
-  var uniqueSellers={};
-  S.matches.forEach(function(m){uniqueSellers[m.sellerCo||m.seller]=true;});
-  var nSellers=Object.keys(uniqueSellers).length;
-  var nBuyers=S.buyers.d.length;
-  var maxByBuyers=slots.length*nBuyers;
-  var realMax=Math.min(maxPossible,maxByBuyers);
-  var needed=nSellers*minM;
-  var capEl=document.getElementById('capacity-warning');
-  if(minM>0&&needed>realMax){
-    var maxAchievable=Math.floor(realMax/Math.max(nSellers,1));
-    capEl.innerHTML='<div class="infobox iw">⚠️ <div><strong>Capacity warning:</strong> With '+nBuyers+' buyers, '+slots.length+' slots and '+tables+' tables, the maximum possible meetings is '+realMax+'. With '+nSellers+' sellers needing minimum '+minM+', you need '+needed+' meetings. Consider reducing the minimum to <strong>'+maxAchievable+'</strong> or adding more slots.</div></div>';
-    capEl.style.display='block';
-  } else {
-    capEl.style.display='none';
-  }
-
-  var grouping={},vendorCount={};
-  S.matches.forEach(function(m){
-    var bc=m.buyerCo||m.buyer,sc=m.sellerCo||m.seller;
-    if(!grouping[bc])grouping[bc]=[];
-    if(grouping[bc].indexOf(sc)<0)grouping[bc].push(sc);
-    vendorCount[sc]=(vendorCount[sc]||0)+1;
-  });
-  var buyers=Object.keys(grouping);
-  buyers.forEach(function(b){grouping[b].sort(function(a,c){return(vendorCount[a]||0)-(vendorCount[c]||0);});});
-  var schedule={};buyers.forEach(function(b){schedule[b]=new Array(slots.length).fill('');});
-  var candidates={};buyers.forEach(function(b){candidates[b]=grouping[b].slice(0,maxM);});
-  var vendorAvail=slots.map(function(){return{};});
-  var tableUsage=slots.map(function(){return 0;});
-  var buyerCount={};buyers.forEach(function(b){buyerCount[b]=0;});
-  var vendorMtgs={};
-  for(var s=0;s<slots.length;s++){
-    buyers.forEach(function(buyer){
-      if(buyerCount[buyer]>=maxM)return;
-      if(candidates[buyer].length>0&&tableUsage[s]<tables){
-        for(var k=0;k<candidates[buyer].length;k++){
-          var v=candidates[buyer][k];
-          if(!vendorAvail[s][v]&&(vendorMtgs[v]||0)<maxM){
-            schedule[buyer][s]=v;vendorAvail[s][v]=true;tableUsage[s]++;
-            buyerCount[buyer]++;vendorMtgs[v]=(vendorMtgs[v]||0)+1;
-            candidates[buyer].splice(k,1);break;
-          }
-        }
-      }
-    });
-  }
-  var noMatch=[];
-  buyers.forEach(function(b){if(buyerCount[b]<minM)noMatch.push({name:b,type:'Buyer',count:buyerCount[b],min:minM});});
-  Object.keys(vendorCount).forEach(function(v){if((vendorMtgs[v]||0)<minM)noMatch.push({name:v,type:'Seller',count:vendorMtgs[v]||0,min:minM});});
-  if(deskMode==='fixed'){var di=1;buyers.forEach(function(b){if(!S.desks[b])S.desks[b]=di++;});}
-  S.sched={buyers:buyers,slots:slots,grid:schedule};S.noMatch=noMatch;
-}
-
-// ── TOOLTIP ──
-var ttEl=document.getElementById('tooltip');
-document.addEventListener('mousemove',function(e){if(ttEl.style.display==='block'){ttEl.style.left=(e.clientX+14)+'px';ttEl.style.top=(e.clientY-10)+'px';}});
-function showTT(buyer,seller,e){
-  var key=buyer+'||'+seller;
-  var reasons=S.matchReasons[key]||[];
-  var html='<div class="tt-title">'+buyer.substring(0,30)+' × '+seller.substring(0,30)+'</div>';
-  if(!reasons.length){html+='<div>No detail available.</div>';}
-  reasons.forEach(function(r){html+='<div class="tt-row"><span>'+(r.type==='required'?'✅':'⭐')+'</span><div><strong>'+r.col+'</strong><br><span style="color:var(--blue40)">'+r.vals.join(', ')+'</span></div></div>';});
-  ttEl.innerHTML=html;ttEl.style.display='block';
-  ttEl.style.left=(e.clientX+14)+'px';ttEl.style.top=(e.clientY-10)+'px';
-}
-function hideTT(){ttEl.style.display='none';}
-
-// ── RENDER SCHEDULE ──
-function renderSchedule(){
-  if(!S.sched){document.getElementById('metrics').innerHTML='<div class="infobox ii" style="grid-column:1/-1">ℹ Run matching first.</div>';return;}
-  var sc=S.sched;
-  var total=0;sc.buyers.forEach(function(b){sc.slots.forEach(function(sl,i){if(sc.grid[b][i])total++;});});
-  var cov=sc.buyers.length?Math.round(100*sc.buyers.filter(function(b){return sc.slots.some(function(sl,i){return sc.grid[b][i];});}).length/sc.buyers.length):0;
-  document.getElementById('metrics').innerHTML=
-    '<div class="metric"><div class="v">'+total+'</div><div class="l">meetings assigned</div></div>'+
-    '<div class="metric"><div class="v">'+S.matches.length+'</div><div class="l">total matches</div></div>'+
-    '<div class="metric"><div class="v">'+sc.buyers.length+'</div><div class="l">active buyers</div></div>'+
-    '<div class="metric"><div class="v">'+cov+'%</div><div class="l">buyer coverage</div></div>';
-  var maxCols=Math.min(sc.buyers.length,7);var vis=sc.buyers.slice(0,maxCols);
-  var allRows=S.slots;
-  var html='<thead><tr><th style="width:135px">Slot</th>'+vis.map(function(b){return '<th title="'+b+'">'+b.substring(0,12)+(b.length>12?'…':'')+'</th>';}).join('')+'</tr></thead><tbody>';
-  var activeIdx=0;
-  allRows.forEach(function(row){
-    var isBreak=row.startsWith('—');
-    if(isBreak){
-      html+='<tr><td colspan="'+(vis.length+1)+'" style="background:#e8e8e8;color:var(--char60);font-size:10px;font-style:italic;padding:5px 8px;text-align:center;font-weight:700;letter-spacing:.05em">'+row+'</td></tr>';
-    } else {
-      var i=activeIdx++;
-      html+='<tr><td class="slbl">'+row+'</td>';
-      vis.forEach(function(b){
-        var v=sc.grid[b]&&sc.grid[b][i];
-        if(v){html+='<td class="hit" onmouseenter="showTT(\''+b.replace(/'/g,"\\'").replace(/"/g,'&quot;')+'\',\''+v.replace(/'/g,"\\'").replace(/"/g,'&quot;')+'\',event)" onmouseleave="hideTT()">'+v.substring(0,12)+(v.length>12?'…':'')+'</td>';}
-        else{html+='<td class="miss">—</td>';}
-      });
-      html+='</tr>';
-    }
-  });
-  document.getElementById('agenda-tbl').innerHTML=html+'</tbody>';
-  document.getElementById('macro-note').innerHTML=sc.buyers.length>maxCols?'<div style="font-size:10px;color:var(--char60);margin-top:5px">Showing '+maxCols+' of '+sc.buyers.length+' buyers. Export CSV for full view.</div>':'';
-  var deskHtml='<div class="infobox ii">ℹ Buyers keep their desk — sellers move to the buyer desk.</div>';
-  sc.buyers.forEach(function(b,bi){deskHtml+='<div class="send-row"><span style="flex:1;font-weight:700">'+b+'</span><span style="color:var(--char60);font-size:11px">Fixed desk:</span><input class="desk-in" type="number" min="1" value="'+(S.desks[b]||1)+'" onchange="updateDesk('+bi+',this.value)"></div>';});
-  document.getElementById('tab-desks').innerHTML=deskHtml;
-  window._buyerDeskMap=sc.buyers;
-  document.getElementById('tab-nm').innerHTML=S.noMatch.length?'<div class="infobox iw">⚠ '+S.noMatch.length+' below minimum.</div>'+S.noMatch.map(function(n){return '<div class="nm-item"><span class="badge '+(n.type==='Buyer'?'bb':'bbs')+'">'+n.type+'</span>'+n.name+' <span style="font-size:10px;color:var(--char60)">('+n.count+'/min '+n.min+')</span></div>';}).join(''):'<div class="infobox io">✓ All participants meet minimum requirements.</div>';
-  var errs=checkIntegrity();
-  document.getElementById('tab-int').innerHTML=errs.length?errs.map(function(e){return '<div class="infobox ie">⚠ '+e+'</div>';}).join(''):'<div class="infobox io">✓ No conflicts. Schedule valid.</div>';
-}
-function showTab(n,el){['tab-macro','tab-desks','tab-nm','tab-int'].forEach(function(t){document.getElementById(t).style.display='none';});document.getElementById('tab-'+n).style.display='block';document.querySelectorAll('.tab-bar .tab').forEach(function(t){t.classList.remove('active');});el.classList.add('active');}
-function checkIntegrity(){
-  if(!S.sched)return[];var sc=S.sched,errs=[];
-  sc.slots.forEach(function(slot,s){var seen={};sc.buyers.forEach(function(b){var v=sc.grid[b][s];if(v){if(seen[v])errs.push('Slot '+slot+': "'+v+'" double-booked.');else seen[v]=true;}});});
-  sc.buyers.forEach(function(b){var seen={};sc.slots.forEach(function(sl,s){var v=sc.grid[b][s];if(v){if(seen[v])errs.push('"'+b+'": "'+v+'" appears twice.');else seen[v]=true;}});});
-  return errs;
-}
-function updateDesk(idx,val){var b=window._buyerDeskMap&&window._buyerDeskMap[idx];if(b)S.desks[b]=val;}
-function exportCSV(){
-  if(!S.sched)return;
-  var sc=S.sched;
-  var rows=[['Slot'].concat(sc.buyers)];
-  sc.slots.forEach(function(slot,i){rows.push([slot].concat(sc.buyers.map(function(b){return sc.grid[b][i]||'';})));});
-  var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
-  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='schedule.csv';a.click();
-  toast('CSV exported','ok');
-}
-
-// ── TEMPLATE PREVIEW ──
-function switchTpl(tab){
-  S.tplTab=tab;
-  document.getElementById('tpl-b').style.display=tab==='buyer'?'block':'none';
-  document.getElementById('tpl-s').style.display=tab==='seller'?'block':'none';
-  document.getElementById('tplt-b').classList.toggle('active',tab==='buyer');
-  document.getElementById('tplt-s').classList.toggle('active',tab==='seller');
-  document.getElementById('prev-label').textContent=tab==='buyer'?'Buyer agenda':'Seller agenda';
-  updatePreview();
-}
-function updatePreview(){
-  var isBuyer=S.tplTab==='buyer';
-  var title=(isBuyer?document.getElementById('ttl-b').value:document.getElementById('ttl-s').value)||(isBuyer?'BUSINESS MEETINGS PROGRAMME':'YOUR MEETING SCHEDULE');
-  var intro=(isBuyer?document.getElementById('int-b').value:document.getElementById('int-s').value)||'Introductory text...';
-  document.getElementById('prev-title').textContent=title;
-  document.getElementById('prev-intro').textContent=intro;
-  document.getElementById('prev-img').innerHTML=S.headerImgData?'<img src="'+S.headerImgData+'">':'<span style="font-size:20px;color:var(--char40)">🖼</span>';
-  var cd=document.getElementById('col-date').value;
-  var ct=document.getElementById('col-thead').value;
-  var cols=[];
-  if(document.getElementById('col-time').checked)cols.push('TIME');
-  if(document.getElementById('col-company').checked)cols.push('COMPANY');
-  if(document.getElementById('col-contact').checked)cols.push('CONTACT NAME');
-  if(document.getElementById('col-desk').checked)cols.push('DESK');
-  document.getElementById('prev-thead').innerHTML=cols.map(function(c){return '<th style="background:'+ct+';color:white;padding:3px 7px;font-size:10px">'+c+'</th>';}).join('');
-  var tbody='',lastDate='';
-  var samples=[{slot:'25/03/2025 11:40-12:00',co:'Sample Company A',desk:1},{slot:'25/03/2025 12:00-12:20',co:'Sample Company B',desk:1},{slot:'25/03/2025 14:00-14:20',co:'Sample Company C',desk:isBuyer?1:3}];
-  if(S.sched&&S.sched.buyers.length>0){
-    var b=S.sched.buyers[0];samples=[];
-    S.sched.slots.slice(0,4).forEach(function(slot,i){var v=S.sched.grid[b][i];if(v)samples.push({slot:slot,co:v,desk:S.desks[b]||1});});
-  }
-  samples.forEach(function(r){
-    var dp=r.slot.split(' ')[0]||'';var tp=r.slot.split(' ')[1]||r.slot;
-    if(dp!==lastDate){tbody+='<tr><td colspan="'+cols.length+'" class="apdate" style="background:'+cd+';color:white">'+dp+'</td></tr>';lastDate=dp;}
-    var row='<tr>';
-    if(document.getElementById('col-time').checked)row+='<td style="padding:3px 7px;font-size:10px">'+tp+'</td>';
-    if(document.getElementById('col-company').checked)row+='<td style="padding:3px 7px;font-size:10px">'+r.co+'</td>';
-    if(document.getElementById('col-contact').checked)row+='<td style="padding:3px 7px;font-size:10px">Contact</td>';
-    if(document.getElementById('col-desk').checked)row+='<td style="padding:3px 7px;font-size:10px;text-align:center;font-weight:700;color:#094172">'+(isBuyer?'Desk '+r.desk:'→ '+r.desk)+'</td>';
-    tbody+=row+'</tr>';
-  });
-  document.getElementById('prev-tbody').innerHTML=tbody;
-}
-
-// ── TEST RUN ──
-function generateTestRun(){
-  if(!S.sched){toast('Generate schedule first','w');return;}
-  var sc=S.sched;
-  var participants=[];
-  sc.buyers.slice(0,2).forEach(function(b){
-    var meetings=[];
-    sc.slots.forEach(function(slot,i){var v=sc.grid[b][i];if(v)meetings.push({slot:slot,co:v,desk:S.desks[b]||1});});
-    participants.push({name:b,type:'Buyer',meetings:meetings});
-  });
-  var sellerMtgs={};
-  sc.slots.forEach(function(slot,i){sc.buyers.forEach(function(b){var v=sc.grid[b][i];if(v){if(!sellerMtgs[v])sellerMtgs[v]=[];sellerMtgs[v].push({slot:slot,co:b,desk:S.desks[b]||1});}});});
-  var fs=Object.keys(sellerMtgs)[0];
-  if(fs)participants.push({name:fs,type:'Seller',meetings:sellerMtgs[fs].slice(0,5)});
-  document.getElementById('testrun-content').innerHTML=participants.map(function(p){
-    var isBuyer=p.type==='Buyer';
-    var rows=p.meetings.slice(0,5).map(function(m){
-      var key=isBuyer?p.name+'||'+m.co:m.co+'||'+p.name;
-      var reasons=(S.matchReasons[key]||[]).map(function(r){return r.vals.join(', ');}).join(' · ');
-      return '<div class="mr"><span class="mr-time">'+m.slot+'</span><div style="flex:1"><div class="mr-co">'+m.co+'</div>'+(reasons?'<div class="mr-reason">'+reasons+'</div>':'')+'</div><span class="mr-desk">'+(isBuyer?'Desk '+m.desk:'→ Desk '+m.desk)+'</span></div>';
-    }).join('');
-    return '<div class="pc"><div class="pc-type">'+p.type+'</div><div class="pc-name">'+p.name+'</div>'+(p.meetings.length?rows:'<div style="font-size:11px;color:var(--char60)">No meetings assigned.</div>')+'</div>';
-  }).join('');
-  document.getElementById('approve-btn').style.display='inline-flex';
-  toast('Preview generated — review and approve','ok');
-}
-function approveRun(){
-  S.testApproved=true;
-  var btn=document.getElementById('send-all-btn');
-  btn.disabled=false;btn.textContent='📤 Send all agendas';
-  document.getElementById('approve-btn').textContent='✓ Approved';
-  document.getElementById('approve-btn').disabled=true;
-  toast('Approved — send unlocked','ok');
-}
-
-// ── SEND ──
-function renderSendStep(){
-  var bh=S.buyers.h,sh=S.sellers.h;
-  ['ecol-b','ncol-b'].forEach(function(id){document.getElementById(id).innerHTML='<option value="">— select —</option>'+bh.map(function(h){return '<option>'+h+'</option>';}).join('');});
-  ['ecol-s','ncol-s'].forEach(function(id){document.getElementById(id).innerHTML='<option value="">— select —</option>'+sh.map(function(h){return '<option>'+h+'</option>';}).join('');});
-  bh.forEach(function(h){if(/email/i.test(h))document.getElementById('ecol-b').value=h;if(/contact.?name/i.test(h))document.getElementById('ncol-b').value=h;});
-  sh.forEach(function(h){if(/email/i.test(h))document.getElementById('ecol-s').value=h;if(/contact.?name/i.test(h))document.getElementById('ncol-s').value=h;});
-  if(S.gmailToken)document.getElementById('gmail-connect-prompt').style.display='none';
-  updateEmailPreview();
-}
-function updateEmailPreview(){
-  var body=document.getElementById('email-body').value;
-  var ev=document.getElementById('ev-name').value||'the event';
-  document.getElementById('email-preview').innerHTML=(body.replace(/\{\{name\}\}/g,'[Name]').replace(/\{\{company\}\}/g,'[Company]').replace(/\{\{event\}\}/g,ev).replace(/\{\{n_meetings\}\}/g,'5').replace(/\{\{agenda_table\}\}/g,'[Agenda table]')).replace(/\n/g,'<br>');
-}
-function insertVar(v){var ta=document.getElementById('email-body');var pos=ta.selectionStart;ta.value=ta.value.substring(0,pos)+v+ta.value.substring(pos);updateEmailPreview();}
-
-function buildAgendaHTML(participant,meetings,isBuyer){
-  var cd=document.getElementById('col-date').value||'#094172';
-  var ct=document.getElementById('col-thead').value||'#0484d1';
-  var title=(isBuyer?document.getElementById('ttl-b').value:document.getElementById('ttl-s').value)||'MEETING PROGRAMME';
-  var intro=(isBuyer?document.getElementById('int-b').value:document.getElementById('int-s').value)||'';
-  var lastDate='';
-  var rows=meetings.map(function(m){
-    var dp=m.slot.split(' ')[0]||'';var tp=m.slot.split(' ')[1]||m.slot;
-    var dr=dp!==lastDate?'<tr><td colspan="4" style="background:'+cd+';color:white;padding:4px 8px;font-weight:700;font-size:11px">'+dp+'</td></tr>':'';
-    lastDate=dp;
-    return dr+'<tr><td style="padding:4px 8px;font-size:11px">'+tp+'</td><td style="padding:4px 8px;font-size:11px;font-weight:700">'+m.co+'</td><td style="padding:4px 8px;font-size:11px">'+(m.contact||'')+'</td><td style="padding:4px 8px;font-size:11px;text-align:center;font-weight:700;color:#094172">'+(isBuyer?'Desk '+m.desk:'→ Desk '+m.desk)+'</td></tr>';
-  }).join('');
-  return '<div style="font-family:Arial,sans-serif;max-width:600px">'+
-    (S.headerImgData?'<img src="'+S.headerImgData+'" style="width:100%;max-height:120px;object-fit:cover">':'')+
-    '<h2 style="text-align:center;padding:10px;font-size:14px;border-bottom:1px solid #eee">'+title+'</h2>'+
-    '<div style="background:#f4f8fb;padding:8px 14px;border-bottom:1px solid #eee;font-size:12px"><strong>'+(isBuyer?'Hosted Buyer':'Exhibitor / Seller')+':</strong> '+participant+' &nbsp;|&nbsp; <strong>'+(isBuyer?'Your desk':'Your schedule')+':</strong> '+(isBuyer?'Desk '+(S.desks[participant]||'—'):'Move to indicated desks')+'</div>'+
-    (intro?'<p style="font-size:11px;font-style:italic;text-align:center;padding:6px 12px;color:#555">'+intro+'</p>':'')+
-    '<table style="width:100%;border-collapse:collapse;font-size:11px">'+
-    '<tr><th style="background:'+ct+';color:white;padding:4px 8px;text-align:left">TIME</th><th style="background:'+ct+';color:white;padding:4px 8px;text-align:left">COMPANY</th><th style="background:'+ct+';color:white;padding:4px 8px;text-align:left">CONTACT</th><th style="background:'+ct+';color:white;padding:4px 8px;text-align:center">DESK</th></tr>'+
-    rows+'</table></div>';
-}
-
-async function sendTestEmailReal(){
-  if(!S.gmailToken){toast('Connect Gmail first','w');return;}
-  if(!S.sched){toast('Generate schedule first','w');return;}
-  var testEmail=document.getElementById('test-email').value.trim();
-  if(!testEmail||!testEmail.includes('@')){toast('Enter a valid email address','w');return;}
-  var status=document.getElementById('test-email-status');
-  status.style.display='block';status.textContent='Sending test emails...';
-  var sc=S.sched;
-  var evName=document.getElementById('ev-name').value||'Test Event';
-  var subject=document.getElementById('email-subj').value.replace(/\{\{event\}\}/g,evName);
-  var bodyTemplate=document.getElementById('email-body').value;
-  var sent=0;
-  if(sc.buyers.length>0){
-    var b=sc.buyers[0];
-    var meetings=[];
-    sc.slots.forEach(function(slot,i){var v=sc.grid[b][i];if(v)meetings.push({slot:slot,co:v,contact:'Contact',desk:S.desks[b]||1});});
-    var agendaHtml=buildAgendaHTML(b,meetings,true);
-    var body=bodyTemplate.replace(/\{\{name\}\}/g,b).replace(/\{\{company\}\}/g,b).replace(/\{\{event\}\}/g,evName).replace(/\{\{n_meetings\}\}/g,meetings.length).replace(/\{\{agenda_table\}\}/g,agendaHtml);
-    try{var r=await sendGmailMessage(testEmail,'[BUYER TEST] '+subject,body);if(r.ok){sent++;status.textContent='✓ Buyer test sent...';}}catch(e){status.textContent='Error: '+e.message;}
-  }
-  await new Promise(function(r){setTimeout(r,500);});
-  var sellerMtgs={};
-  sc.slots.forEach(function(slot,i){sc.buyers.forEach(function(b){var v=sc.grid[b][i];if(v){if(!sellerMtgs[v])sellerMtgs[v]=[];sellerMtgs[v].push({slot:slot,co:b,contact:'Contact',desk:S.desks[b]||1});}});});
-  var firstSeller=Object.keys(sellerMtgs)[0];
-  if(firstSeller){
-    var agendaHtml=buildAgendaHTML(firstSeller,sellerMtgs[firstSeller],false);
-    var body=bodyTemplate.replace(/\{\{name\}\}/g,firstSeller).replace(/\{\{company\}\}/g,firstSeller).replace(/\{\{event\}\}/g,evName).replace(/\{\{n_meetings\}\}/g,sellerMtgs[firstSeller].length).replace(/\{\{agenda_table\}\}/g,agendaHtml);
-    try{var r=await sendGmailMessage(testEmail,'[SELLER TEST] '+subject,body);if(r.ok){sent++;status.textContent='✓ Both test emails sent to '+testEmail+'. Check your inbox!';}}catch(e){status.textContent='Buyer sent. Error on seller: '+e.message;}
-  }
-  toast(sent+' test email(s) sent to '+testEmail,'ok');
-}
-
-async function sendAllEmails(){
-  if(!S.testApproved){toast('Approve the test run first','w');return;}
-  if(!S.gmailToken){toast('Connect Gmail first','w');return;}
-  if(!S.sched){toast('Generate schedule first','w');return;}
-  var sc=S.sched;
-  var emailColB=document.getElementById('ecol-b').value;
-  var nameColB=document.getElementById('ncol-b').value;
-  var emailColS=document.getElementById('ecol-s').value;
-  var nameColS=document.getElementById('ncol-s').value;
-  var subject=document.getElementById('email-subj').value;
-  var bodyTemplate=document.getElementById('email-body').value;
-  var sendTo=document.getElementById('send-to').value;
-  var evName=document.getElementById('ev-name').value||'the event';
-  var tasks=[];
-  if(sendTo==='all'||sendTo==='buyers'){
-    sc.buyers.forEach(function(bco){
-      var buyerRow=S.buyers.d.find(function(r){return (r[S.buyers.h.indexOf('Company name')]||'').toString().trim()===bco;});
-      if(!buyerRow)return;
-      var email=emailColB?buyerRow[S.buyers.h.indexOf(emailColB)]||'':'';
-      var name=nameColB?buyerRow[S.buyers.h.indexOf(nameColB)]||bco:bco;
-      if(!email)return;
-      var meetings=[];
-      sc.slots.forEach(function(slot,i){
-        var v=sc.grid[bco][i];
-        if(v){
-          var sellerRow=S.sellers.d.find(function(r){return (r[S.sellers.h.indexOf('Company name')]||'').toString().trim()===v;});
-          var contact=sellerRow&&nameColS?sellerRow[S.sellers.h.indexOf(nameColS)]||v:v;
-          meetings.push({slot:slot,co:v,contact:contact,desk:S.desks[bco]||1});
-        }
-      });
-      var agendaHtml=buildAgendaHTML(bco,meetings,true);
-      var body=bodyTemplate.replace(/\{\{name\}\}/g,name).replace(/\{\{company\}\}/g,bco).replace(/\{\{event\}\}/g,evName).replace(/\{\{n_meetings\}\}/g,meetings.length).replace(/\{\{agenda_table\}\}/g,agendaHtml);
-      tasks.push({to:email.toString(),subject:subject.replace(/\{\{event\}\}/g,evName),body:body});
-    });
-  }
-  if(sendTo==='all'||sendTo==='sellers'){
-    var sellerMtgs={};
-    sc.slots.forEach(function(slot,i){sc.buyers.forEach(function(b){var v=sc.grid[b][i];if(v){if(!sellerMtgs[v])sellerMtgs[v]=[];sellerMtgs[v].push({slot:slot,co:b,contact:'',desk:S.desks[b]||1});}});});
-    Object.keys(sellerMtgs).forEach(function(sco){
-      var sellerRow=S.sellers.d.find(function(r){return (r[S.sellers.h.indexOf('Company name')]||'').toString().trim()===sco;});
-      if(!sellerRow)return;
-      var email=emailColS?sellerRow[S.sellers.h.indexOf(emailColS)]||'':'';
-      var name=nameColS?sellerRow[S.sellers.h.indexOf(nameColS)]||sco:sco;
-      if(!email)return;
-      var agendaHtml=buildAgendaHTML(sco,sellerMtgs[sco],false);
-      var body=bodyTemplate.replace(/\{\{name\}\}/g,name).replace(/\{\{company\}\}/g,sco).replace(/\{\{event\}\}/g,evName).replace(/\{\{n_meetings\}\}/g,sellerMtgs[sco].length).replace(/\{\{agenda_table\}\}/g,agendaHtml);
-      tasks.push({to:email.toString(),subject:subject.replace(/\{\{event\}\}/g,evName),body:body});
-    });
-  }
-  if(!tasks.length){toast('No valid email addresses found','w');return;}
-  document.getElementById('send-prog').style.display='block';
-  var pbar=document.getElementById('spbar');var status=document.getElementById('send-status');
-  var sent=0,failed=0;
-  for(var i=0;i<tasks.length;i++){
-    var t=tasks[i];
-    if(i>0&&i%50===0){
-      for(var w=70;w>0;w--){
-        status.textContent='⏸ Pausing for Gmail limits ('+w+'s)... '+sent+' sent. Do not close this tab.';
-        await new Promise(function(r){setTimeout(r,1000);});
-      }
-    }
-    status.textContent='📤 Sending to '+t.to+' ('+(i+1)+'/'+tasks.length+')...';
-    pbar.style.width=Math.round(100*(i+1)/tasks.length)+'%';
-    try{var resp=await sendGmailMessage(t.to,t.subject,t.body);if(resp.ok){sent++;}else{failed++;}}catch(e){failed++;}
-    await new Promise(function(r){setTimeout(r,400);});
-  }
-  status.textContent='✓ Done: '+sent+' sent'+(failed?' · '+failed+' failed':'');
-  toast(sent+' emails sent'+(failed?' ('+failed+' failed)':''),'ok');
-}
-
-function exportAllCSV(){
-  if(!S.sched){toast('Generate schedule first','w');return;}
-  var sc=S.sched;
-  var rows=[['Participant','Type','Slot','Counterpart','Desk','Match reasons']];
-  sc.buyers.forEach(function(b){
-    sc.slots.forEach(function(slot,i){
-      var v=sc.grid[b][i];
-      if(v){
-        var key=b+'||'+v;
-        var reasons=(S.matchReasons[key]||[]).map(function(r){return r.vals.join('/');}).join(' | ');
-        rows.push([b,'Buyer',slot,v,S.desks[b]||1,reasons]);
-        rows.push([v,'Seller',slot,b,S.desks[b]||1,reasons]);
-      }
-    });
-  });
-  var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
-  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='how2match_agendas.csv';a.click();
-  toast('All agendas exported','ok');
-}
 
 function showLang(lang,el){
   ['en','es','tr','ko','pt'].forEach(function(l){document.getElementById('lang-'+l).style.display='none';});
