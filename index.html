@@ -916,7 +916,7 @@ var S={
   rules:[],sched:null,matches:[],matchReasons:{},noMatch:[],desks:{},uniqueMatches:{},
   headerImgData:null,step:0,testApproved:false,tplTab:'buyer',
   gmailToken:null,gmailUser:null,scheduleGenerated:false,configChanged:false,
-  editMode:false
+  editMode:false,_forcePicker:null
 };
 var HEADERS=['Company name','Contact name','Email','Language(s)','Region of interest','Criterion 1','Criterion 2','Criterion 3','Criterion 4','Criterion 5','Website','LinkedIn'];
 
@@ -1028,23 +1028,46 @@ function removeMeeting(buyer,slotIdx){
   S.sched.grid[buyer][slotIdx]='';
   renderSchedule();toast('Meeting removed','ok');saveProject();
 }
-function forceMeeting(buyer,slotIdx){
+// Opens an inline searchable picker in the clicked cell (instead of a browser prompt)
+function openForcePicker(buyer,slotIdx){
   if(!S.sched)return;
   var usedAlready={};S.sched.slots.forEach(function(sl,i){var v=S.sched.grid[buyer][i];if(v)usedAlready[v]=true;});
   var candidates=[];
   S.matches.forEach(function(m){if(m.buyerCo===buyer&&candidates.indexOf(m.sellerCo)<0)candidates.push(m.sellerCo);});
   var available=candidates.filter(function(c){return!usedAlready[c];});
   if(!available.length){toast('No valid (required-criteria) candidates left to force for this buyer','w');return;}
-  var listTxt=available.slice(0,20).map(function(c,i){return (i+1)+'. '+c;}).join('\n');
-  var pick=prompt('Force a meeting for "'+buyer+'" in this slot.\n\nType the EXACT seller company name from this list of valid candidates (matched on required criteria, but not yet scheduled):\n\n'+listTxt,available[0]);
-  if(!pick)return;
-  pick=pick.trim();
-  if(available.indexOf(pick)<0){toast('Not in the candidate list — check spelling exactly','err');return;}
-  S.sched.grid[buyer][slotIdx]=pick;
+  S._forcePicker={buyer:buyer,slotIdx:slotIdx,candidates:available};
+  renderSchedule();
+  setTimeout(function(){var el=document.getElementById('force-search-input');if(el)el.focus();},0);
+}
+function closeForcePicker(){
+  S._forcePicker=null;
+  renderSchedule();
+}
+function forcePickerItemsHTML(list){
+  if(!list.length)return '<div style="padding:5px 8px;font-size:10px;color:var(--char60)">No matches</div>';
+  return list.slice(0,30).map(function(c){
+    var esc=c.replace(/'/g,"\\'");
+    return '<div style="padding:5px 8px;font-size:10px;cursor:pointer;border-bottom:1px solid var(--gray);text-align:left" onmouseenter="this.style.background=\'#f0f7ff\'" onmouseleave="this.style.background=\'white\'" onclick="confirmForcePick(\''+esc+'\')">'+c+'</div>';
+  }).join('');
+}
+function filterForcePicker(query){
+  if(!S._forcePicker)return;
+  query=(query||'').toLowerCase();
+  var list=S._forcePicker.candidates.filter(function(c){return c.toLowerCase().indexOf(query)>=0;});
+  var el=document.getElementById('force-results-list');
+  if(el)el.innerHTML=forcePickerItemsHTML(list);
+}
+function confirmForcePick(sellerName){
+  if(!S._forcePicker)return;
+  var buyer=S._forcePicker.buyer,slotIdx=S._forcePicker.slotIdx;
+  if(S._forcePicker.candidates.indexOf(sellerName)<0){toast('Invalid selection','err');return;}
+  S.sched.grid[buyer][slotIdx]=sellerName;
   if(!S.sched.forced)S.sched.forced={};
   S.sched.forced[buyer+'_'+slotIdx]=true;
+  S._forcePicker=null;
   renderSchedule();
-  toast('Meeting forced — check the Integrity tab for conflicts','w');
+  toast('Meeting forced with '+sellerName+' — check the Integrity tab for conflicts','w');
   saveProject();
 }
 function removeBuyer(buyer){
@@ -1388,6 +1411,31 @@ function getMatchReasonText(bco,sco){
   return reasons.map(function(r){return r.col.split('↔')[0]+' ('+r.vals.join(', ')+')';}).join(' · ');
 }
 function isUniqueOpportunity(bco,sco){return !!(S.uniqueMatches&&S.uniqueMatches[bco+'||'+sco]);}
+// Buyers sorted by how many meetings they actually have, richest first —
+// used for previews/test emails so the demo doesn't land on someone with just 1 meeting
+function buyersSortedByMeetings(){
+  if(!S.sched)return[];
+  return S.sched.buyers.slice().sort(function(a,b){
+    var ca=S.sched.slots.filter(function(sl,i){return!!S.sched.grid[a][i];}).length;
+    var cb=S.sched.slots.filter(function(sl,i){return!!S.sched.grid[b][i];}).length;
+    return cb-ca;
+  });
+}
+function pickRichestBuyer(){var l=buyersSortedByMeetings();return l.length?l[0]:null;}
+function pickRichestSeller(){
+  if(!S.sched)return null;
+  var counts={};
+  S.sched.buyers.forEach(function(b){S.sched.slots.forEach(function(sl,i){var v=S.sched.grid[b][i];if(v)counts[v]=(counts[v]||0)+1;});});
+  var best=null,bestCount=-1;
+  Object.keys(counts).forEach(function(s){if(counts[s]>bestCount){bestCount=counts[s];best=s;}});
+  return best;
+}
+// Different phrasing depending on who's reading their own agenda
+function uniqueOpportunityText(isBuyer){
+  return isBuyer
+    ? "This seller is the only one offering everything you're looking for!"
+    : "You're the only seller offering everything this buyer wants — a unique opportunity!";
+}
 // Best-effort contact name lookup for previews (auto-detects a "contact name"-like column)
 function getCounterpartContactName(companyName,counterpartIsSeller){
   var data=counterpartIsSeller?S.sellers.d:S.buyers.d;
@@ -1672,7 +1720,16 @@ function renderSchedule(){
             if(isBlocked){
               html+='<td style="background:#ffe0e0;cursor:pointer;font-size:9px;text-align:center;color:#c00" onclick="unblockSlot(\''+bEsc+'\','+i+')" title="Click to unblock">🚫 Blocked</td>';
             } else {
-              html+='<td class="miss" style="text-align:center"><span style="cursor:pointer;margin-right:6px" onclick="forceMeeting(\''+bEsc+'\','+i+')" title="Force a meeting here (from valid candidates)">➕</span><span style="cursor:pointer;color:var(--char40)" onclick="blockSlot(\''+bEsc+'\','+i+')" title="Block this slot">🚫</span></td>';
+              var isPicking=S._forcePicker&&S._forcePicker.buyer===b&&S._forcePicker.slotIdx===i;
+              if(isPicking){
+                html+='<td style="background:#eef6ff;padding:4px;min-width:150px;max-width:180px;vertical-align:top;text-align:left">'+
+                  '<input type="text" id="force-search-input" placeholder="Search seller…" style="width:100%;font-size:10px;padding:3px 5px;margin-bottom:3px;box-sizing:border-box" oninput="filterForcePicker(this.value)">'+
+                  '<div id="force-results-list" style="max-height:120px;overflow-y:auto;background:white;border:1px solid var(--border);border-radius:3px">'+forcePickerItemsHTML(S._forcePicker.candidates)+'</div>'+
+                  '<div style="text-align:right;margin-top:3px"><span style="cursor:pointer;font-size:9px;color:var(--char60)" onclick="closeForcePicker()">Cancel</span></div>'+
+                '</td>';
+              } else {
+                html+='<td class="miss" style="text-align:center"><span style="cursor:pointer;margin-right:6px" onclick="openForcePicker(\''+bEsc+'\','+i+')" title="Force a meeting here (from valid candidates)">➕</span><span style="cursor:pointer;color:var(--char40)" onclick="blockSlot(\''+bEsc+'\','+i+')" title="Block this slot">🚫</span></td>';
+              }
             }
           } else {
             html+='<td class="miss">—</td>';
@@ -1808,7 +1865,7 @@ function updatePreview(){
   if(sampleHint)sampleHint.style.display=usingRealData?'none':'block';
   var samples=[{slot:'25/03/2025 11:40-12:00',co:'Sample Company A',desk:1},{slot:'25/03/2025 12:00-12:20',co:'Sample Company B',desk:1},{slot:'25/03/2025 14:00-14:20',co:'Sample Company C',desk:isBuyer?1:3}];
   if(usingRealData){
-    var b=S.sched.buyers[0];samples=[];
+    var b=pickRichestBuyer();samples=[];
     S.sched.slots.slice(0,4).forEach(function(slot,i){var v=S.sched.grid[b][i];if(v)samples.push({slot:slot,co:v,desk:getDeskForSlot(b,i)});});
   }
   samples.forEach(function(r){
@@ -1822,10 +1879,10 @@ function updatePreview(){
     if(document.getElementById('col-signature'+suf).checked)row+='<td style="padding:3px 7px;font-size:10px;min-width:80px;border-bottom:1px solid #ccc">&nbsp;</td>';
     tbody+=row+'</tr>';
     if(document.getElementById('col-reason'+suf).checked){
-      var b0=(S.sched&&S.sched.buyers[0])||'';
+      var b0=b||'';
       var reasonText=b0?getMatchReasonText(b0,r.co):'';
       var unique=b0?isUniqueOpportunity(b0,r.co):false;
-      if(reasonText)tbody+='<tr><td colspan="'+cols.length+'" style="padding:2px 7px 6px;font-size:9px;color:#666;background:#fafafa">'+(unique?'⭐ <strong>Perfect match —</strong> ':'🔗 ')+'Match on: '+reasonText+(unique?'. Unique opportunity for this buyer!':'')+'</td></tr>';
+      if(reasonText)tbody+='<tr><td colspan="'+cols.length+'" style="padding:2px 7px 6px;font-size:9px;color:#666;background:#fafafa">'+(unique?'⭐ <strong>Perfect match —</strong> ':'🔗 ')+'Match on: '+reasonText+(unique?'. '+uniqueOpportunityText(isBuyer):'')+'</td></tr>';
     }
     if(document.getElementById('col-links'+suf).checked){
       var links=getCounterpartLinks(r.co,true);
@@ -1840,14 +1897,14 @@ function generateTestRun(){
   if(!S.sched){toast('Generate schedule first','w');return;}
   var sc=S.sched;
   var participants=[];
-  sc.buyers.slice(0,2).forEach(function(b){
+  buyersSortedByMeetings().slice(0,2).forEach(function(b){
     var meetings=[];
     sc.slots.forEach(function(slot,i){var v=sc.grid[b][i];if(v)meetings.push({slot:slot,co:v,desk:getDeskForSlot(b,i)});});
     participants.push({name:b,type:'Buyer',meetings:meetings});
   });
   var sellerMtgs={};
   sc.slots.forEach(function(slot,i){sc.buyers.forEach(function(b){var v=sc.grid[b][i];if(v){if(!sellerMtgs[v])sellerMtgs[v]=[];sellerMtgs[v].push({slot:slot,co:b,desk:getDeskForSlot(b,i)});}});});
-  var fs=Object.keys(sellerMtgs)[0];
+  var fs=pickRichestSeller();
   if(fs)participants.push({name:fs,type:'Seller',meetings:sellerMtgs[fs].slice(0,5)});
   document.getElementById('testrun-content').innerHTML=participants.map(function(p){
     var isBuyer=p.type==='Buyer';
@@ -1858,7 +1915,7 @@ function generateTestRun(){
       var unique=isUniqueOpportunity(bco,sco);
       var links=getCounterpartLinks(m.co,isBuyer);
       var linksLine=(links.website||links.linkedin)?'<div class="mr-reason">'+(links.website?'🌐 '+links.website+' &nbsp;':'')+(links.linkedin?'💼 '+links.linkedin:'')+'</div>':'';
-      return '<div class="mr"><span class="mr-time">'+m.slot+'</span><div style="flex:1"><div class="mr-co">'+m.co+(unique?' <span style="color:var(--warn)">⭐ Unique opportunity</span>':'')+'</div>'+(reasons?'<div class="mr-reason">Match on: '+reasons+'</div>':'')+linksLine+'</div><span class="mr-desk">'+(deskMoves(isBuyer,sc.deskMode)?'→ Desk '+m.desk:'Desk '+m.desk)+'</span></div>';
+      return '<div class="mr"><span class="mr-time">'+m.slot+'</span><div style="flex:1"><div class="mr-co">'+m.co+(unique?' <span style="color:var(--warn)">⭐ '+(isBuyer?'Only match like this':'Unique opportunity')+'</span>':'')+'</div>'+(reasons?'<div class="mr-reason">Match on: '+reasons+(unique?'. '+uniqueOpportunityText(isBuyer):'')+'</div>':'')+linksLine+'</div><span class="mr-desk">'+(deskMoves(isBuyer,sc.deskMode)?'→ Desk '+m.desk:'Desk '+m.desk)+'</span></div>';
     }).join('');
     return '<div class="pc"><div class="pc-type">'+p.type+'</div><div class="pc-name">'+p.name+'</div>'+(p.meetings.length?rows:'<div style="font-size:11px;color:var(--char60)">No meetings assigned.</div>')+'</div>';
   }).join('');
@@ -1900,7 +1957,7 @@ function buildAgendaHTML(participant,meetings,isBuyer){
     if(showReason){
       var reasonText=getMatchReasonText(bco,sco);
       var unique=isUniqueOpportunity(bco,sco);
-      if(reasonText)extraRows+='<tr><td colspan="'+colSpan+'" style="padding:2px 8px 6px;font-size:10px;color:#666;background:#fafafa;border-bottom:1px solid #eee">'+(unique?'⭐ <strong>Perfect match —</strong> ':'🔗 ')+'Match on: '+reasonText+(unique?'. Unique opportunity!':'')+'</td></tr>';
+      if(reasonText)extraRows+='<tr><td colspan="'+colSpan+'" style="padding:2px 8px 6px;font-size:10px;color:#666;background:#fafafa;border-bottom:1px solid #eee">'+(unique?'⭐ <strong>Perfect match —</strong> ':'🔗 ')+'Match on: '+reasonText+(unique?'. '+uniqueOpportunityText(isBuyer):'')+'</td></tr>';
     }
     if(showLinks){
       var links=getCounterpartLinks(m.co,isBuyer);
@@ -1951,7 +2008,7 @@ async function sendTestEmailReal(){
   var nameColS=document.getElementById('ncol-s')&&document.getElementById('ncol-s').value;
   var sent=0;
   if(sc.buyers.length>0){
-    var b=sc.buyers[0];
+    var b=pickRichestBuyer();
     var meetings=[];
     sc.slots.forEach(function(slot,i){
       var v=sc.grid[b][i];
@@ -1978,7 +2035,7 @@ async function sendTestEmailReal(){
       sellerMtgs[v].push({slot:slot,co:b,contact:contact,desk:getDeskForSlot(b,i)});
     }
   });});
-  var firstSeller=Object.keys(sellerMtgs)[0];
+  var firstSeller=pickRichestSeller();
   if(firstSeller){
     var sellerRow0=S.sellers.d.find(function(r){return (r[S.sellers.h.indexOf('Company name')]||'').toString().trim()===firstSeller;});
     var sellerName0=sellerRow0&&nameColS?sellerRow0[S.sellers.h.indexOf(nameColS)]||firstSeller:firstSeller;
