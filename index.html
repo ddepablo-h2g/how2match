@@ -574,6 +574,10 @@ Thank you for your participation.</textarea></div>
         <div class="instr-step"><div class="instr-num">5</div><div>Prepara la <strong>encuesta de satisfacción</strong> con antelación, lista para lanzarla a los 2-3 días de terminar el evento — no la improvises a última hora.</div></div>
         <div class="instr-step"><div class="instr-num">6</div><div><strong>Lección aprendida:</strong> la mayoría de las ausencias no se deben a falta de interés, sino a que el expositor no entendía cómo funciona el programa — muchos esperaban que el comprador acudiera a su propio stand. Deja clarísimo en toda comunicación <strong>quién se desplaza a la mesa de quién</strong>.</div></div>
       </div>
+
+      <div class="instr-section"><h3>5. Antes de tocar la herramienta</h3>
+        <div class="infobox iw">⚠️ <div>Con la metodología ya clara, el último paso antes de ponerte a usar How2Match es leerte <strong>📖 Help</strong> de principio a fin — ahí está explicado paso a paso cada botón y cada pantalla de la herramienta. Si durante el uso te surge una duda puntual, consulta <strong>❓ FAQ</strong>, que resuelve las preguntas más habituales (qué es un criterio, Required vs Preferred, Fixed vs Rotating, cómo funcionan las variables del email, etc.). No empieces a cargar datos de un evento real sin haber pasado por estas dos secciones al menos una vez.</div></div>
+      </div>
     </div>
 
     <!-- DURANTE EL EVENTO -->
@@ -854,6 +858,8 @@ Thank you for your participation.</textarea></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Are agendas sent as PDF?</strong><br>No — agendas are sent as formatted HTML inside the email body, which works on all email clients. If you need PDF attachments, export the CSV from Step 6, format it in Google Sheets, and use Google Sheets + Apps Script with your own Gmail to send them. Note: this approach only works with Gmail — Outlook does not have a native equivalent.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Gmail sending limits and permissions?</strong><br>When you click Connect Gmail, you authorise the tool to send emails on your behalf. Google allows up to 100 emails per hour. The tool auto-pauses every 50 emails. Do not close the browser during sending. Your Gmail credentials are never stored — the connection expires when you close the browser.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>What about AI matching?</strong><br>AI matching (Gemini) is coming soon. When active, it will interpret semantically equivalent values across languages — "Cítricos", "Lemon" and "Limón" would all match automatically, eliminating the need for manual data normalisation.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>What is "Match Reason" and the ⭐ "Perfect match — Unique opportunity" star?</strong><br><strong>Match Reason</strong> lists every criterion that overlapped between a buyer and a seller — both Required and Preferred — so both sides understand exactly why they were paired (e.g. "Match on: Region of interest (EU) · Certification (Organic)"). The <strong>⭐ star</strong> appears when a seller matches a buyer on <em>every single criterion</em> defined (Required + Preferred) <em>and</em> is the <strong>only</strong> seller who does so for that buyer — a genuinely exceptional pairing worth highlighting. It only shows up if you've defined at least one Preferred criterion, and won't appear for every meeting — most matches share only some criteria, which is normal. Toggle it on/off per agenda version with the <strong>MATCH REASON</strong> checkbox in Step 5 (Template).</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>How do the {{variables}} in the email work?</strong><br>In Step 6 (Send), the Subject and Body fields accept placeholders that get replaced with each participant's real data right before sending — so one template produces a personalised email for every buyer and seller. Click a variable tag to insert it at your cursor, or type it directly:<br>• <strong>{{name}}</strong> — the contact name (from the "name column" you select in Step 6)<br>• <strong>{{company}}</strong> — the company name<br>• <strong>{{event}}</strong> — the event name (from Step 1)<br>• <strong>{{n_meetings}}</strong> — how many meetings that specific participant has<br>• <strong>{{agenda_table}}</strong> — the full personalised meeting table (time, company, desk, match reason, etc.) rendered as HTML<br>These same variables also work in the Subject line (except {{agenda_table}}, which only makes sense in the body). Always send yourself a <strong>test email</strong> first to confirm the variables render as expected before sending to everyone.</div></div>
     </div>
     <div id="faq-es" style="display:none">
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Qué son compradores, vendedores y participantes?</strong><br>Los <strong>compradores</strong> son empresas compradoras invitadas con un mínimo de reuniones comprometido. Los <strong>vendedores</strong> son expositores que necesitan un mínimo para justificar su participación. Juntos se denominan <strong>participantes</strong>.</div></div>
@@ -869,6 +875,8 @@ Thank you for your participation.</textarea></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Las agendas se envían como PDF?</strong><br>No — como HTML en el cuerpo del email. Para PDF, exporta el CSV y fórmatealo en Google Sheets o Excel.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Permisos y límites de Gmail</strong><br>Connect Gmail autoriza el envío en tu nombre. Máximo 100/hora, pausas cada 50. Las credenciales nunca se almacenan — la conexión expira al cerrar el navegador.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Y la IA?</strong><br>Próximamente. Gemini AI interpretará valores equivalentes entre idiomas — "Cítricos", "Lemon" y "Limón" coincidirán automáticamente.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Qué es "Match Reason" y la estrella ⭐ "Perfect match — Unique opportunity"?</strong><br><strong>Match Reason</strong> lista todos los criterios en los que ha coincidido un comprador y un vendedor — tanto Obligatorios como Preferibles — para que ambas partes entiendan exactamente por qué se les ha emparejado (ej. "Match on: Region of interest (EU) · Certification (Organic)"). La <strong>estrella ⭐</strong> aparece cuando un vendedor coincide con un comprador en <em>absolutamente todos</em> los criterios definidos (Obligatorios + Preferibles) <em>y</em> es el <strong>único</strong> vendedor que lo consigue para ese comprador — una coincidencia realmente excepcional que merece destacarse. Solo puede aparecer si has definido al menos un criterio Preferible, y no saldrá en todas las reuniones — que la mayoría de matches compartan solo algunos criterios es lo normal. Se activa/desactiva por versión de agenda con el checkbox <strong>MATCH REASON</strong> en el Paso 5 (Template).</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Cómo funcionan las {{variables}} del email?</strong><br>En el Paso 6 (Send), los campos Subject y Body aceptan marcadores que se sustituyen por los datos reales de cada participante justo antes de enviar — así una única plantilla genera un email personalizado para cada comprador y vendedor. Haz clic en una etiqueta de variable para insertarla donde tengas el cursor, o escríbela directamente:<br>• <strong>{{name}}</strong> — el nombre de contacto (según la columna que selecciones en el Paso 6)<br>• <strong>{{company}}</strong> — el nombre de la empresa<br>• <strong>{{event}}</strong> — el nombre del evento (del Paso 1)<br>• <strong>{{n_meetings}}</strong> — cuántas reuniones tiene ese participante en concreto<br>• <strong>{{agenda_table}}</strong> — la tabla completa de reuniones personalizada (hora, empresa, mesa, motivo del match, etc.) renderizada en HTML<br>Estas mismas variables funcionan también en el Subject (excepto {{agenda_table}}, que solo tiene sentido en el cuerpo). Envíate siempre un <strong>email de prueba</strong> antes de mandarlo a todo el mundo, para confirmar que las variables se rellenan bien.</div></div>
     </div>
     <div id="faq-tr" style="display:none">
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Alıcı, Satıcı ve Katılımcı nedir?</strong><br><strong>Alıcılar</strong> minimum toplantı taahhüdü olan davetli satın alma şirketleridir. <strong>Satıcılar</strong> katılımlarını meşrulaştırmak için minimum toplantıya ihtiyaç duyan fuarcılardır. İkisi birlikte <strong>katılımcılar</strong>dır.</div></div>
@@ -995,7 +1003,7 @@ function toggleEditMode(){
   if(S.editMode){
     btn.textContent='✓ Done editing';btn.className='btn bsuc bsm';
     box.style.display='flex';
-    toast('Edit mode ON — click ✕ on any cell to remove a meeting','ok');
+    toast('Edit mode ON — ✕ removes a meeting, ➕ forces one, 🚫 blocks a slot','ok');
   } else {
     btn.textContent='✏️ Edit schedule';btn.className='btn bo bsm';
     box.style.display='none';
@@ -1019,6 +1027,25 @@ function removeMeeting(buyer,slotIdx){
   if(!S.sched)return;
   S.sched.grid[buyer][slotIdx]='';
   renderSchedule();toast('Meeting removed','ok');saveProject();
+}
+function forceMeeting(buyer,slotIdx){
+  if(!S.sched)return;
+  var usedAlready={};S.sched.slots.forEach(function(sl,i){var v=S.sched.grid[buyer][i];if(v)usedAlready[v]=true;});
+  var candidates=[];
+  S.matches.forEach(function(m){if(m.buyerCo===buyer&&candidates.indexOf(m.sellerCo)<0)candidates.push(m.sellerCo);});
+  var available=candidates.filter(function(c){return!usedAlready[c];});
+  if(!available.length){toast('No valid (required-criteria) candidates left to force for this buyer','w');return;}
+  var listTxt=available.slice(0,20).map(function(c,i){return (i+1)+'. '+c;}).join('\n');
+  var pick=prompt('Force a meeting for "'+buyer+'" in this slot.\n\nType the EXACT seller company name from this list of valid candidates (matched on required criteria, but not yet scheduled):\n\n'+listTxt,available[0]);
+  if(!pick)return;
+  pick=pick.trim();
+  if(available.indexOf(pick)<0){toast('Not in the candidate list — check spelling exactly','err');return;}
+  S.sched.grid[buyer][slotIdx]=pick;
+  if(!S.sched.forced)S.sched.forced={};
+  S.sched.forced[buyer+'_'+slotIdx]=true;
+  renderSchedule();
+  toast('Meeting forced — check the Integrity tab for conflicts','w');
+  saveProject();
 }
 function removeBuyer(buyer){
   if(!S.sched)return;
@@ -1322,6 +1349,8 @@ function renderRules(){
 // ── MATCHING ──
 function clean(t){return t.toString().replace(/\u200B/g,'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();}
 function getVals(row,headers,col){var idx=headers.indexOf(col);if(idx<0)return[];var raw=row[idx]?row[idx].toString():'';return raw.split(',').map(function(p){return clean(p);}).filter(Boolean);}
+// Same split as getVals but keeps the original text (for human-readable messages)
+function getRawVals(row,headers,col){var idx=headers.indexOf(col);if(idx<0)return[];var raw=row[idx]?row[idx].toString():'';return raw.split(',').map(function(p){return p.trim();}).filter(Boolean);}
 function overlap(av,bv){return av.filter(function(a){return bv.some(function(b){return a===b||a.includes(b)||b.includes(a);});});}
 // Returns '' if the column doesn't exist (unlike getColVal, which falls back to the first cell) — safe for optional columns like Website/LinkedIn
 function getOptCol(row,headers,col){var idx=headers.indexOf(col);return idx>=0&&row[idx]?row[idx].toString().trim():'';}
@@ -1336,15 +1365,19 @@ function findHeaderLoose(headers,name){
 // For a buyer/seller with ZERO matches, find which required criteria have no overlap with anyone on the other side
 function analyzeBlockingCriteria(entityType,row,headers,reqRules){
   var blocking=[];
+  var counterpartLabel=entityType==='buyer'?'seller':'buyer';
   reqRules.forEach(function(rule){
     var myCol=entityType==='buyer'?rule.bc:rule.sc;
     var otherCol=entityType==='buyer'?rule.sc:rule.bc;
     var myVals=getVals(row,headers,myCol);
-    if(!myVals.length){blocking.push(myCol+' (no value provided)');return;}
+    if(!myVals.length){blocking.push(myCol+' — no value provided in your file');return;}
     var otherData=entityType==='buyer'?S.sellers.d:S.buyers.d;
     var otherHeaders=entityType==='buyer'?S.sellers.h:S.buyers.h;
     var found=otherData.some(function(r2){return overlap(myVals,getVals(r2,otherHeaders,otherCol)).length>0;});
-    if(!found)blocking.push(myCol);
+    if(!found){
+      var rawVals=getRawVals(row,headers,myCol);
+      blocking.push(myCol+' — no '+counterpartLabel+' currently offers/wants "'+rawVals.join(', ')+'"');
+    }
   });
   return blocking;
 }
@@ -1355,6 +1388,18 @@ function getMatchReasonText(bco,sco){
   return reasons.map(function(r){return r.col.split('↔')[0]+' ('+r.vals.join(', ')+')';}).join(' · ');
 }
 function isUniqueOpportunity(bco,sco){return !!(S.uniqueMatches&&S.uniqueMatches[bco+'||'+sco]);}
+// Best-effort contact name lookup for previews (auto-detects a "contact name"-like column)
+function getCounterpartContactName(companyName,counterpartIsSeller){
+  var data=counterpartIsSeller?S.sellers.d:S.buyers.d;
+  var headers=counterpartIsSeller?S.sellers.h:S.buyers.h;
+  var row=data.find(function(r){return getColVal(r,headers,'Company name')===companyName;});
+  if(!row)return companyName;
+  var nameCol=null;
+  for(var i=0;i<headers.length;i++){if(headers[i]&&/contact.?name/i.test(headers[i])){nameCol=headers[i];break;}}
+  if(!nameCol)return companyName;
+  var v=getOptCol(row,headers,nameCol);
+  return v||companyName;
+}
 // Fetches the counterpart's optional Website/LinkedIn, looked up by company name
 function getCounterpartLinks(companyName,counterpartIsSeller){
   var data=counterpartIsSeller?S.sellers.d:S.buyers.d;
@@ -1506,14 +1551,24 @@ function buildSchedule(){
   // who already had at least one match — otherwise participants with zero candidates
   // (blocked on a required criterion) never show up here at all.
   var noMatch=[];
+  // Reverse lookup: seller -> matched buyers (mirrors `grouping`, needed to list capacity-blocked candidates)
+  var sellerGrouping={};
+  S.matches.forEach(function(m){
+    if(!sellerGrouping[m.sellerCo])sellerGrouping[m.sellerCo]=[];
+    if(sellerGrouping[m.sellerCo].indexOf(m.buyerCo)<0)sellerGrouping[m.sellerCo].push(m.buyerCo);
+  });
   S.buyers.d.forEach(function(row){
     var name=getColVal(row,S.buyers.h,'Company name');
     var scheduled=buyerCount.hasOwnProperty(name)?buyerCount[name]:0;
     if(scheduled<minBuyer){
       var candidatePool=grouping[name]?grouping[name].length:0;
-      var entry={name:name,type:'Buyer',count:scheduled,min:minBuyer};
+      var entry={name:name,type:'Buyer',count:scheduled,min:minBuyer,candidatePool:candidatePool};
       if(candidatePool===0){entry.reason='no_candidates';entry.blocking=analyzeBlockingCriteria('buyer',row,S.buyers.h,reqRules);}
-      else{entry.reason='capacity';}
+      else{
+        var scheduledSet={};slots.forEach(function(sl,i){var v=schedule[name]&&schedule[name][i];if(v)scheduledSet[v]=true;});
+        entry.candidates=(grouping[name]||[]).filter(function(s){return!scheduledSet[s];});
+        entry.reason=entry.candidates.length>0?'capacity':'exhausted';
+      }
       noMatch.push(entry);
     }
   });
@@ -1522,9 +1577,13 @@ function buildSchedule(){
     var scheduled=vendorMtgs.hasOwnProperty(name)?vendorMtgs[name]:0;
     if(scheduled<minSeller){
       var candidatePool=vendorCount.hasOwnProperty(name)?vendorCount[name]:0;
-      var entry={name:name,type:'Seller',count:scheduled,min:minSeller};
+      var entry={name:name,type:'Seller',count:scheduled,min:minSeller,candidatePool:candidatePool};
       if(candidatePool===0){entry.reason='no_candidates';entry.blocking=analyzeBlockingCriteria('seller',row,S.sellers.h,reqRules);}
-      else{entry.reason='capacity';}
+      else{
+        var scheduledBuyersSet={};buyers.forEach(function(b){slots.forEach(function(sl,i){if(schedule[b][i]===name)scheduledBuyersSet[b]=true;});});
+        entry.candidates=(sellerGrouping[name]||[]).filter(function(b){return!scheduledBuyersSet[b];});
+        entry.reason=entry.candidates.length>0?'capacity':'exhausted';
+      }
       noMatch.push(entry);
     }
   });
@@ -1597,21 +1656,23 @@ function renderSchedule(){
       vis.forEach(function(b){
         var v=sc.grid[b]&&sc.grid[b][i];
         var desk=getDeskForSlot(b,i);
+        var isForced=sc.forced&&sc.forced[b+'_'+i];
         if(v){
           var bs=b.replace(/'/g,"\\'").replace(/"/g,'&quot;');
           var vs=v.replace(/'/g,"\\'").replace(/"/g,'&quot;');
           if(isEdit){
-            html+='<td class="hit" style="position:relative">'+v.substring(0,14)+(v.length>14?'…':'')+'<span style="position:absolute;top:2px;right:2px;cursor:pointer;color:#ff6b6b;font-size:10px;line-height:1" onclick="removeMeeting(\''+bs+'\','+i+')">✕</span></td>';
+            html+='<td class="hit" style="position:relative'+(isForced?';background:#fff3e0':'')+'">'+(isForced?'🔧 ':'')+v.substring(0,14)+(v.length>14?'…':'')+'<span style="position:absolute;top:2px;right:2px;cursor:pointer;color:#ff6b6b;font-size:10px;line-height:1" onclick="removeMeeting(\''+bs+'\','+i+')">✕</span></td>';
           } else {
-            html+='<td class="hit" onmouseenter="showTT(\''+bs+'\',\''+vs+'\','+i+',event)" onmouseleave="hideTT()">'+v.substring(0,14)+(v.length>14?'…':'')+'<span style="font-size:9px;color:var(--blue60);margin-left:3px">D'+desk+'</span></td>';
+            html+='<td class="hit" style="'+(isForced?'background:#fff3e0':'')+'" onmouseenter="showTT(\''+bs+'\',\''+vs+'\','+i+',event)" onmouseleave="hideTT()">'+(isForced?'🔧 ':'')+v.substring(0,14)+(v.length>14?'…':'')+'<span style="font-size:9px;color:var(--blue60);margin-left:3px">D'+desk+'</span></td>';
           }
         } else {
           if(isEdit){
             var isBlocked=S.sched.blocked&&S.sched.blocked[b+'_'+i];
+            var bEsc=b.replace(/'/g,"\\'");
             if(isBlocked){
-              html+='<td style="background:#ffe0e0;cursor:pointer;font-size:9px;text-align:center;color:#c00" onclick="unblockSlot(\''+b.replace(/'/g,"\\'")+'\','+i+')" title="Click to unblock">🚫 Blocked</td>';
+              html+='<td style="background:#ffe0e0;cursor:pointer;font-size:9px;text-align:center;color:#c00" onclick="unblockSlot(\''+bEsc+'\','+i+')" title="Click to unblock">🚫 Blocked</td>';
             } else {
-              html+='<td class="miss" style="cursor:pointer" onclick="blockSlot(\''+b.replace(/'/g,"\\'")+'\','+i+')" title="Click to block this slot">—</td>';
+              html+='<td class="miss" style="text-align:center"><span style="cursor:pointer;margin-right:6px" onclick="forceMeeting(\''+bEsc+'\','+i+')" title="Force a meeting here (from valid candidates)">➕</span><span style="cursor:pointer;color:var(--char40)" onclick="blockSlot(\''+bEsc+'\','+i+')" title="Block this slot">🚫</span></td>';
             }
           } else {
             html+='<td class="miss">—</td>';
@@ -1642,9 +1703,13 @@ function renderSchedule(){
   document.getElementById('tab-nm').innerHTML=S.noMatch.length?'<div class="infobox iw">⚠ '+S.noMatch.length+' below minimum.</div>'+S.noMatch.map(function(n){
     var detail;
     if(n.reason==='no_candidates'){
-      detail='❌ No matching candidates found at all'+(n.blocking&&n.blocking.length?' — blocked on: <strong>'+n.blocking.join(', ')+'</strong>':'');
+      detail='❌ No matching candidates found at all.'+(n.blocking&&n.blocking.length?'<br>'+n.blocking.map(function(b){return '• '+b;}).join('<br>'):'');
+    } else if(n.reason==='exhausted'){
+      detail='🔸 All '+n.candidatePool+' valid match'+(n.candidatePool===1?'':'es')+' already scheduled — there simply aren\'t enough matching '+(n.type==='Buyer'?'sellers':'buyers')+' to reach the minimum of '+n.min+'. Forcing won\'t help (no candidates left) — consider loosening a Preferred criterion, or check if enough counterpart participants registered with a compatible profile.';
     } else {
-      detail='⚠️ Had valid matches, but capacity (tables/slots) ran out before reaching the minimum.';
+      var cands=n.candidates||[];
+      var candsTxt=cands.length?cands.slice(0,8).join(', ')+(cands.length>8?' +'+(cands.length-8)+' more':''):'';
+      detail='⚠️ Had '+n.candidatePool+' valid match'+(n.candidatePool===1?'':'es')+', but capacity (tables/slots) ran out before reaching the minimum.'+(candsTxt?'<br>Could still meet: <strong>'+candsTxt+'</strong> — go to Macro Schedule → ✏️ Edit schedule to force a meeting manually.':'');
     }
     return '<div class="nm-item" style="flex-direction:column;align-items:flex-start;gap:3px"><div style="display:flex;align-items:center;gap:8px"><span class="badge '+(n.type==='Buyer'?'bb':'bbs')+'">'+n.type+'</span><strong>'+n.name+'</strong><span style="font-size:10px;color:var(--char60)">('+n.count+'/min '+n.min+')</span></div><div style="font-size:11px;color:var(--char60);padding-left:2px">'+detail+'</div></div>';
   }).join(''):'<div class="infobox io">✓ All participants meet minimum requirements.</div>';
@@ -1752,7 +1817,7 @@ function updatePreview(){
     var row='<tr>';
     if(document.getElementById('col-time'+suf).checked)row+='<td style="padding:3px 7px;font-size:10px">'+tp+'</td>';
     if(document.getElementById('col-company'+suf).checked)row+='<td style="padding:3px 7px;font-size:10px">'+r.co+'</td>';
-    if(document.getElementById('col-contact'+suf).checked)row+='<td style="padding:3px 7px;font-size:10px">Contact</td>';
+    if(document.getElementById('col-contact'+suf).checked)row+='<td style="padding:3px 7px;font-size:10px">'+(usingRealData?getCounterpartContactName(r.co,true):'Contact')+'</td>';
     if(document.getElementById('col-desk'+suf).checked)row+='<td style="padding:3px 7px;font-size:10px;text-align:center;font-weight:700;color:#094172">'+(deskMoves(isBuyer,deskMode)?'→ '+r.desk:'Desk '+r.desk)+'</td>';
     if(document.getElementById('col-signature'+suf).checked)row+='<td style="padding:3px 7px;font-size:10px;min-width:80px;border-bottom:1px solid #ccc">&nbsp;</td>';
     tbody+=row+'</tr>';
@@ -1882,22 +1947,43 @@ async function sendTestEmailReal(){
   var evName=document.getElementById('ev-name').value||'Test Event';
   var subject=document.getElementById('email-subj').value.replace(/\{\{event\}\}/g,evName);
   var bodyTemplate=document.getElementById('email-body').value;
+  var nameColB=document.getElementById('ncol-b')&&document.getElementById('ncol-b').value;
+  var nameColS=document.getElementById('ncol-s')&&document.getElementById('ncol-s').value;
   var sent=0;
   if(sc.buyers.length>0){
     var b=sc.buyers[0];
     var meetings=[];
-    sc.slots.forEach(function(slot,i){var v=sc.grid[b][i];if(v)meetings.push({slot:slot,co:v,contact:'Contact',desk:getDeskForSlot(b,i)});});
+    sc.slots.forEach(function(slot,i){
+      var v=sc.grid[b][i];
+      if(v){
+        var sellerRow=S.sellers.d.find(function(r){return (r[S.sellers.h.indexOf('Company name')]||'').toString().trim()===v;});
+        var contact=sellerRow&&nameColS?sellerRow[S.sellers.h.indexOf(nameColS)]||v:v;
+        meetings.push({slot:slot,co:v,contact:contact,desk:getDeskForSlot(b,i)});
+      }
+    });
+    var buyerRow0=S.buyers.d.find(function(r){return (r[S.buyers.h.indexOf('Company name')]||'').toString().trim()===b;});
+    var buyerName0=buyerRow0&&nameColB?buyerRow0[S.buyers.h.indexOf(nameColB)]||b:b;
     var agendaHtml=buildAgendaHTML(b,meetings,true);
-    var body=bodyTemplate.replace(/\{\{name\}\}/g,b).replace(/\{\{company\}\}/g,b).replace(/\{\{event\}\}/g,evName).replace(/\{\{n_meetings\}\}/g,meetings.length).replace(/\{\{agenda_table\}\}/g,agendaHtml);
+    var body=bodyTemplate.replace(/\{\{name\}\}/g,buyerName0).replace(/\{\{company\}\}/g,b).replace(/\{\{event\}\}/g,evName).replace(/\{\{n_meetings\}\}/g,meetings.length).replace(/\{\{agenda_table\}\}/g,agendaHtml);
     try{var r=await sendGmailMessage(testEmail,'[BUYER TEST] '+subject,body);if(r.ok){sent++;status.textContent='✓ Buyer test sent...';}}catch(e){status.textContent='Error: '+e.message;}
   }
   await new Promise(function(r){setTimeout(r,500);});
   var sellerMtgs={};
-  sc.slots.forEach(function(slot,i){sc.buyers.forEach(function(b){var v=sc.grid[b][i];if(v){if(!sellerMtgs[v])sellerMtgs[v]=[];sellerMtgs[v].push({slot:slot,co:b,contact:'Contact',desk:getDeskForSlot(b,i)});}});});
+  sc.slots.forEach(function(slot,i){sc.buyers.forEach(function(b){
+    var v=sc.grid[b][i];
+    if(v){
+      if(!sellerMtgs[v])sellerMtgs[v]=[];
+      var buyerRow=S.buyers.d.find(function(r){return (r[S.buyers.h.indexOf('Company name')]||'').toString().trim()===b;});
+      var contact=buyerRow&&nameColB?buyerRow[S.buyers.h.indexOf(nameColB)]||b:b;
+      sellerMtgs[v].push({slot:slot,co:b,contact:contact,desk:getDeskForSlot(b,i)});
+    }
+  });});
   var firstSeller=Object.keys(sellerMtgs)[0];
   if(firstSeller){
+    var sellerRow0=S.sellers.d.find(function(r){return (r[S.sellers.h.indexOf('Company name')]||'').toString().trim()===firstSeller;});
+    var sellerName0=sellerRow0&&nameColS?sellerRow0[S.sellers.h.indexOf(nameColS)]||firstSeller:firstSeller;
     var agendaHtml=buildAgendaHTML(firstSeller,sellerMtgs[firstSeller],false);
-    var body=bodyTemplate.replace(/\{\{name\}\}/g,firstSeller).replace(/\{\{company\}\}/g,firstSeller).replace(/\{\{event\}\}/g,evName).replace(/\{\{n_meetings\}\}/g,sellerMtgs[firstSeller].length).replace(/\{\{agenda_table\}\}/g,agendaHtml);
+    var body=bodyTemplate.replace(/\{\{name\}\}/g,sellerName0).replace(/\{\{company\}\}/g,firstSeller).replace(/\{\{event\}\}/g,evName).replace(/\{\{n_meetings\}\}/g,sellerMtgs[firstSeller].length).replace(/\{\{agenda_table\}\}/g,agendaHtml);
     try{var r=await sendGmailMessage(testEmail,'[SELLER TEST] '+subject,body);if(r.ok){sent++;status.textContent='✓ Both test emails sent to '+testEmail+'. Check your inbox!';}}catch(e){status.textContent='Buyer sent. Error on seller: '+e.message;}
   }
   toast(sent+' test email(s) sent to '+testEmail,'ok');
