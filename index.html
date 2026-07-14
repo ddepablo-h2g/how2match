@@ -88,6 +88,12 @@ input[type=color]{width:44px;height:32px;padding:2px;border:1px solid var(--bord
 .asr input{flex:1}
 .rule-row{display:flex;align-items:center;gap:6px;padding:8px 10px;border:1px solid var(--border);border-radius:4px;margin-bottom:6px;background:white;flex-wrap:wrap}
 .rule-row select{flex:1;min-width:100px;font-size:11px}
+.rule-side{display:flex;flex-direction:column;gap:2px;flex:1;min-width:110px}
+.rule-side-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;display:flex;align-items:center;gap:3px}
+.rule-side.buyer-side .rule-side-label{color:#0a5c9e}
+.rule-side.buyer-side select{background:#eaf4fc;border-color:#bcdff5}
+.rule-side.seller-side .rule-side-label{color:#8a4b00}
+.rule-side.seller-side select{background:#fff4e6;border-color:#ffdbaa}
 .rbadge{padding:2px 6px;border-radius:3px;font-size:10px;font-weight:700;white-space:nowrap}
 .rb-req{background:#fde8e8;color:#8b1a1a}
 .rb-pref{background:#fff3e0;color:#7a4a00}
@@ -152,7 +158,6 @@ input[type=color]{width:44px;height:32px;padding:2px;border:1px solid var(--bord
 .prog{width:100%;height:4px;background:var(--gray);border-radius:2px;overflow:hidden;margin:6px 0}
 .prog-bar{height:100%;background:var(--blue);border-radius:2px;transition:width .3s}
 .send-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--border);border-radius:4px;margin-bottom:4px;font-size:12px}
-.ai-box{border:1px solid var(--border);border-radius:4px;padding:10px 13px;background:#f8f8f8;display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;opacity:.7}
 .tswitch{position:relative;width:38px;height:20px;flex-shrink:0}
 .tswitch input{opacity:0;width:0;height:0}
 .tslider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--char40);border-radius:20px;transition:.3s}
@@ -194,22 +199,156 @@ var CONFIG = {
     <div class="gmail-status" id="gmail-status"><span class="gmail-dot" id="gmail-dot"></span><span id="gmail-label">Gmail: not connected</span></div>
     <button class="tbtn" onclick="connectGmail()">Connect Gmail</button>
     <span id="save-indicator" style="font-size:10px;color:var(--navy40);display:none">💾 Saved</span>
-    <button class="tbtn" onclick="goStep(6)">📘 Antes de empezar</button>
     <button class="tbtn" onclick="goStep(7)">📖 Help</button>
     <button class="tbtn" onclick="goStep(8)">❓ FAQ</button>
   </div>
 </div>
 
 <div class="stepnav">
-  <div class="step active" id="sn0" onclick="goStep(0)"><div class="snum">1</div>Event</div>
-  <div class="step" id="sn1" onclick="goStep(1)"><div class="snum">2</div>Data</div>
-  <div class="step" id="sn2" onclick="goStep(2)"><div class="snum">3</div>Matching</div>
-  <div class="step" id="sn3" onclick="goStep(3)"><div class="snum">4</div>Schedule</div>
-  <div class="step" id="sn4" onclick="goStep(4)"><div class="snum">5</div>Template</div>
-  <div class="step" id="sn5" onclick="goStep(5)"><div class="snum">6</div>Send</div>
+  <div class="step" id="sn0" onclick="goStep(0)"><div class="snum">1</div>Introduction</div>
+  <div class="step active" id="sn1" onclick="goStep(1)"><div class="snum">2</div>Event</div>
+  <div class="step" id="sn2" onclick="goStep(2)"><div class="snum">3</div>Data</div>
+  <div class="step" id="sn3" onclick="goStep(3)"><div class="snum">4</div>Matching</div>
+  <div class="step" id="sn4" onclick="goStep(4)"><div class="snum">5</div>Schedule</div>
+  <div class="step" id="sn5" onclick="goStep(5)"><div class="snum">6</div>Template</div>
+  <div class="step" id="sn6" onclick="goStep(6)"><div class="snum">7</div>Send</div>
 </div>
 
 <div class="main">
+<!-- STEP 6: ANTES DE EMPEZAR -->
+<div class="panel" id="p6">
+  <div class="card">
+    <div class="ctitle">📘 Antes de empezar</div>
+    <div class="csub">Conocimiento y buenas prácticas de How2Go para programas de matchmaking B2B — más allá del uso de la herramienta.</div>
+    <div class="infobox ii" style="flex-direction:column;align-items:flex-start;gap:6px">
+      <div><strong>ℹ️ ¿Para qué sirve esta pestaña?</strong></div>
+      <div>How2Match es solo una parte del programa de matchmaking. Esta sección recoge la metodología, las recomendaciones y las lecciones aprendidas de proyectos reales de How2Go, para que el equipo que organiza el evento tenga criterio propio más allá de la herramienta: cómo planificar las jornadas, qué esperar durante el evento y cómo cerrarlo correctamente.</div>
+    </div>
+
+    <div class="lang-tabs">
+      <button class="lang-tab active" onclick="showProjPhase('antes',this)">📋 Antes del evento</button>
+      <button class="lang-tab" onclick="showProjPhase('durante',this)">🎪 Durante el evento</button>
+      <button class="lang-tab" onclick="showProjPhase('despues',this)">📊 Después del evento</button>
+    </div>
+
+    <!-- ANTES DEL EVENTO -->
+    <div id="proj-antes">
+      <div class="instr-section"><h3>Quién es quién en el matchmaking</h3>
+        <div class="csub" style="margin-bottom:8px">Conviene tener presente los intereses y objetivos de los distintos perfiles que participan:</div>
+        <div class="aw"><table class="atbl" style="margin-bottom:14px">
+          <thead><tr><th style="width:130px">Perfil</th><th style="width:280px">Quién es</th><th>Qué busca</th></tr></thead>
+          <tbody style="background:white">
+            <tr><td class="slbl" style="white-space:normal">🏢 Organización</td><td style="white-space:normal;padding:6px 8px">La organización de la feria o la institución que participa en la feria y organiza el matchmaking dentro de ella. En definitiva, es quien contrata a How2Go. Puede ser una asociación haciéndolo para sus asociados, o una feria haciéndolo para sus participantes.</td><td style="white-space:normal;padding:6px 8px">En última instancia, darle valor a su evento o a la asociación añadiendo este tipo de servicios y jornadas. Dentro del evento, maximizar el número de reuniones, tener mayor visibilidad, y que su feria y este espacio sean una referencia en el sector. Lo que quieren demostrar es que están ahí para apoyar a quienes les pagan a ellos: los asociados o los expositores de la feria.<br><strong>Lo importante para nosotros:</strong> que queden contentos con nuestros servicios, cumpliendo sus objetivos.</td></tr>
+            <tr><td class="slbl" style="white-space:normal">🏭 Expositor</td><td style="white-space:normal;padding:6px 8px">Suele ser quien ha pagado su suelo para vender su producto, aunque también puede ser un asociado de la organización del matchmaking, por ejemplo.</td><td style="white-space:normal;padding:6px 8px">Crecer, sentirse apoyado, tener buenas reuniones. Tener el número de reuniones que la asociación u organización les ha prometido.<br><strong>Lo importante para nosotros:</strong> que tengan el número de reuniones que se les ha prometido.</td></tr>
+            <tr><td class="slbl" style="white-space:normal">🛒 Comprador</td><td style="white-space:normal;padding:6px 8px">Ha sido invitado: es un perfil con capacidad de compra captado por la organización.</td><td style="white-space:normal;padding:6px 8px">Que se le facilite el trabajo, tener reuniones interesantes, sentirse un perfil activo y valorado.<br><strong>Lo importante para nosotros:</strong> que quiera repetir en la próxima feria.</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <div class="instr-section"><h3>1. Kick-off</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Desde esta primera reunión ya hay que tener claro el <strong>tiempo y el espacio</strong> disponibles (fechas, franjas horarias, mesas), los <strong>objetivos</strong> del programa y los <strong>KPIs</strong> de éxito (nº de reuniones, satisfacción, etc.). Todo lo demás — formularios, criterios de matching, jornadas — se construye sobre estas decisiones iniciales.</div></div>
+      </div>
+
+      <div class="instr-section"><h3>2. Formularios — la base de todo</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Sin formularios buenos, el matchmaking no vale para nada. Cuanto más <strong>estables y homogéneos</strong> sean, mejor: deben cubrir todo tipo de producto y todo tipo de participante, de forma que tanto compradores como vendedores se sientan representados y no se queden fuera cuestiones importantes.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div>Campos a valorar (no todos aplican a todos los eventos, pero conviene tenerlos en mente): tipo de producto / categoría / gama de producto, países de experiencia y países de interés, experiencia de exportación, rango de precios y facturación, canal (mayorista, minorista, online...), idiomas que habla la persona que acudirá a la feria, y posibles <strong>vetos</strong> — empresas con las que ya trabajan, ya conocen, o no quieren coincidir.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div>Antes de diseñar el formulario, hay que <strong>revisar y conocer bien el sector</strong> — solo así se sabe qué preguntas hacen falta y cuáles sobran.</div></div>
+        <div class="instr-step"><div class="instr-num">4</div><div><strong>Opciones cerradas mejor que campos abiertos.</strong> Cuanto menos texto libre, menos ambigüedad.</div></div>
+        <div class="instr-step"><div class="instr-num">5</div><div>Define bien en qué <strong>idioma(s)</strong> va el formulario, de forma que todos los participantes lo entiendan sin depender de traducciones improvisadas.</div></div>
+        <div class="instr-step"><div class="instr-num">6</div><div><strong>Limitación importante:</strong> hasta que la herramienta no tenga IA, el matching solo detecta coincidencias <strong>exactas</strong> — "Limón" = "Limón", pero no "Limon", ni "Lima", ni "Lemão", ni "Lemon", ni "Cítricos". Por eso un formulario homogéneo es la clave de todo. En muchos casos hace falta un trabajo previo de <strong>homogeneización de datos</strong> para que la herramienta pueda funcionar bien.</div></div>
+      </div>
+
+      <div class="instr-section"><h3>3. Organización de las jornadas</h3>
+        <div class="csub" style="margin-bottom:8px">Parámetros que hay que fijar con el organizador antes de generar los slots en How2Match:</div>
+        <div class="aw"><table class="atbl" style="margin-bottom:14px">
+          <thead><tr><th style="width:220px">Parámetro</th><th>Recomendación</th></tr></thead>
+          <tbody style="background:white">
+            <tr><td class="slbl" style="white-space:normal">Fechas del evento</td><td style="white-space:normal;padding:6px 8px">Distinguir día(s) de montaje, apertura y cierre — no siempre coinciden con los días de matchmaking.</td></tr>
+            <tr><td class="slbl" style="white-space:normal">Duración por reunión</td><td style="white-space:normal;padding:6px 8px">20 minutos como estándar. Ajustar según la complejidad del producto/servicio y el tiempo total disponible.</td></tr>
+            <tr><td class="slbl" style="white-space:normal">Jornada de mañana</td><td style="white-space:normal;padding:6px 8px">Bloque de ~3h (ej. 10:00–13:00).</td></tr>
+            <tr><td class="slbl" style="white-space:normal">Jornada de tarde</td><td style="white-space:normal;padding:6px 8px">Bloque de ~3h (ej. 14:00–17:00).</td></tr>
+            <tr><td class="slbl" style="white-space:normal">Nº de mesas disponibles</td><td style="white-space:normal;padding:6px 8px">Define el techo real de reuniones simultáneas. Confírmalo con el organizador — no lo asumas.</td></tr>
+          </tbody>
+        </table></div>
+        <div class="instr-step"><div class="instr-num">1</div><div><strong>Duración + transición:</strong> usa 20 minutos de reunión como estándar y añade <strong>5–10 minutos de margen</strong> entre reuniones consecutivas. En modo <strong>Fixed</strong> (mesa fija) solo se desplaza el vendedor, así que 5 min suele bastar. En modo <strong>Rotating</strong> (mesas compartidas) se desplazan ambas partes — amplía el margen a 10 min para evitar colisiones en el pasillo.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div><strong>Sobre el total de reuniones estimadas:</strong> los clientes siempre quieren maximizar el número de reuniones — nadie quiere que su evento parezca vacío. Pero hay que encontrar el equilibrio: calcula la capacidad real cruzando slots disponibles, duración de cada reunión, número de mesas, y nº de compradores y vendedores — y deja siempre algo de holgura. Ni tan justo que el espacio, el tiempo o las mesas se conviertan en un cuello de botella, ni tan flojo que el evento se vea vacío.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div><strong>No quemar a los participantes:</strong> que existan muchos matches posibles no significa que haya que llenar la agenda. Usa los límites de máximo de reuniones por comprador y por vendedor con cabeza — como referencia, 6 reuniones seguidas ya es bastante, y más de 10 en un día suele ser excesivo, por mucho match que dé. Cargar demasiado agota y baja la calidad de las conversaciones.</div></div>
+        <div class="instr-step"><div class="instr-num">4</div><div><strong>Cartelería y señalización:</strong> planifica cómo se va a identificar cada mesa — nombre del comprador, bandera del país, y siempre un número visible (tanto en modo Fixed como Rotating). Todos los participantes tienen que poder localizar su mesa de un vistazo.</div></div>
+        <div class="instr-step"><div class="instr-num">5</div><div><strong>Documento máster:</strong> prepáralo organizado por día, con los datos de contacto de todos los participantes (compradores y expositores) ya incluidos desde antes del evento. Tiene que estar disponible tanto impreso como en el ordenador, en manos de la persona responsable de coordinar el matchmaking — es la herramienta que permite resolver incidencias sobre la marcha sin perder ni un contacto.</div></div>
+      </div>
+
+      <div class="instr-section"><h3>4. Comunicación pre-evento</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Llamamientos informativos cada <strong>2 semanas</strong> durante los ~70 días previos al evento — no solo logística, también el valor estratégico de participar.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div>Cierre de formularios ~<strong>2 semanas antes</strong> del evento, con avisos a 3 días y a 1 día del cierre definitivo.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div>Agenda (borrador) enviada ~<strong>1 semana antes</strong> del evento.</div></div>
+        <div class="instr-step"><div class="instr-num">4</div><div>Recordatorio final durante la misma semana del evento.</div></div>
+        <div class="instr-step"><div class="instr-num">5</div><div>Prepara la <strong>encuesta de satisfacción</strong> con antelación, lista para lanzarla a los 2-3 días de terminar el evento — no la improvises a última hora.</div></div>
+        <div class="instr-step"><div class="instr-num">6</div><div><strong>Lección aprendida:</strong> la mayoría de las ausencias no se deben a falta de interés, sino a que el expositor no entendía cómo funciona el programa — muchos esperaban que el comprador acudiera a su propio stand. Deja clarísimo en toda comunicación <strong>quién se desplaza a la mesa de quién</strong>.</div></div>
+      </div>
+
+      <div class="instr-section"><h3>5. 📢 Comunicación</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Preparar y compartir notas informativas para expositores y compradores (tendencias del sector, oportunidades de internacionalización, potencial y evolución de la feria en ediciones anteriores). Sirven tanto para captar expositores como para captar compradores, y se comparten también con la organización para que pueda reutilizarlas en sus propios canales.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div>Preparación de informes de país, informes de sector y pre-estudios de mercado: sirven para justificar y vender el evento a nuevos participantes, y dan argumentos de peso a la organización de cara a su propia comunicación y captación.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div>Preparar de antemano las preguntas y el guion de las entrevistas/testimonios que se recogerán in situ durante el evento.</div></div>
+        <div class="instr-step"><div class="instr-num">4</div><div>Traspaso periódico de métricas de avance a la organización: nº de expositores registrados, países participantes, compradores confirmados — permite comunicar el crecimiento del evento a medida que se acerca la fecha.</div></div>
+        <div class="instr-step"><div class="instr-num">5</div><div>Todo material (plantillas, formularios, infografías) se envía a la organización para su revisión y aprobación antes de distribuirse.</div></div>
+      </div>
+
+      <div class="instr-section"><h3>6. Antes de tocar la herramienta</h3>
+        <div class="infobox iw">⚠️ <div>Con la metodología ya clara, el último paso antes de ponerte a usar How2Match es leerte <strong>📖 Help</strong> de principio a fin — ahí está explicado paso a paso cada botón y cada pantalla de la herramienta. Si durante el uso te surge una duda puntual, consulta <strong>❓ FAQ</strong>, que resuelve las preguntas más habituales (qué es un criterio, Required vs Preferred, Fixed vs Rotating, cómo funcionan las variables del email, etc.). No empieces a cargar datos de un evento real sin haber pasado por estas dos secciones al menos una vez.</div></div>
+      </div>
+    </div>
+
+    <!-- DURANTE EL EVENTO -->
+    <div id="proj-durante" style="display:none">
+      <div class="instr-section"><h3>1. Equipo de apoyo in situ</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Visita previa el <strong>día -1</strong> para conocer el espacio y validar la logística: mesas, señalización, wifi, etc.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div>Equipo mínimo recomendado: <strong>1 responsable de proyecto + 2 personas de apoyo</strong>, claramente identificadas (acreditación/chaleco).</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div>Funciones: control de asistencia, acompañar a compradores y expositores a su mesa, resolver incidencias en tiempo real, y fomentar el networking espontáneo entre reuniones.</div></div>
+      </div>
+
+      <div class="instr-section"><h3>2. Gestión de incidencias — lecciones aprendidas de campo</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div><strong>Agendas desactualizadas:</strong> si se envía una segunda versión de la agenda (ej. tras incorporar nuevos compradores), refuerza el aviso por un canal que sí se lea — un WhatsApp directo a la persona que asistirá suele funcionar mejor que un segundo email que pasa desapercibido.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div><strong>Una de las partes no acude a la reunión:</strong> identifica a la contraparte presente e intercambia sus datos de contacto, para que la reunión pueda producirse igualmente en otro momento — antes de que acabe el evento o incluso después.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div><strong>Matchmaking instantáneo:</strong> cuando una reunión programada no se produce, aprovecha el hueco para generar una reunión "en caliente" con otro comprador interesado en la misma categoría que no estuviera ya en su agenda. En la práctica, estas reuniones no programadas suelen generar tanto o más valor que las originales.</div></div>
+        <div class="instr-step"><div class="instr-num">4</div><div>Mantén siempre actualizado el <strong>documento máster</strong> de control a medida que se producen estos cambios in situ, para no perder trazabilidad de qué reuniones han tenido lugar realmente.</div></div>
+      </div>
+
+      <div class="instr-section"><h3>3. Documentación para el informe posterior</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Haz fotos durante las jornadas: mesas en uso, ambiente general, momentos de las reuniones — todo este material sirve luego para el informe de cierre y para el equipo de marketing/comunicación.</div></div>
+      </div>
+
+      <div class="instr-section"><h3>4. 📸 Comunicación</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Recopilar y guardar fotografías, testimonios, citas y entrevistas a participantes (usando el guion preparado previamente).</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div>Identificar y documentar casos de éxito o encuentros destacados que puedan servir como ejemplo del impacto del programa.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div>Recopilar y guardar números en caliente (reuniones celebradas, participantes presentes) para poder ofrecer a la organización piezas de comunicación rápidas y llamativas durante el propio evento, sin esperar al cierre.</div></div>
+      </div>
+    </div>
+
+    <!-- DESPUÉS DEL EVENTO -->
+    <div id="proj-despues" style="display:none">
+      <div class="instr-section"><h3>1. Encuesta de satisfacción</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Se lanza a los 2-3 días tras el evento (ya preparada de antemano, ver "Antes del evento"), a compradores y expositores por separado.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div>Lo importante es preguntar por: nivel de satisfacción general, propuestas de mejora, estimación de operaciones de venta/compra generadas o en curso, y volumen de negocio aproximado facilitado por el programa.</div></div>
+      </div>
+      <div class="instr-section"><h3>2. Informe de cierre</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Resumen de la actividad realizada y lista completa de participantes (compradores y expositores).</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div>Total de reuniones celebradas frente a las programadas — el desvío es un dato valioso para la siguiente edición.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div>Estimación del negocio o impacto generado, y análisis de las encuestas de satisfacción.</div></div>
+        <div class="instr-step"><div class="instr-num">4</div><div>Fotos y testimonios recogidos durante el evento.</div></div>
+        <div class="instr-step"><div class="instr-num">5</div><div>Conclusiones generales y propuestas de mejora concretas para la próxima edición.</div></div>
+      </div>
+      <div class="instr-section"><h3>3. 📊 Comunicación</h3>
+        <div class="instr-step"><div class="instr-num">1</div><div>Generar el informe de cierre alimentándolo con todo lo recopilado in situ (fotos, testimonios, números en caliente) más los datos de la encuesta de satisfacción post-evento.</div></div>
+        <div class="instr-step"><div class="instr-num">2</div><div>El informe incluye: nº total de participantes, nº de reuniones celebradas, países y regiones involucradas, tipologías de servicios/productos representados.</div></div>
+        <div class="instr-step"><div class="instr-num">3</div><div>Reseñas, testimonios y citas destacadas de compradores y expositores, junto con imágenes tomadas in situ — contenido listo para campañas de comunicación de la organización.</div></div>
+        <div class="instr-step"><div class="instr-num">4</div><div>Estimación del volumen de negocio generado, para dimensionar y comunicar el impacto económico del matchmaking como herramienta de internacionalización.</div></div>
+        <div class="instr-step"><div class="instr-num">5</div><div>Recordatorios a los partners para dar seguimiento a los contactos generados, semanas después del evento.</div></div>
+      </div>
+    </div>
+    <div class="actions"><button class="btn bp" onclick="goStep(1)">Next: Event →</button></div>
+  </div>
+</div>
 
 <!-- STEP 0: EVENT -->
 <div class="panel active" id="p0">
@@ -271,7 +410,7 @@ var CONFIG = {
       <button class="btn bo bsm" onclick="addSlotManual()">+ Add</button>
     </div>
   </div>
-  <div class="actions"><button class="btn bp" onclick="goStep(1)">Next: Data →</button></div>
+  <div class="actions"><button class="btn bp" onclick="goStep(2)">Next: Data →</button></div>
 </div>
 
 <!-- STEP 1: DATA -->
@@ -306,8 +445,8 @@ var CONFIG = {
     </div>
   </div>
   <div class="actions">
-    <button class="btn bg" onclick="goStep(0)">← Back</button>
-    <button class="btn bp" onclick="goStep(2)">Next: Matching →</button>
+    <button class="btn bg" onclick="goStep(1)">← Back</button>
+    <button class="btn bp" onclick="goStep(3)">Next: Matching →</button>
   </div>
 </div>
 
@@ -316,24 +455,16 @@ var CONFIG = {
   <div class="card">
     <div class="ctitle">Matching parameters</div>
     <div class="csub">Map buyer columns to seller columns. Required = blocks match if no overlap. Preferred = boosts ranking when it overlaps.</div>
-    <div class="ai-box">
-      <div style="flex:1">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-          <div style="font-size:13px;font-weight:700;color:var(--char60)">🤖 Gemini AI semantic matching</div>
-          <label class="tswitch" style="opacity:.4;pointer-events:none"><input type="checkbox" id="ai-toggle" disabled><span class="tslider"></span></label>
-        </div>
-        <div style="font-size:11px;font-weight:700;color:var(--warn);margin-bottom:6px">🚧 Coming Soon — AI matching not yet active</div>
-        <div style="height:1px;background:var(--border);margin-bottom:8px"></div>
-        <div style="font-size:11px;color:var(--dark);font-weight:400;margin-bottom:4px"><strong>How matching works:</strong> values in each cell must be separated by <strong>commas</strong>. Example: <em>Producto 1, Producto 2, Producto 3</em>. A match occurs when any value from the buyer appears identically in the seller's cell.</div>
-        <div style="font-size:11px;color:var(--warn);font-weight:700">⚠️ Spelling must be identical — a typo or missing comma means no match. Numeric ranges (e.g. "50,000–200,000") will rarely match exactly — use them as Preferred only.</div>
-      </div>
+    <div class="infobox ii" style="flex-direction:column;align-items:flex-start;gap:4px">
+      <div><strong>ℹ️ How matching works:</strong> values in each cell must be separated by <strong>commas</strong>. Example: <em>Producto 1, Producto 2, Producto 3</em>. A match occurs when any value from the buyer appears identically in the seller's cell.</div>
+      <div style="font-weight:700;color:var(--warn)">⚠️ Spelling must be identical — a typo or missing comma means no match. Numeric ranges (e.g. "50,000–200,000") will rarely match exactly — use them as Preferred only.</div>
     </div>
     <div class="slbl-t">Rules</div>
     <div id="rules-container"></div>
     <button class="btn bo bsm" onclick="addRule()" style="margin-bottom:12px">+ Add criterion</button>
   </div>
   <div class="actions">
-    <button class="btn bg" onclick="goStep(1)">← Back</button>
+    <button class="btn bg" onclick="goStep(2)">← Back</button>
     <button class="btn bn" onclick="runMatch()">⚡ Generate matches →</button>
   </div>
 </div>
@@ -362,16 +493,18 @@ var CONFIG = {
       <div class="tab active" id="tb-macro" onclick="showTab('macro',this)">Macro schedule</div>
       <div class="tab" id="tb-desks" onclick="showTab('desks',this)">Desks</div>
       <div class="tab" id="tb-nm" onclick="showTab('nm',this)">No match</div>
+      <div class="tab" id="tb-cta" onclick="showTab('cta',this)">Call to Action</div>
       <div class="tab" id="tb-int" onclick="showTab('int',this)">Integrity</div>
     </div>
     <div id="tab-macro"><div class="aw"><table class="atbl" id="agenda-tbl"></table></div><div id="macro-note"></div></div>
     <div id="tab-desks" style="display:none"></div>
     <div id="tab-nm" style="display:none"></div>
+    <div id="tab-cta" style="display:none"></div>
     <div id="tab-int" style="display:none"></div>
     <div class="actions">
-      <button class="btn bg" onclick="goStep(2)">← Back</button>
+      <button class="btn bg" onclick="goStep(3)">← Back</button>
       <button class="btn bo" onclick="exportCSV()">⬇ CSV</button>
-      <button class="btn bp" onclick="goStep(4)">Template →</button>
+      <button class="btn bp" onclick="goStep(5)">Template →</button>
     </div>
   </div>
 </div>
@@ -437,8 +570,8 @@ var CONFIG = {
       <table class="aptbl"><thead><tr id="prev-thead"></tr></thead><tbody id="prev-tbody"></tbody></table>
     </div>
     <div class="actions">
-      <button class="btn bg" onclick="goStep(3)">← Back</button>
-      <button class="btn bp" onclick="goStep(5)">Configure sending →</button>
+      <button class="btn bg" onclick="goStep(4)">← Back</button>
+      <button class="btn bp" onclick="goStep(6)">Configure sending →</button>
     </div>
   </div>
 </div>
@@ -512,110 +645,10 @@ Thank you for your participation.</textarea></div>
       <div class="prog"><div class="prog-bar" id="spbar" style="width:0%"></div></div>
       <div style="font-size:11px;color:var(--char60);margin-top:4px" id="send-status"></div>
     </div>
-    <div class="actions"><button class="btn bg" onclick="goStep(4)">← Back</button></div>
+    <div class="actions"><button class="btn bg" onclick="goStep(5)">← Back</button></div>
   </div>
 </div>
 
-<!-- STEP 6: ANTES DE EMPEZAR -->
-<div class="panel" id="p6">
-  <div class="card">
-    <div class="ctitle">📘 Antes de empezar</div>
-    <div class="csub">Conocimiento y buenas prácticas de How2Go para programas de matchmaking B2B — más allá del uso de la herramienta.</div>
-    <div class="infobox ii" style="flex-direction:column;align-items:flex-start;gap:6px">
-      <div><strong>ℹ️ ¿Para qué sirve esta pestaña?</strong></div>
-      <div>How2Match es solo una parte del programa de matchmaking. Esta sección recoge la metodología, las recomendaciones y las lecciones aprendidas de proyectos reales de How2Go, para que el equipo que organiza el evento tenga criterio propio más allá de la herramienta: cómo planificar las jornadas, qué esperar durante el evento y cómo cerrarlo correctamente.</div>
-    </div>
-
-    <div class="lang-tabs">
-      <button class="lang-tab active" onclick="showProjPhase('antes',this)">📋 Antes del evento</button>
-      <button class="lang-tab" onclick="showProjPhase('durante',this)">🎪 Durante el evento</button>
-      <button class="lang-tab" onclick="showProjPhase('despues',this)">📊 Después del evento</button>
-    </div>
-
-    <!-- ANTES DEL EVENTO -->
-    <div id="proj-antes">
-      <div class="instr-section"><h3>1. Kick-off</h3>
-        <div class="instr-step"><div class="instr-num">1</div><div>Desde esta primera reunión ya hay que tener claro el <strong>tiempo y el espacio</strong> disponibles (fechas, franjas horarias, mesas), los <strong>objetivos</strong> del programa y los <strong>KPIs</strong> de éxito (nº de reuniones, satisfacción, etc.). Todo lo demás — formularios, criterios de matching, jornadas — se construye sobre estas decisiones iniciales.</div></div>
-      </div>
-
-      <div class="instr-section"><h3>2. Formularios — la base de todo</h3>
-        <div class="instr-step"><div class="instr-num">1</div><div>Sin formularios buenos, el matchmaking no vale para nada. Cuanto más <strong>estables y homogéneos</strong> sean, mejor: deben cubrir todo tipo de producto y todo tipo de participante, de forma que tanto compradores como vendedores se sientan representados y no se queden fuera cuestiones importantes.</div></div>
-        <div class="instr-step"><div class="instr-num">2</div><div>Campos a valorar (no todos aplican a todos los eventos, pero conviene tenerlos en mente): tipo de producto / categoría / gama de producto, países de experiencia y países de interés, experiencia de exportación, rango de precios y facturación, canal (mayorista, minorista, online...), idiomas que habla la persona que acudirá a la feria, y posibles <strong>vetos</strong> — empresas con las que ya trabajan, ya conocen, o no quieren coincidir.</div></div>
-        <div class="instr-step"><div class="instr-num">3</div><div>Antes de diseñar el formulario, hay que <strong>revisar y conocer bien el sector</strong> — solo así se sabe qué preguntas hacen falta y cuáles sobran.</div></div>
-        <div class="instr-step"><div class="instr-num">4</div><div><strong>Opciones cerradas mejor que campos abiertos.</strong> Cuanto menos texto libre, menos ambigüedad.</div></div>
-        <div class="instr-step"><div class="instr-num">5</div><div>Define bien en qué <strong>idioma(s)</strong> va el formulario, de forma que todos los participantes lo entiendan sin depender de traducciones improvisadas.</div></div>
-        <div class="instr-step"><div class="instr-num">6</div><div><strong>Limitación importante:</strong> hasta que la herramienta no tenga IA, el matching solo detecta coincidencias <strong>exactas</strong> — "Limón" = "Limón", pero no "Limon", ni "Lima", ni "Lemão", ni "Lemon", ni "Cítricos". Por eso un formulario homogéneo es la clave de todo. En muchos casos hace falta un trabajo previo de <strong>homogeneización de datos</strong> para que la herramienta pueda funcionar bien.</div></div>
-      </div>
-
-      <div class="instr-section"><h3>3. Organización de las jornadas</h3>
-        <div class="csub" style="margin-bottom:8px">Parámetros que hay que fijar con el organizador antes de generar los slots en How2Match:</div>
-        <div class="aw"><table class="atbl" style="margin-bottom:14px">
-          <thead><tr><th style="width:220px">Parámetro</th><th>Recomendación</th></tr></thead>
-          <tbody style="background:white">
-            <tr><td class="slbl" style="white-space:normal">Fechas del evento</td><td style="white-space:normal;padding:6px 8px">Distinguir día(s) de montaje, apertura y cierre — no siempre coinciden con los días de matchmaking.</td></tr>
-            <tr><td class="slbl" style="white-space:normal">Duración por reunión</td><td style="white-space:normal;padding:6px 8px">20 minutos como estándar. Ajustar según la complejidad del producto/servicio y el tiempo total disponible.</td></tr>
-            <tr><td class="slbl" style="white-space:normal">Jornada de mañana</td><td style="white-space:normal;padding:6px 8px">Bloque de ~3h (ej. 10:00–13:00).</td></tr>
-            <tr><td class="slbl" style="white-space:normal">Jornada de tarde</td><td style="white-space:normal;padding:6px 8px">Bloque de ~3h (ej. 14:00–17:00).</td></tr>
-            <tr><td class="slbl" style="white-space:normal">Nº de mesas disponibles</td><td style="white-space:normal;padding:6px 8px">Define el techo real de reuniones simultáneas. Confírmalo con el organizador — no lo asumas.</td></tr>
-          </tbody>
-        </table></div>
-        <div class="instr-step"><div class="instr-num">1</div><div><strong>Duración + transición:</strong> usa 20 minutos de reunión como estándar y añade <strong>5–10 minutos de margen</strong> entre reuniones consecutivas. En modo <strong>Fixed</strong> (mesa fija) solo se desplaza el vendedor, así que 5 min suele bastar. En modo <strong>Rotating</strong> (mesas compartidas) se desplazan ambas partes — amplía el margen a 10 min para evitar colisiones en el pasillo.</div></div>
-        <div class="instr-step"><div class="instr-num">2</div><div><strong>Sobre el total de reuniones estimadas:</strong> los clientes siempre quieren maximizar el número de reuniones — nadie quiere que su evento parezca vacío. Pero hay que encontrar el equilibrio: calcula la capacidad real cruzando slots disponibles, duración de cada reunión, número de mesas, y nº de compradores y vendedores — y deja siempre algo de holgura. Ni tan justo que el espacio, el tiempo o las mesas se conviertan en un cuello de botella, ni tan flojo que el evento se vea vacío.</div></div>
-        <div class="instr-step"><div class="instr-num">3</div><div><strong>No quemar a los participantes:</strong> que existan muchos matches posibles no significa que haya que llenar la agenda. Usa los límites de máximo de reuniones por comprador y por vendedor con cabeza — como referencia, 6 reuniones seguidas ya es bastante, y más de 10 en un día suele ser excesivo, por mucho match que dé. Cargar demasiado agota y baja la calidad de las conversaciones.</div></div>
-        <div class="instr-step"><div class="instr-num">4</div><div><strong>Cartelería y señalización:</strong> planifica cómo se va a identificar cada mesa — nombre del comprador, bandera del país, y siempre un número visible (tanto en modo Fixed como Rotating). Todos los participantes tienen que poder localizar su mesa de un vistazo.</div></div>
-        <div class="instr-step"><div class="instr-num">5</div><div><strong>Documento máster:</strong> prepáralo organizado por día, con los datos de contacto de todos los participantes (compradores y expositores) ya incluidos desde antes del evento. Tiene que estar disponible tanto impreso como en el ordenador, en manos de la persona responsable de coordinar el matchmaking — es la herramienta que permite resolver incidencias sobre la marcha sin perder ni un contacto.</div></div>
-      </div>
-
-      <div class="instr-section"><h3>4. Comunicación pre-evento</h3>
-        <div class="instr-step"><div class="instr-num">1</div><div>Llamamientos informativos cada <strong>2 semanas</strong> durante los ~70 días previos al evento — no solo logística, también el valor estratégico de participar.</div></div>
-        <div class="instr-step"><div class="instr-num">2</div><div>Cierre de formularios ~<strong>2 semanas antes</strong> del evento, con avisos a 3 días y a 1 día del cierre definitivo.</div></div>
-        <div class="instr-step"><div class="instr-num">3</div><div>Agenda (borrador) enviada ~<strong>1 semana antes</strong> del evento.</div></div>
-        <div class="instr-step"><div class="instr-num">4</div><div>Recordatorio final durante la misma semana del evento.</div></div>
-        <div class="instr-step"><div class="instr-num">5</div><div>Prepara la <strong>encuesta de satisfacción</strong> con antelación, lista para lanzarla a los 2-3 días de terminar el evento — no la improvises a última hora.</div></div>
-        <div class="instr-step"><div class="instr-num">6</div><div><strong>Lección aprendida:</strong> la mayoría de las ausencias no se deben a falta de interés, sino a que el expositor no entendía cómo funciona el programa — muchos esperaban que el comprador acudiera a su propio stand. Deja clarísimo en toda comunicación <strong>quién se desplaza a la mesa de quién</strong>.</div></div>
-      </div>
-    </div>
-
-    <!-- DURANTE EL EVENTO -->
-    <div id="proj-durante" style="display:none">
-      <div class="instr-section"><h3>1. Equipo de apoyo in situ</h3>
-        <div class="instr-step"><div class="instr-num">1</div><div>Visita previa el <strong>día -1</strong> para conocer el espacio y validar la logística: mesas, señalización, wifi, etc.</div></div>
-        <div class="instr-step"><div class="instr-num">2</div><div>Equipo mínimo recomendado: <strong>1 responsable de proyecto + 2 personas de apoyo</strong>, claramente identificadas (acreditación/chaleco).</div></div>
-        <div class="instr-step"><div class="instr-num">3</div><div>Funciones: control de asistencia, acompañar a compradores y expositores a su mesa, resolver incidencias en tiempo real, y fomentar el networking espontáneo entre reuniones.</div></div>
-      </div>
-
-      <div class="instr-section"><h3>2. Gestión de incidencias — lecciones aprendidas de campo</h3>
-        <div class="instr-step"><div class="instr-num">1</div><div><strong>Agendas desactualizadas:</strong> si se envía una segunda versión de la agenda (ej. tras incorporar nuevos compradores), refuerza el aviso por un canal que sí se lea — un WhatsApp directo a la persona que asistirá suele funcionar mejor que un segundo email que pasa desapercibido.</div></div>
-        <div class="instr-step"><div class="instr-num">2</div><div><strong>Una de las partes no acude a la reunión:</strong> identifica a la contraparte presente e intercambia sus datos de contacto, para que la reunión pueda producirse igualmente en otro momento — antes de que acabe el evento o incluso después.</div></div>
-        <div class="instr-step"><div class="instr-num">3</div><div><strong>Matchmaking instantáneo:</strong> cuando una reunión programada no se produce, aprovecha el hueco para generar una reunión "en caliente" con otro comprador interesado en la misma categoría que no estuviera ya en su agenda. En la práctica, estas reuniones no programadas suelen generar tanto o más valor que las originales.</div></div>
-        <div class="instr-step"><div class="instr-num">4</div><div>Mantén siempre actualizado el <strong>documento máster</strong> de control a medida que se producen estos cambios in situ, para no perder trazabilidad de qué reuniones han tenido lugar realmente.</div></div>
-      </div>
-
-      <div class="instr-section"><h3>3. Documentación para el informe posterior</h3>
-        <div class="instr-step"><div class="instr-num">1</div><div>Haz fotos durante las jornadas: mesas en uso, ambiente general, momentos de las reuniones — todo este material sirve luego para el informe de cierre y para el equipo de marketing/comunicación.</div></div>
-      </div>
-    </div>
-
-    <!-- DESPUÉS DEL EVENTO -->
-    <div id="proj-despues" style="display:none">
-      <div class="instr-section"><h3>1. Encuesta de satisfacción</h3>
-        <div class="instr-step"><div class="instr-num">1</div><div>Se lanza a los 2-3 días tras el evento (ya preparada de antemano, ver "Antes del evento"), a compradores y expositores por separado.</div></div>
-        <div class="instr-step"><div class="instr-num">2</div><div>Lo importante es preguntar por: nivel de satisfacción general, propuestas de mejora, estimación de operaciones de venta/compra generadas o en curso, y volumen de negocio aproximado facilitado por el programa.</div></div>
-      </div>
-      <div class="instr-section"><h3>2. Informe de cierre</h3>
-        <div class="instr-step"><div class="instr-num">1</div><div>Resumen de la actividad realizada y lista completa de participantes (compradores y expositores).</div></div>
-        <div class="instr-step"><div class="instr-num">2</div><div>Total de reuniones celebradas frente a las programadas — el desvío es un dato valioso para la siguiente edición.</div></div>
-        <div class="instr-step"><div class="instr-num">3</div><div>Estimación del negocio o impacto generado, y análisis de las encuestas de satisfacción.</div></div>
-        <div class="instr-step"><div class="instr-num">4</div><div>Fotos y testimonios recogidos durante el evento.</div></div>
-        <div class="instr-step"><div class="instr-num">5</div><div>Conclusiones generales y propuestas de mejora concretas para la próxima edición.</div></div>
-      </div>
-      <div class="instr-section"><h3>3. Seguimiento y comunicación</h3>
-        <div class="instr-step"><div class="instr-num">1</div><div>Recordatorios a los partners para dar seguimiento a los contactos generados, semanas después del evento.</div></div>
-        <div class="instr-step"><div class="instr-num">2</div><div>Comparte con el equipo de marketing/comunicación las métricas clave (nº de participantes, países, sectores) y los testimonios/fotos recogidos in situ — es contenido valioso para futuras campañas.</div></div>
-      </div>
-    </div>
-  </div>
-</div>
 <!-- STEP 7: HELP -->
 <div class="panel" id="p7">
   <div class="card">
@@ -854,6 +887,8 @@ Thank you for your participation.</textarea></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Are agendas sent as PDF?</strong><br>No — agendas are sent as formatted HTML inside the email body, which works on all email clients. If you need PDF attachments, export the CSV from Step 6, format it in Google Sheets, and use Google Sheets + Apps Script with your own Gmail to send them. Note: this approach only works with Gmail — Outlook does not have a native equivalent.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Gmail sending limits and permissions?</strong><br>When you click Connect Gmail, you authorise the tool to send emails on your behalf. Google allows up to 100 emails per hour. The tool auto-pauses every 50 emails. Do not close the browser during sending. Your Gmail credentials are never stored — the connection expires when you close the browser.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>What about AI matching?</strong><br>Coming soon. AI will be used in <strong>Step 2 (Data)</strong> for a "Step 0" of data homogenisation: before matching runs, it will scan the uploaded files and propose synonym groupings (e.g. "Cítricos", "Lemon" and "Limón") for the consultant to review and confirm one by one before the cross-match runs. This keeps the actual matching in Step 3 exact and predictable, but working from an already-unified vocabulary.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>What is "Match Reason" and the ⭐ "Perfect match — Unique opportunity" star?</strong><br><strong>Match Reason</strong> lists every criterion that overlapped between a buyer and a seller — both Required and Preferred — so both sides understand exactly why they were paired (e.g. "Match on: Region of interest (EU) · Certification (Organic)"). The <strong>⭐ star</strong> appears when a seller matches a buyer on <em>every single criterion</em> defined (Required + Preferred) <em>and</em> is the <strong>only</strong> seller who does so for that buyer — a genuinely exceptional pairing worth highlighting. It only shows up if you've defined at least one Preferred criterion, and won't appear for every meeting — most matches share only some criteria, which is normal. Toggle it on/off per agenda version with the <strong>MATCH REASON</strong> checkbox in Step 5 (Template).</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>How do the {{variables}} in the email work?</strong><br>In Step 6 (Send), the Subject and Body fields accept placeholders that get replaced with each participant's real data right before sending — so one template produces a personalised email for every buyer and seller. Click a variable tag to insert it at your cursor, or type it directly:<br>• <strong>{{name}}</strong> — the contact name (from the "name column" you select in Step 6)<br>• <strong>{{company}}</strong> — the company name<br>• <strong>{{event}}</strong> — the event name (from Step 1)<br>• <strong>{{n_meetings}}</strong> — how many meetings that specific participant has<br>• <strong>{{agenda_table}}</strong> — the full personalised meeting table (time, company, desk, match reason, etc.) rendered as HTML<br>These same variables also work in the Subject line (except {{agenda_table}}, which only makes sense in the body). Always send yourself a <strong>test email</strong> first to confirm the variables render as expected before sending to everyone.</div></div>
     </div>
     <div id="faq-es" style="display:none">
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Qué son compradores, vendedores y participantes?</strong><br>Los <strong>compradores</strong> son empresas compradoras invitadas con un mínimo de reuniones comprometido. Los <strong>vendedores</strong> son expositores que necesitan un mínimo para justificar su participación. Juntos se denominan <strong>participantes</strong>.</div></div>
@@ -869,32 +904,59 @@ Thank you for your participation.</textarea></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Las agendas se envían como PDF?</strong><br>No — como HTML en el cuerpo del email. Para PDF, exporta el CSV y fórmatealo en Google Sheets o Excel.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Permisos y límites de Gmail</strong><br>Connect Gmail autoriza el envío en tu nombre. Máximo 100/hora, pausas cada 50. Las credenciales nunca se almacenan — la conexión expira al cerrar el navegador.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Y la IA?</strong><br>Próximamente. La IA se usará en el <strong>Paso 2 (Data)</strong> para un "Paso 0" de homogeneización de datos: antes de ejecutar el matching, escaneará los archivos subidos y propondrá agrupaciones de sinónimos (por ejemplo, "Cítricos", "Lemon" y "Limón") para que el consultor las revise y confirme una a una antes de lanzar el cruce. Así el matching del Paso 3 sigue siendo exacto y predecible, pero con un vocabulario ya unificado de partida.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Qué es "Match Reason" y la estrella ⭐ "Perfect match — Unique opportunity"?</strong><br><strong>Match Reason</strong> lista todos los criterios en los que ha coincidido un comprador y un vendedor — tanto Obligatorios como Preferibles — para que ambas partes entiendan exactamente por qué se les ha emparejado (ej. "Match on: Region of interest (EU) · Certification (Organic)"). La <strong>estrella ⭐</strong> aparece cuando un vendedor coincide con un comprador en <em>absolutamente todos</em> los criterios definidos (Obligatorios + Preferibles) <em>y</em> es el <strong>único</strong> vendedor que lo consigue para ese comprador — una coincidencia realmente excepcional que merece destacarse. Solo puede aparecer si has definido al menos un criterio Preferible, y no saldrá en todas las reuniones — que la mayoría de matches compartan solo algunos criterios es lo normal. Se activa/desactiva por versión de agenda con el checkbox <strong>MATCH REASON</strong> en el Paso 5 (Template).</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>¿Cómo funcionan las {{variables}} del email?</strong><br>En el Paso 6 (Send), los campos Subject y Body aceptan marcadores que se sustituyen por los datos reales de cada participante justo antes de enviar — así una única plantilla genera un email personalizado para cada comprador y vendedor. Haz clic en una etiqueta de variable para insertarla donde tengas el cursor, o escríbela directamente:<br>• <strong>{{name}}</strong> — el nombre de contacto (según la columna que selecciones en el Paso 6)<br>• <strong>{{company}}</strong> — el nombre de la empresa<br>• <strong>{{event}}</strong> — el nombre del evento (del Paso 1)<br>• <strong>{{n_meetings}}</strong> — cuántas reuniones tiene ese participante en concreto<br>• <strong>{{agenda_table}}</strong> — la tabla completa de reuniones personalizada (hora, empresa, mesa, motivo del match, etc.) renderizada en HTML<br>Estas mismas variables funcionan también en el Subject (excepto {{agenda_table}}, que solo tiene sentido en el cuerpo). Envíate siempre un <strong>email de prueba</strong> antes de mandarlo a todo el mundo, para confirmar que las variables se rellenan bien.</div></div>
     </div>
     <div id="faq-tr" style="display:none">
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Alıcı, Satıcı ve Katılımcı nedir?</strong><br><strong>Alıcılar</strong> minimum toplantı taahhüdü olan davetli satın alma şirketleridir. <strong>Satıcılar</strong> katılımlarını meşrulaştırmak için minimum toplantıya ihtiyaç duyan fuarcılardır. İkisi birlikte <strong>katılımcılar</strong>dır.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Slot nedir?</strong><br>Bir toplantı zaman dilimi (örn. 9:00–9:20). Her slotta mevcut masa sayısı kadar eşzamanlı toplantı yapılabilir.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Mola nedir?</strong><br>Programa eklenen toplantı dışı bir dönem (öğle yemeği, kahve arası). Makro program görünümünde yer alır ancak herhangi bir toplantı atanmaz.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Kriter nedir?</strong><br>Eşleştirme için kullanılan bir sütun — örn. "Ürün kategorisi" veya "İlgi bölgesi". Şablondaki Criterion 1–5 sütunlarını etkinliğinizin ihtiyaçlarına göre yeniden adlandırabilirsiniz.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Zorunlu ve Tercihli kriter farkı?</strong><br><strong>Zorunlu:</strong> ortak değer yoksa toplantı planlanmaz. <strong>Tercihli:</strong> ortak değerler skoru artırır ama toplantıyı engellemez.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Fixed ve Rotating farkı?</strong><br><strong>Fixed:</strong> sabit masa. <strong>Rotating:</strong> masalar slot başına paylaşılır. Alıcı sayısı > masa sayısı ise Rotating zorunludur.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Makro Program nedir?</strong><br>Organizatör için ana görünüm — satırlar slotlar, sütunlar alıcılar, her hücrede atanan satıcı bulunur. Fixed modda masa numarası her alıcının sütun başlığında görünür. Rotating modda her hücrede görünür. Kayıtlarınız için CSV olarak dışa aktarın.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Bütünlük (Integrity) nedir?</strong><br>Bütünlük kontrolü, hiçbir satıcının aynı slotta iki toplantıya atanmadığını ve hiçbir alıcının aynı satıcıyla iki kez buluşmadığını doğrular.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Kendi Excel dosyamı şablon kullanmadan yükleyebilir miyim?</strong><br>Evet, ancak verilen şablonlarla çalışmanızı ve verilerinizi önce normalleştirmenizi şiddetle tavsiye ederiz — tutarlı yazım, virgülle ayrılmış değerler ve alıcı/satıcı dosyaları arasında eşleşen sütun adları. Tutarsız veri = kaçırılan eşleşmeler.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Bir katılımcının özel müsaitlik kısıtlamaları var. Ne yapmalıyım?</strong><br>Araç, eşleştirme sırasında bireysel slot hariç tutmayı desteklemez. Özel durumlar için — uçağını kaçıran, başka bir katılımcıyı zaten tanıyan veya belirli bir slotta müsait olmayan bir katılımcı — programı oluşturduktan sonra bu toplantıları manuel olarak kaldırmak için 4. Adım'daki <strong>✏️ Edit schedule</strong> düğmesini kullanın.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>PDF olarak gönderilir mi?</strong><br>Hayır — e-posta gövdesinde HTML. PDF için CSV indirip Google Sheets'te biçimlendirin.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Gmail izinleri ve limitleri?</strong><br>Saatte 100 e-posta. Her 50'de otomatik duraklar. Kimlik bilgileri asla saklanmaz — tarayıcı kapatıldığında bağlantı sona erer.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Yapay Zeka eşleştirme?</strong><br>Yakında. Gemini AI ile "Narenciye", "Lemon" ve "Limón" otomatik eşleşecek — manuel normalleştirmeye gerek kalmayacak.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>"Match Reason" ve ⭐ "Perfect match — Unique opportunity" yıldızı nedir?</strong><br><strong>Match Reason</strong>, bir alıcı ile satıcı arasında örtüşen her kriteri listeler — hem Zorunlu hem Tercihli — böylece her iki taraf da neden eşleştirildiklerini tam olarak anlar. <strong>⭐ yıldızı</strong>, bir satıcının bir alıcıyla tanımlanan her kriterde (Zorunlu + Tercihli) eşleştiği ve o alıcı için bunu yapan <strong>tek</strong> satıcı olduğu zaman görünür — gerçekten istisnai bir eşleşme. Sadece en az bir Tercihli kriter tanımladıysanız görünür ve her toplantıda görünmez. 5. Adım'daki (Template) <strong>MATCH REASON</strong> onay kutusuyla her agenda versiyonunda açıp kapatabilirsiniz.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>E-postadaki {{variables}} nasıl çalışır?</strong><br>6. Adım'da (Send), Subject ve Body alanları, gönderilmeden hemen önce her katılımcının gerçek verileriyle değiştirilen yer tutucuları kabul eder — böylece tek bir şablon her alıcı ve satıcı için kişiselleştirilmiş bir e-posta üretir.<br>• <strong>{{name}}</strong> — kişi adı<br>• <strong>{{company}}</strong> — şirket adı<br>• <strong>{{event}}</strong> — etkinlik adı<br>• <strong>{{n_meetings}}</strong> — o katılımcının kaç toplantısı olduğu<br>• <strong>{{agenda_table}}</strong> — HTML olarak render edilen tam kişiselleştirilmiş toplantı tablosu<br>Herkese göndermeden önce her zaman kendinize bir <strong>test e-postası</strong> gönderin.</div></div>
     </div>
     <div id="faq-ko" style="display:none">
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>구매자, 판매자, 참가자란?</strong><br><strong>구매자</strong>는 최소 미팅 약속이 있는 초청 구매 기업입니다. <strong>판매자</strong>는 참가를 정당화하기 위한 최솟값이 필요한 전시업체입니다. 둘을 합쳐 <strong>참가자</strong>라고 합니다.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>슬롯이란?</strong><br>하나의 미팅 시간 단위(예: 9:00–9:20). 각 슬롯에서 테이블 수만큼 동시 미팅이 가능합니다.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>휴식 시간이란?</strong><br>일정에 삽입된 회의가 없는 기간(점심, 커피)입니다. 매크로 일정 보기에 표시되지만 회의가 배정되지 않습니다.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>기준이란?</strong><br>매칭에 사용되는 열입니다 — 예: "제품 카테고리" 또는 "관심 지역". 템플릿의 Criterion 1–5 열은 행사에 맞게 이름을 변경할 수 있습니다.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>필수 vs 선호 기준?</strong><br><strong>필수:</strong> 공통 값 없으면 미팅 없음. <strong>선호:</strong> 공통 값이 점수를 높이지만 미팅을 막지 않습니다.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Fixed vs Rotating?</strong><br><strong>Fixed:</strong> 고정 테이블. <strong>Rotating:</strong> 슬롯별 공유. 구매자 > 테이블이면 Rotating 필수입니다.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>매크로 일정이란?</strong><br>주최자를 위한 마스터 뷰 — 슬롯이 행, 구매자가 열, 각 셀에 배정된 판매자가 표시됩니다. Fixed 모드에서는 각 구매자 열 머리글에 테이블 번호가 표시됩니다. Rotating 모드에서는 각 셀에 표시됩니다. 기록을 위해 CSV로 내보내세요.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>무결성(Integrity)이란?</strong><br>무결성 검사는 어떤 판매자도 같은 슬롯에서 이중 예약되지 않았는지, 어떤 구매자도 같은 판매자와 두 번 만나지 않는지 확인합니다.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>템플릿을 사용하지 않고 제 Excel을 업로드할 수 있나요?</strong><br>가능하지만, 제공된 템플릿을 사용하고 데이터를 먼저 정규화할 것을 강력히 권장합니다 — 일관된 철자, 쉼표로 구분된 값, 구매자/판매자 파일 간 일치하는 열 이름. 일관되지 않은 데이터 = 놓친 매칭.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>참가자에게 특정 가용성 제약이 있습니다. 어떻게 해야 하나요?</strong><br>이 도구는 매칭 중 개별 슬롯 제외를 지원하지 않습니다. 특별한 경우 — 비행기를 놓친 참가자, 이미 다른 참가자를 아는 경우, 특정 슬롯에 참석할 수 없는 경우 — 일정을 생성한 후 4단계의 <strong>✏️ Edit schedule</strong> 버튼을 사용하여 해당 회의를 수동으로 제거하세요.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>PDF로 전송되나요?</strong><br>아니요 — 이메일 본문에 HTML로 전송됩니다. PDF는 CSV를 내보내 Google Sheets에서 만드세요.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Gmail 발송 한도 및 권한?</strong><br>Connect Gmail을 클릭하면 도구가 귀하를 대신하여 이메일을 보낼 수 있도록 승인합니다. Google은 시간당 최대 100개의 이메일을 허용합니다. 도구는 50개마다 자동으로 일시 중지됩니다. 발송 중에는 브라우저를 닫지 마세요. Gmail 자격 증명은 저장되지 않습니다 — 브라우저를 닫으면 연결이 만료됩니다.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>AI 매칭은?</strong><br>곧 출시. Gemini AI로 "감귤류", "Lemon", "Limón"이 자동 매칭됩니다.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>"Match Reason"과 ⭐ "Perfect match — Unique opportunity" 별은 무엇인가요?</strong><br><strong>Match Reason</strong>은 구매자와 판매자 사이에 겹치는 모든 기준을 나열합니다 — 필수와 선호 모두 — 그래서 양측이 왜 매칭되었는지 정확히 이해할 수 있습니다. <strong>⭐ 별</strong>은 판매자가 정의된 모든 기준(필수 + 선호)에서 구매자와 일치하고, 그 구매자에 대해 그렇게 하는 <strong>유일한</strong> 판매자일 때 나타납니다 — 진정으로 예외적인 매칭입니다. 최소 하나의 선호 기준을 정의한 경우에만 나타나며 모든 회의에 나타나지는 않습니다. 5단계(Template)의 <strong>MATCH REASON</strong> 체크박스로 일정 버전별로 켜고 끌 수 있습니다.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>이메일의 {{변수}}는 어떻게 작동하나요?</strong><br>6단계(Send)에서 Subject 및 Body 필드는 발송 직전에 각 참가자의 실제 데이터로 대체되는 자리 표시자를 허용합니다 — 따라서 하나의 템플릿이 모든 구매자와 판매자에 대해 개인화된 이메일을 생성합니다.<br>• <strong>{{name}}</strong> — 연락처 이름<br>• <strong>{{company}}</strong> — 회사 이름<br>• <strong>{{event}}</strong> — 행사 이름<br>• <strong>{{n_meetings}}</strong> — 해당 참가자의 회의 수<br>• <strong>{{agenda_table}}</strong> — HTML로 렌더링된 전체 개인화된 회의 테이블<br>모두에게 보내기 전에 항상 자신에게 <strong>테스트 이메일</strong>을 보내세요.</div></div>
     </div>
     <div id="faq-pt" style="display:none">
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>O que são compradores, vendedores e participantes?</strong><br><strong>Compradores</strong> são empresas convidadas com compromisso mínimo de reuniões. <strong>Vendedores</strong> são expositores que precisam de um mínimo para justificar a participação. Em conjunto chamam-se <strong>participantes</strong>.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>O que é um slot?</strong><br>Um período de reunião (ex. 9:00–9:20). Cada slot permite tantas reuniões simultâneas quantas mesas disponíveis.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>O que é uma pausa?</strong><br>Um período sem reuniões (almoço, café) inserido na agenda. Aparece na vista de agenda macro, mas nenhuma reunião é atribuída a ela.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>O que é um critério?</strong><br>Uma coluna usada para o matching — ex. "Categoria de produto" ou "Região de interesse". Pode renomear as colunas Criterion 1–5 no template conforme as necessidades do seu evento.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Obrigatório vs Preferível?</strong><br><strong>Obrigatório:</strong> sem valor comum = sem reunião. <strong>Preferível:</strong> aumenta o score mas não bloqueia.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Fixed vs Rotating?</strong><br><strong>Fixed:</strong> mesa fixa por comprador. <strong>Rotating:</strong> mesas partilhadas por slot. Obrigatório se compradores > mesas.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>O que é a Agenda Macro?</strong><br>A vista principal para o organizador — slots como linhas, compradores como colunas, vendedor atribuído em cada célula. No modo Fixed, a mesa aparece no cabeçalho de cada coluna de comprador. No modo Rotating, aparece em cada célula. Exporte como CSV para os seus registos.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>O que é a Integridade?</strong><br>A verificação de Integridade confirma que nenhum vendedor está reservado em duplicado (atribuído a duas reuniões no mesmo slot) e que nenhum comprador tem o mesmo vendedor duas vezes.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Posso carregar o meu próprio Excel sem usar o template?</strong><br>Sim, mas recomendamos vivamente trabalhar a partir dos templates fornecidos e normalizar os seus dados primeiro — ortografia consistente, valores separados por vírgulas, e nomes de colunas coincidentes entre os ficheiros de compradores e vendedores. Dados inconsistentes = matches perdidos.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Um participante tem restrições de disponibilidade específicas. O que faço?</strong><br>A ferramenta não suporta exclusões individuais de slots durante o matching. Para casos especiais — um participante que perde o voo, já conhece outro participante, ou não está disponível num slot específico — use o botão <strong>✏️ Edit schedule</strong> no Passo 4 para remover manualmente essas reuniões depois de gerar a agenda.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>As agendas são PDF?</strong><br>Não — HTML no corpo do e-mail. Para PDF, exporte o CSV e formate no Google Sheets.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Limites e permissões Gmail?</strong><br>Até 100 e-mails/hora, pausas a cada 50. As credenciais nunca são guardadas — a ligação expira ao fechar o browser.</div></div>
       <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>E a IA?</strong><br>Em breve. Gemini AI vai interpretar "Cítricos", "Lemon" e "Limón" como equivalentes automaticamente.</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>O que é "Match Reason" e a estrela ⭐ "Perfect match — Unique opportunity"?</strong><br><strong>Match Reason</strong> lista todos os critérios que coincidiram entre um comprador e um vendedor — tanto Obrigatórios como Preferíveis — para que ambas as partes entendam exatamente porque foram emparelhados. A <strong>estrela ⭐</strong> aparece quando um vendedor coincide com um comprador em <em>absolutamente todos</em> os critérios definidos (Obrigatórios + Preferíveis) <em>e</em> é o <strong>único</strong> vendedor que consegue isso para esse comprador — uma correspondência verdadeiramente excecional. Só aparece se tiver definido pelo menos um critério Preferível, e não aparece em todas as reuniões. Ative/desative por versão de agenda com a checkbox <strong>MATCH REASON</strong> no Passo 5 (Template).</div></div>
+      <div class="instr-step"><div class="instr-num" style="background:var(--blue)">Q</div><div><strong>Como funcionam as {{variáveis}} no e-mail?</strong><br>No Passo 6 (Send), os campos Subject e Body aceitam marcadores que são substituídos pelos dados reais de cada participante antes do envio — assim, um único template produz um e-mail personalizado para cada comprador e vendedor.<br>• <strong>{{name}}</strong> — nome de contacto<br>• <strong>{{company}}</strong> — nome da empresa<br>• <strong>{{event}}</strong> — nome do evento<br>• <strong>{{n_meetings}}</strong> — quantas reuniões esse participante tem<br>• <strong>{{agenda_table}}</strong> — a tabela completa de reuniões personalizada, renderizada em HTML<br>Envie sempre um <strong>e-mail de teste</strong> antes de enviar a todos.</div></div>
     </div>
   </div>
 </div>
@@ -908,7 +970,7 @@ var S={
   rules:[],sched:null,matches:[],matchReasons:{},noMatch:[],desks:{},uniqueMatches:{},
   headerImgData:null,step:0,testApproved:false,tplTab:'buyer',
   gmailToken:null,gmailUser:null,scheduleGenerated:false,configChanged:false,
-  editMode:false
+  editMode:false,_forcePicker:null,ctaCols:null
 };
 var HEADERS=['Company name','Contact name','Email','Language(s)','Region of interest','Criterion 1','Criterion 2','Criterion 3','Criterion 4','Criterion 5','Website','LinkedIn'];
 
@@ -995,7 +1057,7 @@ function toggleEditMode(){
   if(S.editMode){
     btn.textContent='✓ Done editing';btn.className='btn bsuc bsm';
     box.style.display='flex';
-    toast('Edit mode ON — click ✕ on any cell to remove a meeting','ok');
+    toast('Edit mode ON — ✕ removes a meeting, ➕ forces one, 🚫 blocks a slot','ok');
   } else {
     btn.textContent='✏️ Edit schedule';btn.className='btn bo bsm';
     box.style.display='none';
@@ -1019,6 +1081,83 @@ function removeMeeting(buyer,slotIdx){
   if(!S.sched)return;
   S.sched.grid[buyer][slotIdx]='';
   renderSchedule();toast('Meeting removed','ok');saveProject();
+}
+// Opens an inline searchable picker in the clicked cell (instead of a browser prompt)
+function openForcePicker(buyer,slotIdx){
+  if(!S.sched)return;
+  var usedAlready={};S.sched.slots.forEach(function(sl,i){var v=S.sched.grid[buyer][i];if(v)usedAlready[v]=true;});
+  var candidates=[];
+  S.matches.forEach(function(m){if(m.buyerCo===buyer&&candidates.indexOf(m.sellerCo)<0)candidates.push(m.sellerCo);});
+  var available=candidates.filter(function(c){return!usedAlready[c];});
+  if(!available.length){toast('No valid (required-criteria) candidates left to force for this buyer','w');return;}
+  S._forcePicker={buyer:buyer,slotIdx:slotIdx,candidates:available};
+  renderSchedule();
+  setTimeout(function(){var el=document.getElementById('force-search-input');if(el)el.focus();},0);
+}
+function closeForcePicker(){
+  S._forcePicker=null;
+  renderSchedule();
+}
+function forcePickerItemsHTML(list){
+  if(!list.length)return '<div style="padding:5px 8px;font-size:10px;color:var(--char60)">No matches</div>';
+  return list.slice(0,30).map(function(c){
+    var esc=c.replace(/'/g,"\\'");
+    return '<div style="padding:5px 8px;font-size:10px;cursor:pointer;border-bottom:1px solid var(--gray);text-align:left" onmouseenter="this.style.background=\'#f0f7ff\'" onmouseleave="this.style.background=\'white\'" onclick="confirmForcePick(\''+esc+'\')">'+c+'</div>';
+  }).join('');
+}
+function filterForcePicker(query){
+  if(!S._forcePicker)return;
+  query=(query||'').toLowerCase();
+  var list=S._forcePicker.candidates.filter(function(c){return c.toLowerCase().indexOf(query)>=0;});
+  var el=document.getElementById('force-results-list');
+  if(el)el.innerHTML=forcePickerItemsHTML(list);
+}
+function confirmForcePick(sellerName){
+  if(!S._forcePicker)return;
+  var buyer=S._forcePicker.buyer,slotIdx=S._forcePicker.slotIdx;
+  if(S._forcePicker.candidates.indexOf(sellerName)<0){toast('Invalid selection','err');return;}
+  S.sched.grid[buyer][slotIdx]=sellerName;
+  if(!S.sched.forced)S.sched.forced={};
+  S.sched.forced[buyer+'_'+slotIdx]=true;
+  S._forcePicker=null;
+  renderSchedule();
+  toast('Meeting forced with '+sellerName+' — check the Integrity tab for conflicts','w');
+  saveProject();
+  suggestSwapIfOverloaded(sellerName);
+}
+// After forcing a meeting, check if the forced seller is now over their Max. If so, look for
+// another buyer already meeting that seller who could instead meet a different seller who's
+// still below their Min — same buyer, same slot/desk, just a different seller (1-to-1 swap).
+function suggestSwapIfOverloaded(sellerName){
+  if(!S.sched)return;
+  var sc=S.sched;
+  var maxSeller=parseInt(document.getElementById('ev-max-seller').value)||99;
+  var minSeller=parseInt(document.getElementById('ev-min-seller').value)||0;
+  var count=0;sc.buyers.forEach(function(b){sc.slots.forEach(function(sl,i){if(sc.grid[b][i]===sellerName)count++;});});
+  if(count<=maxSeller)return;
+  var vendorMtgs={};
+  sc.buyers.forEach(function(b){sc.slots.forEach(function(sl,i){var v=sc.grid[b][i];if(v)vendorMtgs[v]=(vendorMtgs[v]||0)+1;});});
+  for(var bi=0;bi<sc.buyers.length;bi++){
+    var buyer=sc.buyers[bi];
+    for(var si=0;si<sc.slots.length;si++){
+      if(sc.grid[buyer][si]!==sellerName)continue;
+      var alreadyAtBuyer={};sc.slots.forEach(function(sl,i){var v=sc.grid[buyer][i];if(v)alreadyAtBuyer[v]=true;});
+      var candidateY=S.matches.find(function(m){
+        return m.buyerCo===buyer&&m.sellerCo!==sellerName&&!alreadyAtBuyer[m.sellerCo]&&(vendorMtgs[m.sellerCo]||0)<minSeller;
+      });
+      if(candidateY){
+        var y=candidateY.sellerCo;
+        var yCount=vendorMtgs[y]||0;
+        if(confirm('Seller "'+sellerName+'" is now at '+count+'/'+maxSeller+' (overloaded).\n\nSwap their meeting with "'+buyer+'" for "'+y+'" (currently '+yCount+'/'+minSeller+')? The slot and desk for "'+buyer+'" stay the same.')){
+          sc.grid[buyer][si]=y;
+          renderSchedule();
+          toast('Swap aplicado: '+y+' ahora con '+buyer,'ok');
+          saveProject();
+        }
+        return;
+      }
+    }
+  }
 }
 function removeBuyer(buyer){
   if(!S.sched)return;
@@ -1112,7 +1251,7 @@ function clearProject(){localStorage.removeItem('how2match_project');toast('Proj
 function markConfigChanged(){
   if(S.scheduleGenerated){
     S.configChanged=true;
-    if(S.step===3){document.getElementById('regen-warning').style.display='block';}
+    if(S.step===4){document.getElementById('regen-warning').style.display='block';}
   }
 }
 
@@ -1180,7 +1319,7 @@ function goStep(n){
   // Show/hide the p3 outer container (full width) vs main container
   var main=document.querySelector('.main');
   var p3outer=document.getElementById('p3-outer');
-  if(n===3){
+  if(n===4){
     main.style.display='none';
     p3outer.style.display='block';
   } else {
@@ -1188,12 +1327,16 @@ function goStep(n){
     p3outer.style.display='none';
   }
   document.querySelectorAll('.panel').forEach(function(p,i){p.classList.toggle('active',i===n);});
-  document.querySelectorAll('.step').forEach(function(s,i){s.classList.remove('active','done');if(i===n)s.classList.add('active');else if(i<n)s.classList.add('done');});
-  if(n===3){
+  // Step 0 (Antes de empezar) is part of the stepnav now; steps 7-8 (Help / FAQ) remain
+  // separate informational panels — don't touch the stepnav progress indicator for those.
+  if(n<7){
+    document.querySelectorAll('.step').forEach(function(s,i){s.classList.remove('active','done');if(i===n)s.classList.add('active');else if(i<n)s.classList.add('done');});
+  }
+  if(n===4){
     renderSchedule();
     document.getElementById('regen-warning').style.display=S.configChanged&&S.scheduleGenerated?'block':'none';
   }
-  if(n===5)renderSendStep();
+  if(n===6)renderSendStep();
 }
 function updatePill(){document.getElementById('proj-pill').textContent=document.getElementById('ev-name').value||'No project';}
 function toast(msg,type){var a=document.getElementById('toast-area');var t=document.createElement('div');t.className='toast '+(type||'');t.textContent=msg;a.appendChild(t);setTimeout(function(){t.remove();},3500);}
@@ -1292,14 +1435,42 @@ function checkBothLoaded(){
     document.getElementById('cols-preview').style.display='block';
     if(b){document.getElementById('b-count').textContent=S.buyers.d.length;document.getElementById('b-cols').innerHTML=S.buyers.h.map(function(h){return '<span class="ctag">'+h+'</span>';}).join('');}
     if(s){document.getElementById('s-count').textContent=S.sellers.d.length;document.getElementById('s-cols').innerHTML=S.sellers.h.map(function(h){return '<span class="ctag">'+h+'</span>';}).join('');}
-    if(b&&s&&S.rules.length===0){S.rules=[{bc:'',sc:'',type:'required'}];renderRules();}
+    if(b&&s&&S.rules.length===0){
+      // Auto-suggest a rule for every buyer/seller column pair whose names match exactly
+      // (case-insensitive), excluding fixed identity/contact columns. Pre-filled as Preferred —
+      // the consultant can edit, remove, or change to Required afterwards.
+      var skipCols={'company name':1,'contact name':1,'email':1,'website':1,'linkedin':1};
+      var suggested=[];
+      S.buyers.h.forEach(function(bh){
+        var key=bh.trim().toLowerCase();
+        if(skipCols[key])return;
+        var match=S.sellers.h.find(function(sh){return sh.trim().toLowerCase()===key;});
+        if(match)suggested.push({bc:bh,sc:match,type:'preferred'});
+      });
+      S.rules=suggested.length?suggested:[{bc:'',sc:'',type:'required'}];
+      renderRules();
+      if(suggested.length)toast(suggested.length+' matching column(s) auto-suggested as Preferred — review and adjust','ok');
+    }
   }
 }
 
 // ── RULES ──
 function addRule(){S.rules.push({bc:'',sc:'',type:'required'});renderRules();}
 function removeRule(i){S.rules.splice(i,1);renderRules();}
-function updateRule(i,k,v){S.rules[i][k]=v;if(k==='type')renderRules();}
+// When the consultant manually picks a buyer or seller column, if the exact same column name
+// exists on the other side and that side is still empty, auto-fill it — so an exact-name match
+// only needs to be selected once, not twice.
+function updateRule(i,k,v){
+  S.rules[i][k]=v;
+  if(k==='bc'&&v&&!S.rules[i].sc){
+    var m=S.sellers.h.find(function(h){return h.trim().toLowerCase()===v.trim().toLowerCase();});
+    if(m)S.rules[i].sc=m;
+  } else if(k==='sc'&&v&&!S.rules[i].bc){
+    var m2=S.buyers.h.find(function(h){return h.trim().toLowerCase()===v.trim().toLowerCase();});
+    if(m2)S.rules[i].bc=m2;
+  }
+  renderRules();
+}
 function renderRules(){
   var bh=S.buyers.h,sh=S.sellers.h;
   var el=document.getElementById('rules-container');
@@ -1308,9 +1479,9 @@ function renderRules(){
     var bo=bh.map(function(h){return '<option value="'+h+'"'+(h===r.bc?' selected':'')+'>'+h+'</option>';}).join('');
     var so=sh.map(function(h){return '<option value="'+h+'"'+(h===r.sc?' selected':'')+'>'+h+'</option>';}).join('');
     return '<div class="rule-row"><span class="rbadge '+(r.type==='required'?'rb-req':'rb-pref')+'">'+(r.type==='required'?'REQUIRED':'PREFERRED')+'</span>'+
-      '<select onchange="updateRule('+i+',\'bc\',this.value)"><option value="">— buyer column —</option>'+bo+'</select>'+
+      '<div class="rule-side buyer-side"><span class="rule-side-label">🛒 Buyer</span><select onchange="updateRule('+i+',\'bc\',this.value)"><option value="">— buyer column —</option>'+bo+'</select></div>'+
       '<span style="color:var(--char40)">↔</span>'+
-      '<select onchange="updateRule('+i+',\'sc\',this.value)"><option value="">— seller column —</option>'+so+'</select>'+
+      '<div class="rule-side seller-side"><span class="rule-side-label">🏭 Seller</span><select onchange="updateRule('+i+',\'sc\',this.value)"><option value="">— seller column —</option>'+so+'</select></div>'+
       '<select style="width:130px;font-size:11px" onchange="updateRule('+i+',\'type\',this.value)">'+
         '<option value="required"'+(r.type==='required'?' selected':'')+'>Required (blocks)</option>'+
         '<option value="preferred"'+(r.type==='preferred'?' selected':'')+'>Preferred (+score)</option>'+
@@ -1322,6 +1493,8 @@ function renderRules(){
 // ── MATCHING ──
 function clean(t){return t.toString().replace(/\u200B/g,'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();}
 function getVals(row,headers,col){var idx=headers.indexOf(col);if(idx<0)return[];var raw=row[idx]?row[idx].toString():'';return raw.split(',').map(function(p){return clean(p);}).filter(Boolean);}
+// Same split as getVals but keeps the original text (for human-readable messages)
+function getRawVals(row,headers,col){var idx=headers.indexOf(col);if(idx<0)return[];var raw=row[idx]?row[idx].toString():'';return raw.split(',').map(function(p){return p.trim();}).filter(Boolean);}
 function overlap(av,bv){return av.filter(function(a){return bv.some(function(b){return a===b||a.includes(b)||b.includes(a);});});}
 // Returns '' if the column doesn't exist (unlike getColVal, which falls back to the first cell) — safe for optional columns like Website/LinkedIn
 function getOptCol(row,headers,col){var idx=headers.indexOf(col);return idx>=0&&row[idx]?row[idx].toString().trim():'';}
@@ -1336,15 +1509,19 @@ function findHeaderLoose(headers,name){
 // For a buyer/seller with ZERO matches, find which required criteria have no overlap with anyone on the other side
 function analyzeBlockingCriteria(entityType,row,headers,reqRules){
   var blocking=[];
+  var counterpartLabel=entityType==='buyer'?'seller':'buyer';
   reqRules.forEach(function(rule){
     var myCol=entityType==='buyer'?rule.bc:rule.sc;
     var otherCol=entityType==='buyer'?rule.sc:rule.bc;
     var myVals=getVals(row,headers,myCol);
-    if(!myVals.length){blocking.push(myCol+' (no value provided)');return;}
+    if(!myVals.length){blocking.push(myCol+' — no value provided in your file');return;}
     var otherData=entityType==='buyer'?S.sellers.d:S.buyers.d;
     var otherHeaders=entityType==='buyer'?S.sellers.h:S.buyers.h;
     var found=otherData.some(function(r2){return overlap(myVals,getVals(r2,otherHeaders,otherCol)).length>0;});
-    if(!found)blocking.push(myCol);
+    if(!found){
+      var rawVals=getRawVals(row,headers,myCol);
+      blocking.push(myCol+' — no '+counterpartLabel+' currently offers/wants "'+rawVals.join(', ')+'"');
+    }
   });
   return blocking;
 }
@@ -1355,6 +1532,43 @@ function getMatchReasonText(bco,sco){
   return reasons.map(function(r){return r.col.split('↔')[0]+' ('+r.vals.join(', ')+')';}).join(' · ');
 }
 function isUniqueOpportunity(bco,sco){return !!(S.uniqueMatches&&S.uniqueMatches[bco+'||'+sco]);}
+// Buyers sorted by how many meetings they actually have, richest first —
+// used for previews/test emails so the demo doesn't land on someone with just 1 meeting
+function buyersSortedByMeetings(){
+  if(!S.sched)return[];
+  return S.sched.buyers.slice().sort(function(a,b){
+    var ca=S.sched.slots.filter(function(sl,i){return!!S.sched.grid[a][i];}).length;
+    var cb=S.sched.slots.filter(function(sl,i){return!!S.sched.grid[b][i];}).length;
+    return cb-ca;
+  });
+}
+function pickRichestBuyer(){var l=buyersSortedByMeetings();return l.length?l[0]:null;}
+function pickRichestSeller(){
+  if(!S.sched)return null;
+  var counts={};
+  S.sched.buyers.forEach(function(b){S.sched.slots.forEach(function(sl,i){var v=S.sched.grid[b][i];if(v)counts[v]=(counts[v]||0)+1;});});
+  var best=null,bestCount=-1;
+  Object.keys(counts).forEach(function(s){if(counts[s]>bestCount){bestCount=counts[s];best=s;}});
+  return best;
+}
+// Different phrasing depending on who's reading their own agenda
+function uniqueOpportunityText(isBuyer){
+  return isBuyer
+    ? "This seller is the only one offering everything you're looking for!"
+    : "You're the only seller offering everything this buyer wants — a unique opportunity!";
+}
+// Best-effort contact name lookup for previews (auto-detects a "contact name"-like column)
+function getCounterpartContactName(companyName,counterpartIsSeller){
+  var data=counterpartIsSeller?S.sellers.d:S.buyers.d;
+  var headers=counterpartIsSeller?S.sellers.h:S.buyers.h;
+  var row=data.find(function(r){return getColVal(r,headers,'Company name')===companyName;});
+  if(!row)return companyName;
+  var nameCol=null;
+  for(var i=0;i<headers.length;i++){if(headers[i]&&/contact.?name/i.test(headers[i])){nameCol=headers[i];break;}}
+  if(!nameCol)return companyName;
+  var v=getOptCol(row,headers,nameCol);
+  return v||companyName;
+}
 // Fetches the counterpart's optional Website/LinkedIn, looked up by company name
 function getCounterpartLinks(companyName,counterpartIsSeller){
   var data=counterpartIsSeller?S.sellers.d:S.buyers.d;
@@ -1416,7 +1630,7 @@ function runMatch(){
   }
   S.scheduleGenerated=true;S.configChanged=false;
   buildSchedule();
-  goStep(3);
+  goStep(4);
   toast(matches.length+' matches found','ok');
   saveProject();
 }
@@ -1506,14 +1720,24 @@ function buildSchedule(){
   // who already had at least one match — otherwise participants with zero candidates
   // (blocked on a required criterion) never show up here at all.
   var noMatch=[];
+  // Reverse lookup: seller -> matched buyers (mirrors `grouping`, needed to list capacity-blocked candidates)
+  var sellerGrouping={};
+  S.matches.forEach(function(m){
+    if(!sellerGrouping[m.sellerCo])sellerGrouping[m.sellerCo]=[];
+    if(sellerGrouping[m.sellerCo].indexOf(m.buyerCo)<0)sellerGrouping[m.sellerCo].push(m.buyerCo);
+  });
   S.buyers.d.forEach(function(row){
     var name=getColVal(row,S.buyers.h,'Company name');
     var scheduled=buyerCount.hasOwnProperty(name)?buyerCount[name]:0;
     if(scheduled<minBuyer){
       var candidatePool=grouping[name]?grouping[name].length:0;
-      var entry={name:name,type:'Buyer',count:scheduled,min:minBuyer};
+      var entry={name:name,type:'Buyer',count:scheduled,min:minBuyer,candidatePool:candidatePool};
       if(candidatePool===0){entry.reason='no_candidates';entry.blocking=analyzeBlockingCriteria('buyer',row,S.buyers.h,reqRules);}
-      else{entry.reason='capacity';}
+      else{
+        var scheduledSet={};slots.forEach(function(sl,i){var v=schedule[name]&&schedule[name][i];if(v)scheduledSet[v]=true;});
+        entry.candidates=(grouping[name]||[]).filter(function(s){return!scheduledSet[s];});
+        entry.reason=entry.candidates.length>0?'capacity':'exhausted';
+      }
       noMatch.push(entry);
     }
   });
@@ -1522,15 +1746,61 @@ function buildSchedule(){
     var scheduled=vendorMtgs.hasOwnProperty(name)?vendorMtgs[name]:0;
     if(scheduled<minSeller){
       var candidatePool=vendorCount.hasOwnProperty(name)?vendorCount[name]:0;
-      var entry={name:name,type:'Seller',count:scheduled,min:minSeller};
+      var entry={name:name,type:'Seller',count:scheduled,min:minSeller,candidatePool:candidatePool};
       if(candidatePool===0){entry.reason='no_candidates';entry.blocking=analyzeBlockingCriteria('seller',row,S.sellers.h,reqRules);}
-      else{entry.reason='capacity';}
+      else{
+        var scheduledBuyersSet={};buyers.forEach(function(b){slots.forEach(function(sl,i){if(schedule[b][i]===name)scheduledBuyersSet[b]=true;});});
+        entry.candidates=(sellerGrouping[name]||[]).filter(function(b){return!scheduledBuyersSet[b];});
+        entry.reason=entry.candidates.length>0?'capacity':'exhausted';
+      }
       noMatch.push(entry);
     }
   });
 
   S.sched={buyers:buyers,slots:slots,grid:schedule,slotDesks:slotDesks,deskMode:deskMode};
   S.noMatch=noMatch;
+
+  // ── CALL TO ACTION: who needs a phone call, and why ──
+  // 1) Below 51% of their Min (any reason) — 2) Star match but only 1 meeting — 3) global capacity>15% lost
+  var ctaAlerts=[];
+  buyers.forEach(function(b){
+    var count=buyerCount[b]||0;
+    if(minBuyer>0&&count/minBuyer<0.51){
+      ctaAlerts.push({name:b,type:'Buyer',count:count,min:minBuyer,pct:Math.round(100*count/minBuyer),reason:'below_target'});
+    }
+    if(count===1){
+      var onlySeller=null;
+      slots.forEach(function(sl,i){var v=schedule[b][i];if(v)onlySeller=v;});
+      if(onlySeller&&isUniqueOpportunity(b,onlySeller)){
+        ctaAlerts.push({name:b,type:'Buyer',count:count,reason:'star',counterpart:onlySeller});
+      }
+    }
+  });
+  Object.keys(vendorCount).forEach(function(v){
+    var count=vendorMtgs.hasOwnProperty(v)?vendorMtgs[v]:0;
+    if(minSeller>0&&count/minSeller<0.51){
+      ctaAlerts.push({name:v,type:'Seller',count:count,min:minSeller,pct:Math.round(100*count/minSeller),reason:'below_target'});
+    }
+    if(count===1){
+      var onlyBuyer=null;
+      buyers.forEach(function(b){slots.forEach(function(sl,i){if(schedule[b][i]===v)onlyBuyer=b;});});
+      if(onlyBuyer&&isUniqueOpportunity(onlyBuyer,v)){
+        ctaAlerts.push({name:v,type:'Seller',count:count,reason:'star',counterpart:onlyBuyer});
+      }
+    }
+  });
+  // Capacity alert: meetings lost specifically to capacity (tables/slots ran out), as % of meetings actually scheduled
+  var totalScheduled=0;buyers.forEach(function(b){slots.forEach(function(sl,i){if(schedule[b][i])totalScheduled++;});});
+  var capacityLostCount=noMatch.filter(function(n){return n.reason==='capacity';}).length;
+  var capacityAlert=null;
+  if(totalScheduled>0&&(capacityLostCount/totalScheduled)>0.15){
+    var pctLost=Math.round(100*capacityLostCount/totalScheduled);
+    var suggestion=deskMode==='rotating'
+      ? 'Consider extending the schedule (more slots) — in Rotating mode, tables can\'t easily be added.'
+      : 'Consider adding more tables, or extending the schedule if you\'re already using all available tables.';
+    capacityAlert={pct:pctLost,count:capacityLostCount,suggestion:suggestion};
+  }
+  S.cta={alerts:ctaAlerts,capacityAlert:capacityAlert};
 }
 
 // Helper: get desk for a buyer at a specific slot
@@ -1597,21 +1867,32 @@ function renderSchedule(){
       vis.forEach(function(b){
         var v=sc.grid[b]&&sc.grid[b][i];
         var desk=getDeskForSlot(b,i);
+        var isForced=sc.forced&&sc.forced[b+'_'+i];
         if(v){
           var bs=b.replace(/'/g,"\\'").replace(/"/g,'&quot;');
           var vs=v.replace(/'/g,"\\'").replace(/"/g,'&quot;');
           if(isEdit){
-            html+='<td class="hit" style="position:relative">'+v.substring(0,14)+(v.length>14?'…':'')+'<span style="position:absolute;top:2px;right:2px;cursor:pointer;color:#ff6b6b;font-size:10px;line-height:1" onclick="removeMeeting(\''+bs+'\','+i+')">✕</span></td>';
+            html+='<td class="hit" style="position:relative'+(isForced?';background:#fff3e0':'')+'">'+(isForced?'🔧 ':'')+v.substring(0,14)+(v.length>14?'…':'')+'<span style="position:absolute;top:2px;right:2px;cursor:pointer;color:#ff6b6b;font-size:10px;line-height:1" onclick="removeMeeting(\''+bs+'\','+i+')">✕</span></td>';
           } else {
-            html+='<td class="hit" onmouseenter="showTT(\''+bs+'\',\''+vs+'\','+i+',event)" onmouseleave="hideTT()">'+v.substring(0,14)+(v.length>14?'…':'')+'<span style="font-size:9px;color:var(--blue60);margin-left:3px">D'+desk+'</span></td>';
+            html+='<td class="hit" style="'+(isForced?'background:#fff3e0':'')+'" onmouseenter="showTT(\''+bs+'\',\''+vs+'\','+i+',event)" onmouseleave="hideTT()">'+(isForced?'🔧 ':'')+v.substring(0,14)+(v.length>14?'…':'')+'<span style="font-size:9px;color:var(--blue60);margin-left:3px">D'+desk+'</span></td>';
           }
         } else {
           if(isEdit){
             var isBlocked=S.sched.blocked&&S.sched.blocked[b+'_'+i];
+            var bEsc=b.replace(/'/g,"\\'");
             if(isBlocked){
-              html+='<td style="background:#ffe0e0;cursor:pointer;font-size:9px;text-align:center;color:#c00" onclick="unblockSlot(\''+b.replace(/'/g,"\\'")+'\','+i+')" title="Click to unblock">🚫 Blocked</td>';
+              html+='<td style="background:#ffe0e0;cursor:pointer;font-size:9px;text-align:center;color:#c00" onclick="unblockSlot(\''+bEsc+'\','+i+')" title="Click to unblock">🚫 Blocked</td>';
             } else {
-              html+='<td class="miss" style="cursor:pointer" onclick="blockSlot(\''+b.replace(/'/g,"\\'")+'\','+i+')" title="Click to block this slot">—</td>';
+              var isPicking=S._forcePicker&&S._forcePicker.buyer===b&&S._forcePicker.slotIdx===i;
+              if(isPicking){
+                html+='<td style="background:#eef6ff;padding:4px;min-width:150px;max-width:180px;vertical-align:top;text-align:left">'+
+                  '<input type="text" id="force-search-input" placeholder="Search seller…" style="width:100%;font-size:10px;padding:3px 5px;margin-bottom:3px;box-sizing:border-box" oninput="filterForcePicker(this.value)">'+
+                  '<div id="force-results-list" style="max-height:120px;overflow-y:auto;background:white;border:1px solid var(--border);border-radius:3px">'+forcePickerItemsHTML(S._forcePicker.candidates)+'</div>'+
+                  '<div style="text-align:right;margin-top:3px"><span style="cursor:pointer;font-size:9px;color:var(--char60)" onclick="closeForcePicker()">Cancel</span></div>'+
+                '</td>';
+              } else {
+                html+='<td class="miss" style="text-align:center"><span style="cursor:pointer;margin-right:6px" onclick="openForcePicker(\''+bEsc+'\','+i+')" title="Force a meeting here (from valid candidates)">➕</span><span style="cursor:pointer;color:var(--char40)" onclick="blockSlot(\''+bEsc+'\','+i+')" title="Block this slot">🚫</span></td>';
+              }
             }
           } else {
             html+='<td class="miss">—</td>';
@@ -1642,16 +1923,98 @@ function renderSchedule(){
   document.getElementById('tab-nm').innerHTML=S.noMatch.length?'<div class="infobox iw">⚠ '+S.noMatch.length+' below minimum.</div>'+S.noMatch.map(function(n){
     var detail;
     if(n.reason==='no_candidates'){
-      detail='❌ No matching candidates found at all'+(n.blocking&&n.blocking.length?' — blocked on: <strong>'+n.blocking.join(', ')+'</strong>':'');
+      detail='❌ No matching candidates found at all.'+(n.blocking&&n.blocking.length?'<br>'+n.blocking.map(function(b){return '• '+b;}).join('<br>'):'');
+    } else if(n.reason==='exhausted'){
+      detail='🔸 All '+n.candidatePool+' valid match'+(n.candidatePool===1?'':'es')+' already scheduled — there simply aren\'t enough matching '+(n.type==='Buyer'?'sellers':'buyers')+' to reach the minimum of '+n.min+'. Forcing won\'t help (no candidates left) — consider loosening a Preferred criterion, or check if enough counterpart participants registered with a compatible profile.';
     } else {
-      detail='⚠️ Had valid matches, but capacity (tables/slots) ran out before reaching the minimum.';
+      var cands=n.candidates||[];
+      var candsTxt=cands.length?cands.slice(0,8).join(', ')+(cands.length>8?' +'+(cands.length-8)+' more':''):'';
+      detail='⚠️ Had '+n.candidatePool+' valid match'+(n.candidatePool===1?'':'es')+', but capacity (tables/slots) ran out before reaching the minimum.'+(candsTxt?'<br>Could still meet: <strong>'+candsTxt+'</strong> — go to Macro Schedule → ✏️ Edit schedule to force a meeting manually.':'');
     }
     return '<div class="nm-item" style="flex-direction:column;align-items:flex-start;gap:3px"><div style="display:flex;align-items:center;gap:8px"><span class="badge '+(n.type==='Buyer'?'bb':'bbs')+'">'+n.type+'</span><strong>'+n.name+'</strong><span style="font-size:10px;color:var(--char60)">('+n.count+'/min '+n.min+')</span></div><div style="font-size:11px;color:var(--char60);padding-left:2px">'+detail+'</div></div>';
   }).join(''):'<div class="infobox io">✓ All participants meet minimum requirements.</div>';
   var errs=checkIntegrity();
   document.getElementById('tab-int').innerHTML=errs.length?errs.map(function(e){return '<div class="infobox ie">⚠ '+e+'</div>';}).join(''):'<div class="infobox io">✓ No conflicts. Schedule valid.</div>';
+
+  // CTA tab
+  var cta=S.cta||{alerts:[],capacityAlert:null};
+  var ctaHtml='';
+  if(cta.capacityAlert){
+    ctaHtml+='<div class="infobox ie">⚠️ <div><strong>Capacity alert:</strong> '+cta.capacityAlert.pct+'% of meetings ('+cta.capacityAlert.count+') were lost due to capacity (tables/slots ran out), above the 15% threshold. Call the organization: '+cta.capacityAlert.suggestion+'</div></div>';
+  }
+  if(cta.alerts.length){
+    ctaHtml+='<div class="infobox iw">'+cta.alerts.length+' contact(s) worth calling.</div>';
+    ctaHtml+=cta.alerts.map(function(a){
+      var badge='<span class="badge '+(a.type==='Buyer'?'bb':'bbs')+'">'+a.type+'</span>';
+      if(a.reason==='star'){
+        return '<div class="nm-item" style="flex-direction:column;align-items:flex-start;gap:3px">'+
+          '<div style="display:flex;align-items:center;gap:8px">'+badge+'<strong>'+a.name+'</strong><span style="font-size:10px;color:var(--warn);font-weight:700">⭐ Unique opportunity</span></div>'+
+          '<div style="font-size:11px;color:var(--char60);padding-left:2px">Only has 1 meeting, but it\'s a perfect/unique match with <strong>'+a.counterpart+'</strong> — call to make sure they don\'t miss it.</div></div>';
+      }
+      return '<div class="nm-item" style="flex-direction:column;align-items:flex-start;gap:3px">'+
+        '<div style="display:flex;align-items:center;gap:8px">'+badge+'<strong>'+a.name+'</strong><span style="font-size:10px;color:var(--char60)">('+a.count+'/'+a.min+' — '+a.pct+'%)</span></div>'+
+        '<div style="font-size:11px;color:var(--char60);padding-left:2px">Below 51% of their target — call to check if they can widen their search criteria or confirm availability.</div></div>';
+    }).join('');
+    ctaHtml+=buildCTAColumnPicker();
+    ctaHtml+='<div style="margin-top:10px"><button class="btn bo bsm" onclick="exportCTAcsv()">⬇ Export contacts to call (CSV)</button></div>';
+  } else if(!cta.capacityAlert){
+    ctaHtml='<div class="infobox io">✓ No calls needed right now — everyone is on track.</div>';
+  }
+  document.getElementById('tab-cta').innerHTML=ctaHtml;
 }
-function showTab(n,el){['tab-macro','tab-desks','tab-nm','tab-int'].forEach(function(t){document.getElementById(t).style.display='none';});document.getElementById('tab-'+n).style.display='block';document.querySelectorAll('.tab-bar .tab').forEach(function(t){t.classList.remove('active');});el.classList.add('active');}
+
+// Builds the checkbox column picker for the CTA export. Union of buyer + seller headers
+// (case-insensitive dedupe), pre-checked for likely contact fields the first time it's shown.
+// Your data will only be visible to you — this reads from the files already uploaded locally.
+function buildCTAColumnPicker(){
+  var seen={},cols=[];
+  S.buyers.h.concat(S.sellers.h).forEach(function(h){
+    var k=h.trim().toLowerCase();
+    if(!seen[k]){seen[k]=true;cols.push(h);}
+  });
+  if(!S.ctaCols){
+    S.ctaCols={};
+    cols.forEach(function(h){
+      var k=h.toLowerCase();
+      S.ctaCols[h]=/contact.?name|company|email|phone|tel(e|é)fono/.test(k);
+    });
+  }
+  var html='<div class="slbl-t" style="margin-top:14px">Columns to include in the export</div>';
+  html+='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:6px">';
+  html+=cols.map(function(h){
+    var checked=S.ctaCols.hasOwnProperty(h)?S.ctaCols[h]:false;
+    return '<label style="display:flex;align-items:center;gap:5px;font-size:12px"><input type="checkbox" style="width:auto" '+(checked?'checked':'')+' onchange="toggleCTACol(\''+h.replace(/'/g,"\\'")+'\',this.checked)"> '+h+'</label>';
+  }).join('');
+  html+='</div>';
+  return html;
+}
+function toggleCTACol(col,val){if(!S.ctaCols)S.ctaCols={};S.ctaCols[col]=val;}
+
+// CTA contact export — uses the columns the consultant selected in the picker above, plus a
+// 'Reason for call' column that the tool always generates itself (not from the uploaded Excel)
+function exportCTAcsv(){
+  if(!S.cta||!S.cta.alerts.length){toast('No contacts to export','w');return;}
+  var selectedCols=Object.keys(S.ctaCols||{}).filter(function(c){return S.ctaCols[c];});
+  var rows=[['Type'].concat(selectedCols,['Reason for call'])];
+  S.cta.alerts.forEach(function(a){
+    var isBuyer=a.type==='Buyer';
+    var data=isBuyer?S.buyers.d:S.sellers.d;
+    var headers=isBuyer?S.buyers.h:S.sellers.h;
+    var row=data.find(function(r){return getColVal(r,headers,'Company name')===a.name;});
+    var reason=a.reason==='star'
+      ? 'Unique opportunity — only 1 meeting but a perfect/unique match with '+a.counterpart
+      : 'Below target: '+a.count+'/'+a.min+' meetings ('+a.pct+'%) — check if they can widen their search';
+    var vals=selectedCols.map(function(c){
+      var h=findHeaderLoose(headers,c);
+      return row&&h?getOptCol(row,headers,h):'';
+    });
+    rows.push([a.type].concat(vals,[reason]));
+  });
+  var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c||'').replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+  var a2=document.createElement('a');a2.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a2.download='call_to_action_contacts.csv';a2.click();
+  toast('CTA contacts exported','ok');
+}
+function showTab(n,el){['tab-macro','tab-desks','tab-nm','tab-cta','tab-int'].forEach(function(t){document.getElementById(t).style.display='none';});document.getElementById('tab-'+n).style.display='block';document.querySelectorAll('.tab-bar .tab').forEach(function(t){t.classList.remove('active');});el.classList.add('active');}
 function checkIntegrity(){
   if(!S.sched)return[];var sc=S.sched,errs=[];
   sc.slots.forEach(function(slot,s){var seen={};sc.buyers.forEach(function(b){var v=sc.grid[b][s];if(v){if(seen[v])errs.push('Slot '+slot+': "'+v+'" double-booked.');else seen[v]=true;}});});
@@ -1743,7 +2106,7 @@ function updatePreview(){
   if(sampleHint)sampleHint.style.display=usingRealData?'none':'block';
   var samples=[{slot:'25/03/2025 11:40-12:00',co:'Sample Company A',desk:1},{slot:'25/03/2025 12:00-12:20',co:'Sample Company B',desk:1},{slot:'25/03/2025 14:00-14:20',co:'Sample Company C',desk:isBuyer?1:3}];
   if(usingRealData){
-    var b=S.sched.buyers[0];samples=[];
+    var b=pickRichestBuyer();samples=[];
     S.sched.slots.slice(0,4).forEach(function(slot,i){var v=S.sched.grid[b][i];if(v)samples.push({slot:slot,co:v,desk:getDeskForSlot(b,i)});});
   }
   samples.forEach(function(r){
@@ -1752,15 +2115,15 @@ function updatePreview(){
     var row='<tr>';
     if(document.getElementById('col-time'+suf).checked)row+='<td style="padding:3px 7px;font-size:10px">'+tp+'</td>';
     if(document.getElementById('col-company'+suf).checked)row+='<td style="padding:3px 7px;font-size:10px">'+r.co+'</td>';
-    if(document.getElementById('col-contact'+suf).checked)row+='<td style="padding:3px 7px;font-size:10px">Contact</td>';
+    if(document.getElementById('col-contact'+suf).checked)row+='<td style="padding:3px 7px;font-size:10px">'+(usingRealData?getCounterpartContactName(r.co,true):'Contact')+'</td>';
     if(document.getElementById('col-desk'+suf).checked)row+='<td style="padding:3px 7px;font-size:10px;text-align:center;font-weight:700;color:#094172">'+(deskMoves(isBuyer,deskMode)?'→ '+r.desk:'Desk '+r.desk)+'</td>';
     if(document.getElementById('col-signature'+suf).checked)row+='<td style="padding:3px 7px;font-size:10px;min-width:80px;border-bottom:1px solid #ccc">&nbsp;</td>';
     tbody+=row+'</tr>';
     if(document.getElementById('col-reason'+suf).checked){
-      var b0=(S.sched&&S.sched.buyers[0])||'';
+      var b0=b||'';
       var reasonText=b0?getMatchReasonText(b0,r.co):'';
       var unique=b0?isUniqueOpportunity(b0,r.co):false;
-      if(reasonText)tbody+='<tr><td colspan="'+cols.length+'" style="padding:2px 7px 6px;font-size:9px;color:#666;background:#fafafa">'+(unique?'⭐ <strong>Perfect match —</strong> ':'🔗 ')+'Match on: '+reasonText+(unique?'. Unique opportunity for this buyer!':'')+'</td></tr>';
+      if(reasonText)tbody+='<tr><td colspan="'+cols.length+'" style="padding:2px 7px 6px;font-size:9px;color:#666;background:#fafafa">'+(unique?'⭐ <strong>Perfect match —</strong> ':'🔗 ')+'Match on: '+reasonText+(unique?'. '+uniqueOpportunityText(isBuyer):'')+'</td></tr>';
     }
     if(document.getElementById('col-links'+suf).checked){
       var links=getCounterpartLinks(r.co,true);
@@ -1775,14 +2138,14 @@ function generateTestRun(){
   if(!S.sched){toast('Generate schedule first','w');return;}
   var sc=S.sched;
   var participants=[];
-  sc.buyers.slice(0,2).forEach(function(b){
+  buyersSortedByMeetings().slice(0,2).forEach(function(b){
     var meetings=[];
     sc.slots.forEach(function(slot,i){var v=sc.grid[b][i];if(v)meetings.push({slot:slot,co:v,desk:getDeskForSlot(b,i)});});
     participants.push({name:b,type:'Buyer',meetings:meetings});
   });
   var sellerMtgs={};
   sc.slots.forEach(function(slot,i){sc.buyers.forEach(function(b){var v=sc.grid[b][i];if(v){if(!sellerMtgs[v])sellerMtgs[v]=[];sellerMtgs[v].push({slot:slot,co:b,desk:getDeskForSlot(b,i)});}});});
-  var fs=Object.keys(sellerMtgs)[0];
+  var fs=pickRichestSeller();
   if(fs)participants.push({name:fs,type:'Seller',meetings:sellerMtgs[fs].slice(0,5)});
   document.getElementById('testrun-content').innerHTML=participants.map(function(p){
     var isBuyer=p.type==='Buyer';
@@ -1793,7 +2156,7 @@ function generateTestRun(){
       var unique=isUniqueOpportunity(bco,sco);
       var links=getCounterpartLinks(m.co,isBuyer);
       var linksLine=(links.website||links.linkedin)?'<div class="mr-reason">'+(links.website?'🌐 '+links.website+' &nbsp;':'')+(links.linkedin?'💼 '+links.linkedin:'')+'</div>':'';
-      return '<div class="mr"><span class="mr-time">'+m.slot+'</span><div style="flex:1"><div class="mr-co">'+m.co+(unique?' <span style="color:var(--warn)">⭐ Unique opportunity</span>':'')+'</div>'+(reasons?'<div class="mr-reason">Match on: '+reasons+'</div>':'')+linksLine+'</div><span class="mr-desk">'+(deskMoves(isBuyer,sc.deskMode)?'→ Desk '+m.desk:'Desk '+m.desk)+'</span></div>';
+      return '<div class="mr"><span class="mr-time">'+m.slot+'</span><div style="flex:1"><div class="mr-co">'+m.co+(unique?' <span style="color:var(--warn)">⭐ '+(isBuyer?'Only match like this':'Unique opportunity')+'</span>':'')+'</div>'+(reasons?'<div class="mr-reason">Match on: '+reasons+(unique?'. '+uniqueOpportunityText(isBuyer):'')+'</div>':'')+linksLine+'</div><span class="mr-desk">'+(deskMoves(isBuyer,sc.deskMode)?'→ Desk '+m.desk:'Desk '+m.desk)+'</span></div>';
     }).join('');
     return '<div class="pc"><div class="pc-type">'+p.type+'</div><div class="pc-name">'+p.name+'</div>'+(p.meetings.length?rows:'<div style="font-size:11px;color:var(--char60)">No meetings assigned.</div>')+'</div>';
   }).join('');
@@ -1835,7 +2198,7 @@ function buildAgendaHTML(participant,meetings,isBuyer){
     if(showReason){
       var reasonText=getMatchReasonText(bco,sco);
       var unique=isUniqueOpportunity(bco,sco);
-      if(reasonText)extraRows+='<tr><td colspan="'+colSpan+'" style="padding:2px 8px 6px;font-size:10px;color:#666;background:#fafafa;border-bottom:1px solid #eee">'+(unique?'⭐ <strong>Perfect match —</strong> ':'🔗 ')+'Match on: '+reasonText+(unique?'. Unique opportunity!':'')+'</td></tr>';
+      if(reasonText)extraRows+='<tr><td colspan="'+colSpan+'" style="padding:2px 8px 6px;font-size:10px;color:#666;background:#fafafa;border-bottom:1px solid #eee">'+(unique?'⭐ <strong>Perfect match —</strong> ':'🔗 ')+'Match on: '+reasonText+(unique?'. '+uniqueOpportunityText(isBuyer):'')+'</td></tr>';
     }
     if(showLinks){
       var links=getCounterpartLinks(m.co,isBuyer);
@@ -1882,22 +2245,43 @@ async function sendTestEmailReal(){
   var evName=document.getElementById('ev-name').value||'Test Event';
   var subject=document.getElementById('email-subj').value.replace(/\{\{event\}\}/g,evName);
   var bodyTemplate=document.getElementById('email-body').value;
+  var nameColB=document.getElementById('ncol-b')&&document.getElementById('ncol-b').value;
+  var nameColS=document.getElementById('ncol-s')&&document.getElementById('ncol-s').value;
   var sent=0;
   if(sc.buyers.length>0){
-    var b=sc.buyers[0];
+    var b=pickRichestBuyer();
     var meetings=[];
-    sc.slots.forEach(function(slot,i){var v=sc.grid[b][i];if(v)meetings.push({slot:slot,co:v,contact:'Contact',desk:getDeskForSlot(b,i)});});
+    sc.slots.forEach(function(slot,i){
+      var v=sc.grid[b][i];
+      if(v){
+        var sellerRow=S.sellers.d.find(function(r){return (r[S.sellers.h.indexOf('Company name')]||'').toString().trim()===v;});
+        var contact=sellerRow&&nameColS?sellerRow[S.sellers.h.indexOf(nameColS)]||v:v;
+        meetings.push({slot:slot,co:v,contact:contact,desk:getDeskForSlot(b,i)});
+      }
+    });
+    var buyerRow0=S.buyers.d.find(function(r){return (r[S.buyers.h.indexOf('Company name')]||'').toString().trim()===b;});
+    var buyerName0=buyerRow0&&nameColB?buyerRow0[S.buyers.h.indexOf(nameColB)]||b:b;
     var agendaHtml=buildAgendaHTML(b,meetings,true);
-    var body=bodyTemplate.replace(/\{\{name\}\}/g,b).replace(/\{\{company\}\}/g,b).replace(/\{\{event\}\}/g,evName).replace(/\{\{n_meetings\}\}/g,meetings.length).replace(/\{\{agenda_table\}\}/g,agendaHtml);
+    var body=bodyTemplate.replace(/\{\{name\}\}/g,buyerName0).replace(/\{\{company\}\}/g,b).replace(/\{\{event\}\}/g,evName).replace(/\{\{n_meetings\}\}/g,meetings.length).replace(/\{\{agenda_table\}\}/g,agendaHtml);
     try{var r=await sendGmailMessage(testEmail,'[BUYER TEST] '+subject,body);if(r.ok){sent++;status.textContent='✓ Buyer test sent...';}}catch(e){status.textContent='Error: '+e.message;}
   }
   await new Promise(function(r){setTimeout(r,500);});
   var sellerMtgs={};
-  sc.slots.forEach(function(slot,i){sc.buyers.forEach(function(b){var v=sc.grid[b][i];if(v){if(!sellerMtgs[v])sellerMtgs[v]=[];sellerMtgs[v].push({slot:slot,co:b,contact:'Contact',desk:getDeskForSlot(b,i)});}});});
-  var firstSeller=Object.keys(sellerMtgs)[0];
+  sc.slots.forEach(function(slot,i){sc.buyers.forEach(function(b){
+    var v=sc.grid[b][i];
+    if(v){
+      if(!sellerMtgs[v])sellerMtgs[v]=[];
+      var buyerRow=S.buyers.d.find(function(r){return (r[S.buyers.h.indexOf('Company name')]||'').toString().trim()===b;});
+      var contact=buyerRow&&nameColB?buyerRow[S.buyers.h.indexOf(nameColB)]||b:b;
+      sellerMtgs[v].push({slot:slot,co:b,contact:contact,desk:getDeskForSlot(b,i)});
+    }
+  });});
+  var firstSeller=pickRichestSeller();
   if(firstSeller){
+    var sellerRow0=S.sellers.d.find(function(r){return (r[S.sellers.h.indexOf('Company name')]||'').toString().trim()===firstSeller;});
+    var sellerName0=sellerRow0&&nameColS?sellerRow0[S.sellers.h.indexOf(nameColS)]||firstSeller:firstSeller;
     var agendaHtml=buildAgendaHTML(firstSeller,sellerMtgs[firstSeller],false);
-    var body=bodyTemplate.replace(/\{\{name\}\}/g,firstSeller).replace(/\{\{company\}\}/g,firstSeller).replace(/\{\{event\}\}/g,evName).replace(/\{\{n_meetings\}\}/g,sellerMtgs[firstSeller].length).replace(/\{\{agenda_table\}\}/g,agendaHtml);
+    var body=bodyTemplate.replace(/\{\{name\}\}/g,sellerName0).replace(/\{\{company\}\}/g,firstSeller).replace(/\{\{event\}\}/g,evName).replace(/\{\{n_meetings\}\}/g,sellerMtgs[firstSeller].length).replace(/\{\{agenda_table\}\}/g,agendaHtml);
     try{var r=await sendGmailMessage(testEmail,'[SELLER TEST] '+subject,body);if(r.ok){sent++;status.textContent='✓ Both test emails sent to '+testEmail+'. Check your inbox!';}}catch(e){status.textContent='Buyer sent. Error on seller: '+e.message;}
   }
   toast(sent+' test email(s) sent to '+testEmail,'ok');
@@ -2000,77 +2384,6 @@ function showLang(lang,el){
   el.classList.add('active');
 }
 
-updatePreview();
-var HEADERS=['Company name','Contact name','Email','Language(s)','Region of interest','Criterion 1','Criterion 2','Criterion 3','Criterion 4','Criterion 5','Website','LinkedIn'];
-
-// ── CONFIG CHANGE TRACKING ──
-function markConfigChanged(){
-  if(S.scheduleGenerated){
-    S.configChanged=true;
-    // Show warning if already on schedule step
-    if(S.step===3){document.getElementById('regen-warning').style.display='block';}
-  }
-}
-
-// ── GMAIL OAUTH ──
-function connectGmail(){
-  var client=google.accounts.oauth2.initTokenClient({
-    client_id:CONFIG.GMAIL_CLIENT_ID,
-    scope:CONFIG.GMAIL_SCOPES,
-    callback:function(resp){
-      if(resp.error){toast('Gmail auth failed: '+resp.error,'err');return;}
-      S.gmailToken=resp.access_token;
-      fetchGmailUser();
-    }
-  });
-  client.requestAccessToken();
-}
-function fetchGmailUser(){
-  fetch('https://www.googleapis.com/gmail/v1/users/me/profile',{headers:{Authorization:'Bearer '+S.gmailToken}})
-    .then(function(r){return r.json();})
-    .then(function(d){
-      var email=d.emailAddress||d.email||'connected';
-      S.gmailUser=email;
-      document.getElementById('gmail-label').textContent='Gmail: '+email;
-      document.getElementById('gmail-dot').classList.add('on');
-      document.getElementById('gmail-status').classList.add('connected');
-      document.getElementById('gmail-connect-prompt').style.display='none';
-      toast('Gmail connected: '+email,'ok');
-    })
-    .catch(function(){
-      fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+S.gmailToken}})
-        .then(function(r){return r.json();})
-        .then(function(d){
-          var email=d.email||'connected';
-          S.gmailUser=email;
-          document.getElementById('gmail-label').textContent='Gmail: '+email;
-          document.getElementById('gmail-dot').classList.add('on');
-          document.getElementById('gmail-status').classList.add('connected');
-          document.getElementById('gmail-connect-prompt').style.display='none';
-          toast('Gmail connected: '+email,'ok');
-        })
-        .catch(function(){
-          S.gmailUser='connected';
-          document.getElementById('gmail-label').textContent='Gmail: connected';
-          document.getElementById('gmail-dot').classList.add('on');
-          document.getElementById('gmail-status').classList.add('connected');
-          document.getElementById('gmail-connect-prompt').style.display='none';
-          toast('Gmail connected','ok');
-        });
-    });
-}
-function sendGmailMessage(to,subject,body){
-  var encodedSubject='=?UTF-8?B?'+btoa(unescape(encodeURIComponent(subject)))+'?=';
-  var msg='To: '+to+'\r\nSubject: '+encodedSubject+'\r\nContent-Type: text/html; charset=utf-8\r\n\r\n'+body;
-  var encoded=btoa(unescape(encodeURIComponent(msg))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-  return fetch('https://www.googleapis.com/gmail/v1/users/me/messages/send',{
-    method:'POST',
-    headers:{Authorization:'Bearer '+S.gmailToken,'Content-Type':'application/json'},
-    body:JSON.stringify({raw:encoded})
-  });
-}
-
-// ── NAV ──
 function showFaqLang(lang,el){
   ['en','es','tr','ko','pt'].forEach(function(l){document.getElementById('faq-'+l).style.display='none';});
   document.getElementById('faq-'+lang).style.display='block';
@@ -2081,16 +2394,6 @@ function showProjPhase(phase,el){
   ['antes','durante','despues'].forEach(function(p){document.getElementById('proj-'+p).style.display='none';});
   document.getElementById('proj-'+phase).style.display='block';
   el.parentElement.querySelectorAll('.lang-tab').forEach(function(t){t.classList.remove('active');});
-  el.classList.add('active');
-}
-function toast(msg,type){var a=document.getElementById('toast-area');var t=document.createElement('div');t.className='toast '+(type||'');t.textContent=msg;a.appendChild(t);setTimeout(function(){t.remove();},3500);}
-
-// ── SLOTS ──
-
-function showLang(lang,el){
-  ['en','es','tr','ko','pt'].forEach(function(l){document.getElementById('lang-'+l).style.display='none';});
-  document.getElementById('lang-'+lang).style.display='block';
-  document.querySelectorAll('.lang-tab').forEach(function(t){t.classList.remove('active');});
   el.classList.add('active');
 }
 
