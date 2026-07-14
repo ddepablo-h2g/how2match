@@ -479,6 +479,7 @@ var CONFIG = {
     <div class="ctitle">Generated schedule</div>
     <div class="csub">Hover any cell to see why buyer and seller matched.</div>
     <div id="capacity-warning" style="display:none;margin-bottom:12px"></div>
+    <div id="swap-suggestion" style="display:none;margin-bottom:12px"></div>
     <div id="regen-warning" style="display:none;margin-bottom:12px">
       <div class="infobox iw">⚠️ <div><strong>Configuration changed.</strong> Your event settings (slots, tables or minimums) have been modified since the last schedule was generated. Go back to Matching and click <strong>Generate matches</strong> again to update the schedule.</div></div>
     </div>
@@ -971,7 +972,7 @@ var S={
   rules:[],sched:null,matches:[],matchReasons:{},noMatch:[],desks:{},uniqueMatches:{},
   headerImgData:null,step:0,testApproved:false,tplTab:'buyer',
   gmailToken:null,gmailUser:null,scheduleGenerated:false,configChanged:false,
-  editMode:false,_forcePicker:null,ctaCols:null
+  editMode:false,_forcePicker:null,ctaCols:null,_swapSuggestion:null
 };
 var HEADERS=['Company name','Contact name','Email','Language(s)','Region of interest','Criterion 1','Criterion 2','Criterion 3','Criterion 4','Criterion 5','Website','LinkedIn'];
 
@@ -1083,15 +1084,27 @@ function removeMeeting(buyer,slotIdx){
   S.sched.grid[buyer][slotIdx]='';
   renderSchedule();toast('Meeting removed','ok');saveProject();
 }
-// Opens an inline searchable picker in the clicked cell (instead of a browser prompt)
+// Opens an inline searchable picker in the clicked cell (instead of a browser prompt).
+// Candidates are sorted furthest-from-their-Min first, so the top of the list is always
+// the seller who most needs this meeting — the best option is offered first.
 function openForcePicker(buyer,slotIdx){
   if(!S.sched)return;
   var usedAlready={};S.sched.slots.forEach(function(sl,i){var v=S.sched.grid[buyer][i];if(v)usedAlready[v]=true;});
+  // Sellers already booked with a DIFFERENT buyer in this exact slot can't be offered here —
+  // this is what prevents the picker from ever letting you force a double-booking.
+  var busyThisSlot={};S.sched.buyers.forEach(function(b){if(b!==buyer&&S.sched.grid[b][slotIdx])busyThisSlot[S.sched.grid[b][slotIdx]]=true;});
   var candidates=[];
   S.matches.forEach(function(m){if(m.buyerCo===buyer&&candidates.indexOf(m.sellerCo)<0)candidates.push(m.sellerCo);});
-  var available=candidates.filter(function(c){return!usedAlready[c];});
-  if(!available.length){toast('No valid (required-criteria) candidates left to force for this buyer','w');return;}
-  S._forcePicker={buyer:buyer,slotIdx:slotIdx,candidates:available};
+  var available=candidates.filter(function(c){return!usedAlready[c]&&!busyThisSlot[c];});
+  if(!available.length){toast('No valid candidates free for this exact slot (all matching sellers are already busy at this time, or already met this buyer)','w');return;}
+  var minSeller=parseInt(document.getElementById('ev-min-seller').value)||0;
+  var vendorMtgs={};
+  S.sched.buyers.forEach(function(b){S.sched.slots.forEach(function(sl,i){var v=S.sched.grid[b][i];if(v)vendorMtgs[v]=(vendorMtgs[v]||0)+1;});});
+  available.sort(function(a,b){
+    var gapA=minSeller-(vendorMtgs[a]||0),gapB=minSeller-(vendorMtgs[b]||0);
+    return gapB-gapA; // furthest below their Min first
+  });
+  S._forcePicker={buyer:buyer,slotIdx:slotIdx,candidates:available,vendorMtgs:vendorMtgs,minSeller:minSeller};
   renderSchedule();
   setTimeout(function(){var el=document.getElementById('force-search-input');if(el)el.focus();},0);
 }
@@ -1101,9 +1114,13 @@ function closeForcePicker(){
 }
 function forcePickerItemsHTML(list){
   if(!list.length)return '<div style="padding:5px 8px;font-size:10px;color:var(--char60)">No matches</div>';
+  var vendorMtgs=(S._forcePicker&&S._forcePicker.vendorMtgs)||{};
+  var minSeller=(S._forcePicker&&S._forcePicker.minSeller)||0;
   return list.slice(0,30).map(function(c){
     var esc=c.replace(/'/g,"\\'");
-    return '<div style="padding:5px 8px;font-size:10px;cursor:pointer;border-bottom:1px solid var(--gray);text-align:left" onmouseenter="this.style.background=\'#f0f7ff\'" onmouseleave="this.style.background=\'white\'" onclick="confirmForcePick(\''+esc+'\')">'+c+'</div>';
+    var count=vendorMtgs[c]||0;
+    var tag=minSeller>0?' <span style="color:var(--warn);font-weight:700">('+count+'/'+minSeller+')</span>':'';
+    return '<div style="padding:5px 8px;font-size:10px;cursor:pointer;border-bottom:1px solid var(--gray);text-align:left" onmouseenter="this.style.background=\'#f0f7ff\'" onmouseleave="this.style.background=\'white\'" onclick="confirmForcePick(\''+esc+'\')">'+c+tag+'</div>';
   }).join('');
 }
 function filterForcePicker(query){
@@ -1121,15 +1138,17 @@ function confirmForcePick(sellerName){
   if(!S.sched.forced)S.sched.forced={};
   S.sched.forced[buyer+'_'+slotIdx]=true;
   S._forcePicker=null;
+  checkSwapSuggestion(sellerName,buyer,slotIdx);
   renderSchedule();
   toast('Meeting forced with '+sellerName+' — check the Integrity tab for conflicts','w');
   saveProject();
-  suggestSwapIfOverloaded(sellerName);
 }
 // After forcing a meeting, check if the forced seller is now over their Max. If so, look for
 // another buyer already meeting that seller who could instead meet a different seller who's
 // still below their Min — same buyer, same slot/desk, just a different seller (1-to-1 swap).
-function suggestSwapIfOverloaded(sellerName){
+// Rather than a browser confirm() popup, this stores the suggestion in S._swapSuggestion so
+// renderSchedule() can show it as an inline, dismissible box within the app itself.
+function checkSwapSuggestion(sellerName,excludeBuyer,excludeSlotIdx){
   if(!S.sched)return;
   var sc=S.sched;
   var maxSeller=parseInt(document.getElementById('ev-max-seller').value)||99;
@@ -1138,27 +1157,45 @@ function suggestSwapIfOverloaded(sellerName){
   if(count<=maxSeller)return;
   var vendorMtgs={};
   sc.buyers.forEach(function(b){sc.slots.forEach(function(sl,i){var v=sc.grid[b][i];if(v)vendorMtgs[v]=(vendorMtgs[v]||0)+1;});});
+  // Among all buyers currently meeting the overloaded seller, find candidate alternative sellers
+  // for each, and pick the alternative that is furthest below its own Min — the best swap target.
+  // The meeting the user just forced is explicitly excluded — swapping it out would silently
+  // undo the very action the user took, which is never the intent here.
+  var best=null;
   for(var bi=0;bi<sc.buyers.length;bi++){
     var buyer=sc.buyers[bi];
     for(var si=0;si<sc.slots.length;si++){
       if(sc.grid[buyer][si]!==sellerName)continue;
+      if(buyer===excludeBuyer&&si===excludeSlotIdx)continue;
       var alreadyAtBuyer={};sc.slots.forEach(function(sl,i){var v=sc.grid[buyer][i];if(v)alreadyAtBuyer[v]=true;});
-      var candidateY=S.matches.find(function(m){
-        return m.buyerCo===buyer&&m.sellerCo!==sellerName&&!alreadyAtBuyer[m.sellerCo]&&(vendorMtgs[m.sellerCo]||0)<minSeller;
+      var busyThisSlot={};sc.buyers.forEach(function(b2){if(b2!==buyer&&sc.grid[b2][si])busyThisSlot[sc.grid[b2][si]]=true;});
+      var candidatesY=S.matches.filter(function(m){
+        return m.buyerCo===buyer&&m.sellerCo!==sellerName&&!alreadyAtBuyer[m.sellerCo]&&!busyThisSlot[m.sellerCo]&&(vendorMtgs[m.sellerCo]||0)<minSeller;
       });
-      if(candidateY){
-        var y=candidateY.sellerCo;
-        var yCount=vendorMtgs[y]||0;
-        if(confirm('Seller "'+sellerName+'" is now at '+count+'/'+maxSeller+' (overloaded).\n\nSwap their meeting with "'+buyer+'" for "'+y+'" (currently '+yCount+'/'+minSeller+')? The slot and desk for "'+buyer+'" stay the same.')){
-          sc.grid[buyer][si]=y;
-          renderSchedule();
-          toast('Swap aplicado: '+y+' ahora con '+buyer,'ok');
-          saveProject();
-        }
-        return;
-      }
+      candidatesY.forEach(function(m){
+        var yCount=vendorMtgs[m.sellerCo]||0;
+        var gap=minSeller-yCount;
+        if(!best||gap>best.gap){best={buyer:buyer,slotIdx:si,y:m.sellerCo,yCount:yCount,gap:gap};}
+      });
     }
   }
+  if(best){
+    S._swapSuggestion={sellerName:sellerName,count:count,maxSeller:maxSeller,minSeller:minSeller,
+      buyer:best.buyer,slotIdx:best.slotIdx,slotLabel:sc.slots[best.slotIdx],y:best.y,yCount:best.yCount};
+  }
+}
+function applySwapSuggestion(){
+  var s=S._swapSuggestion;
+  if(!s||!S.sched)return;
+  S.sched.grid[s.buyer][s.slotIdx]=s.y;
+  S._swapSuggestion=null;
+  renderSchedule();
+  toast('Swap applied: '+s.y+' now with '+s.buyer,'ok');
+  saveProject();
+}
+function dismissSwapSuggestion(){
+  S._swapSuggestion=null;
+  renderSchedule();
 }
 function removeBuyer(buyer){
   if(!S.sched)return;
@@ -1796,10 +1833,29 @@ function buildSchedule(){
   var capacityAlert=null;
   if(totalScheduled>0&&(capacityLostCount/totalScheduled)>0.15){
     var pctLost=Math.round(100*capacityLostCount/totalScheduled);
-    var suggestion=deskMode==='rotating'
-      ? 'Consider extending the schedule (more slots) — in Rotating mode, tables can\'t easily be added.'
-      : 'Consider adding more tables, or extending the schedule if you\'re already using all available tables.';
-    capacityAlert={pct:pctLost,count:capacityLostCount,suggestion:suggestion};
+    // Diagnose the actual bottleneck instead of guessing: are buyers capped at their Max
+    // (a demand-side limit, not a scheduling one), or are slots/tables physically full?
+    var pctBuyersAtMax=buyers.length?buyers.filter(function(b){return buyerCount[b]>=maxBuyer;}).length/buyers.length:0;
+    var slotsAtCapacity=slots.length?tableUsage.filter(function(u){return u>=tables;}).length/slots.length:0;
+    var buyersMaxed=pctBuyersAtMax>=0.7;
+    var slotsFull=slotsAtCapacity>=0.7;
+    var cause,suggestion;
+    if(buyersMaxed&&!slotsFull){
+      cause='Most buyers ('+Math.round(pctBuyersAtMax*100)+'%) have already hit their Max meetings limit, while slots/tables still have room.';
+      suggestion="This isn't a slots/tables problem — it's a Max meetings/Buyer limit. Consider raising Max meetings/Buyer, or inviting more buyers.";
+    } else if(buyersMaxed&&slotsFull){
+      cause='Most buyers ('+Math.round(pctBuyersAtMax*100)+'%) are at their Max meetings limit, and slots/tables are also full.';
+      suggestion='Raising Max/Buyer alone won\'t help — there\'s no time left in the schedule either. Consider extending the schedule (more slots).';
+    } else if(slotsFull){
+      cause='Slots/tables are full ('+Math.round(slotsAtCapacity*100)+'% of slots at full table usage), while buyers still have room to meet more.';
+      suggestion=deskMode==='rotating'
+        ? 'Consider adding more tables — in Rotating mode this directly increases how many meetings fit per slot.'
+        : 'In '+(deskMode==='seller_fixed'?'Fixed (Sellers)':'Fixed')+' mode, tables are tied to '+(deskMode==='seller_fixed'?'sellers':'buyers')+', so extend the schedule (more slots) instead of adding tables.';
+    } else {
+      cause='Meetings are being lost to capacity even though buyers aren\'t all at Max and slots aren\'t consistently full — likely an uneven distribution of matches across slots.';
+      suggestion='Consider extending the schedule (more slots), or loosening a Preferred criterion to spread matches more evenly.';
+    }
+    capacityAlert={pct:pctLost,count:capacityLostCount,cause:cause,suggestion:suggestion};
   }
   S.cta={alerts:ctaAlerts,capacityAlert:capacityAlert};
 }
@@ -1843,6 +1899,16 @@ function hideTT(){ttEl.style.display='none';}
 function renderSchedule(){
   if(!S.sched){document.getElementById('metrics').innerHTML='<div class="infobox ii" style="grid-column:1/-1">ℹ Run matching first.</div>';return;}
   var sc=S.sched;
+  var swapBox=document.getElementById('swap-suggestion');
+  if(S._swapSuggestion){
+    var s=S._swapSuggestion;
+    swapBox.style.display='block';
+    swapBox.innerHTML='<div class="infobox iw"><div style="flex:1"><strong>⚠️ Swap suggested:</strong> seller "'+s.sellerName+'" is now overloaded ('+s.count+'/'+s.maxSeller+'). At slot <strong>'+s.slotLabel+'</strong>, swap "<strong>'+s.buyer+'</strong>"\'s meeting with "'+s.sellerName+'" for "<strong>'+s.y+'</strong>" (currently '+s.yCount+'/'+s.minSeller+')? The slot and desk for "'+s.buyer+'" stay the same — only the seller changes.'+
+      '<div style="margin-top:8px;display:flex;gap:8px"><button class="btn bsuc bsm" onclick="applySwapSuggestion()">✓ Apply swap</button><button class="btn bg bsm" onclick="dismissSwapSuggestion()">✕ Dismiss</button></div></div></div>';
+  } else {
+    swapBox.style.display='none';
+    swapBox.innerHTML='';
+  }
   var total=0;sc.buyers.forEach(function(b){sc.slots.forEach(function(sl,i){if(sc.grid[b][i])total++;});});
   var cov=sc.buyers.length?Math.round(100*sc.buyers.filter(function(b){return sc.slots.some(function(sl,i){return sc.grid[b][i];});}).length/sc.buyers.length):0;
   document.getElementById('metrics').innerHTML=
@@ -1921,7 +1987,15 @@ function renderSchedule(){
   }
   document.getElementById('tab-desks').innerHTML=deskHtml;
 
-  document.getElementById('tab-nm').innerHTML=S.noMatch.length?'<div class="infobox iw">⚠ '+S.noMatch.length+' below minimum.</div>'+S.noMatch.map(function(n){
+  var sortedNoMatch=S.noMatch.slice().sort(function(a,b){
+    if(a.type!==b.type)return a.type==='Buyer'?-1:1;
+    var rank={capacity:0,no_candidates:1,exhausted:2};
+    var ra=rank[a.reason],rb=rank[b.reason];
+    if(ra!==rb)return ra-rb;
+    if(a.reason==='capacity')return (b.candidatePool||0)-(a.candidatePool||0);
+    return 0;
+  });
+  document.getElementById('tab-nm').innerHTML=S.noMatch.length?'<div class="infobox iw">⚠ '+S.noMatch.length+' below minimum.</div>'+sortedNoMatch.map(function(n){
     var detail;
     if(n.reason==='no_candidates'){
       detail='❌ No matching candidates found at all.'+(n.blocking&&n.blocking.length?'<br>'+n.blocking.map(function(b){return '• '+b;}).join('<br>'):'');
@@ -1941,7 +2015,7 @@ function renderSchedule(){
   var cta=S.cta||{alerts:[],capacityAlert:null};
   var ctaHtml='';
   if(cta.capacityAlert){
-    ctaHtml+='<div class="infobox ie">⚠️ <div><strong>Capacity alert:</strong> '+cta.capacityAlert.pct+'% of meetings ('+cta.capacityAlert.count+') were lost due to capacity (tables/slots ran out), above the 15% threshold. Call the organization: '+cta.capacityAlert.suggestion+'</div></div>';
+    ctaHtml+='<div class="infobox ie">⚠️ <div><strong>Capacity alert:</strong> '+cta.capacityAlert.pct+'% of meetings ('+cta.capacityAlert.count+') were lost due to capacity, above the 15% threshold.<br><strong>What\'s happening:</strong> '+cta.capacityAlert.cause+'<br><strong>Call the organization:</strong> '+cta.capacityAlert.suggestion+'</div></div>';
   }
   if(cta.alerts.length){
     ctaHtml+='<div class="infobox iw">'+cta.alerts.length+' contact(s) worth calling.</div>';
