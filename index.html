@@ -1896,6 +1896,52 @@ function showTT(buyer,seller,slotIdx,e){
 function hideTT(){ttEl.style.display='none';}
 
 // ── RENDER SCHEDULE ──
+// Groups No Match entries: Buyers first, then Sellers; within each, by reason (capacity → no_candidates →
+// exhausted). The explanatory sentence for each reason is shown ONCE per group, not repeated per company.
+function renderNoMatchGrouped(){
+  if(!S.noMatch.length)return '<div class="infobox io">✓ All participants meet minimum requirements.</div>';
+  var html='<div class="infobox iw">⚠ '+S.noMatch.length+' below minimum.</div>';
+  ['Buyer','Seller'].forEach(function(type){
+    var entries=S.noMatch.filter(function(n){return n.type===type;});
+    if(!entries.length)return;
+    html+='<div class="slbl-t">'+(type==='Buyer'?'🛒 Buyers':'🏭 Sellers')+' — '+entries.length+' below minimum</div>';
+    var counterpart=type==='Buyer'?'sellers':'buyers';
+
+    var capacityGroup=entries.filter(function(n){return n.reason==='capacity';})
+      .sort(function(a,b){return (b.candidatePool||0)-(a.candidatePool||0);});
+    if(capacityGroup.length){
+      html+='<div class="infobox iw" style="margin-bottom:6px">⚠️ Had valid matches, but capacity (tables/slots) ran out before reaching the minimum — <strong>these are worth forcing manually</strong> (Macro Schedule → ✏️ Edit schedule), sorted by most available matches first.</div>';
+      html+=capacityGroup.map(function(n){
+        var cands=n.candidates||[];
+        var candsTxt=cands.length?cands.slice(0,8).join(', ')+(cands.length>8?' +'+(cands.length-8)+' more':''):'';
+        return '<div class="nm-item" style="flex-direction:column;align-items:flex-start;gap:2px">'+
+          '<div><strong>'+n.name+'</strong> <span style="font-size:10px;color:var(--char60)">('+n.count+'/min '+n.min+' — '+n.candidatePool+' possible match'+(n.candidatePool===1?'':'es')+')</span></div>'+
+          (candsTxt?'<div style="font-size:11px;color:var(--char60);padding-left:2px">Could still meet: <strong>'+candsTxt+'</strong></div>':'')+
+        '</div>';
+      }).join('');
+    }
+
+    var noCandGroup=entries.filter(function(n){return n.reason==='no_candidates';});
+    if(noCandGroup.length){
+      html+='<div class="infobox ie" style="margin-bottom:6px">❌ No matching candidates found at all — nothing to force here, the profile simply doesn\'t overlap with any '+counterpart+'.</div>';
+      html+=noCandGroup.map(function(n){
+        var blocking=(n.blocking&&n.blocking.length)?'<div style="font-size:11px;color:var(--char60);padding-left:2px">'+n.blocking.map(function(b){return '• '+b;}).join('<br>')+'</div>':'';
+        return '<div class="nm-item" style="flex-direction:column;align-items:flex-start;gap:2px">'+
+          '<div><strong>'+n.name+'</strong> <span style="font-size:10px;color:var(--char60)">('+n.count+'/min '+n.min+')</span></div>'+blocking+'</div>';
+      }).join('');
+    }
+
+    var exhaustedGroup=entries.filter(function(n){return n.reason==='exhausted';});
+    if(exhaustedGroup.length){
+      html+='<div class="infobox iw" style="margin-bottom:6px">🔸 All valid matches already scheduled — not enough matching '+counterpart+' to reach the minimum. Forcing won\'t help (no candidates left) — <strong>call these to check if they can widen their search or offer more</strong>.</div>';
+      html+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">'+exhaustedGroup.map(function(n){
+        return '<span class="ctag" style="background:var(--gray);color:var(--dark)">'+n.name+' <span style="color:var(--char60)">('+n.count+'/'+n.min+')</span></span>';
+      }).join('')+'</div>';
+    }
+  });
+  return html;
+}
+
 function renderSchedule(){
   if(!S.sched){document.getElementById('metrics').innerHTML='<div class="infobox ii" style="grid-column:1/-1">ℹ Run matching first.</div>';return;}
   var sc=S.sched;
@@ -1987,27 +2033,7 @@ function renderSchedule(){
   }
   document.getElementById('tab-desks').innerHTML=deskHtml;
 
-  var sortedNoMatch=S.noMatch.slice().sort(function(a,b){
-    if(a.type!==b.type)return a.type==='Buyer'?-1:1;
-    var rank={capacity:0,no_candidates:1,exhausted:2};
-    var ra=rank[a.reason],rb=rank[b.reason];
-    if(ra!==rb)return ra-rb;
-    if(a.reason==='capacity')return (b.candidatePool||0)-(a.candidatePool||0);
-    return 0;
-  });
-  document.getElementById('tab-nm').innerHTML=S.noMatch.length?'<div class="infobox iw">⚠ '+S.noMatch.length+' below minimum.</div>'+sortedNoMatch.map(function(n){
-    var detail;
-    if(n.reason==='no_candidates'){
-      detail='❌ No matching candidates found at all.'+(n.blocking&&n.blocking.length?'<br>'+n.blocking.map(function(b){return '• '+b;}).join('<br>'):'');
-    } else if(n.reason==='exhausted'){
-      detail='🔸 All '+n.candidatePool+' valid match'+(n.candidatePool===1?'':'es')+' already scheduled — there simply aren\'t enough matching '+(n.type==='Buyer'?'sellers':'buyers')+' to reach the minimum of '+n.min+'. Forcing won\'t help (no candidates left) — consider loosening a Preferred criterion, or check if enough counterpart participants registered with a compatible profile.';
-    } else {
-      var cands=n.candidates||[];
-      var candsTxt=cands.length?cands.slice(0,8).join(', ')+(cands.length>8?' +'+(cands.length-8)+' more':''):'';
-      detail='⚠️ Had '+n.candidatePool+' valid match'+(n.candidatePool===1?'':'es')+', but capacity (tables/slots) ran out before reaching the minimum.'+(candsTxt?'<br>Could still meet: <strong>'+candsTxt+'</strong> — go to Macro Schedule → ✏️ Edit schedule to force a meeting manually.':'');
-    }
-    return '<div class="nm-item" style="flex-direction:column;align-items:flex-start;gap:3px"><div style="display:flex;align-items:center;gap:8px"><span class="badge '+(n.type==='Buyer'?'bb':'bbs')+'">'+n.type+'</span><strong>'+n.name+'</strong><span style="font-size:10px;color:var(--char60)">('+n.count+'/min '+n.min+')</span></div><div style="font-size:11px;color:var(--char60);padding-left:2px">'+detail+'</div></div>';
-  }).join(''):'<div class="infobox io">✓ All participants meet minimum requirements.</div>';
+  document.getElementById('tab-nm').innerHTML=renderNoMatchGrouped();
   var errs=checkIntegrity();
   document.getElementById('tab-int').innerHTML=errs.length?errs.map(function(e){return '<div class="infobox ie">⚠ '+e+'</div>';}).join(''):'<div class="infobox io">✓ No conflicts. Schedule valid.</div>';
 
@@ -2015,21 +2041,29 @@ function renderSchedule(){
   var cta=S.cta||{alerts:[],capacityAlert:null};
   var ctaHtml='';
   if(cta.capacityAlert){
-    ctaHtml+='<div class="infobox ie">⚠️ <div><strong>Capacity alert:</strong> '+cta.capacityAlert.pct+'% of meetings ('+cta.capacityAlert.count+') were lost due to capacity, above the 15% threshold.<br><strong>What\'s happening:</strong> '+cta.capacityAlert.cause+'<br><strong>Call the organization:</strong> '+cta.capacityAlert.suggestion+'</div></div>';
+    ctaHtml+='<div class="infobox ie">⚠️ <div><strong>Capacity alert:</strong> '+cta.capacityAlert.pct+'% of meetings are lost due to capacity.<br><strong>What\'s happening:</strong> '+cta.capacityAlert.cause+'<br><strong>Call the organization:</strong> '+cta.capacityAlert.suggestion+'</div></div>';
   }
   if(cta.alerts.length){
     ctaHtml+='<div class="infobox iw">'+cta.alerts.length+' contact(s) worth calling.</div>';
-    ctaHtml+=cta.alerts.map(function(a){
-      var badge='<span class="badge '+(a.type==='Buyer'?'bb':'bbs')+'">'+a.type+'</span>';
-      if(a.reason==='star'){
-        return '<div class="nm-item" style="flex-direction:column;align-items:flex-start;gap:3px">'+
-          '<div style="display:flex;align-items:center;gap:8px">'+badge+'<strong>'+a.name+'</strong><span style="font-size:10px;color:var(--warn);font-weight:700">⭐ Unique opportunity</span></div>'+
-          '<div style="font-size:11px;color:var(--char60);padding-left:2px">Only has 1 meeting, but it\'s a perfect/unique match with <strong>'+a.counterpart+'</strong> — call to make sure they don\'t miss it.</div></div>';
-      }
-      return '<div class="nm-item" style="flex-direction:column;align-items:flex-start;gap:3px">'+
-        '<div style="display:flex;align-items:center;gap:8px">'+badge+'<strong>'+a.name+'</strong><span style="font-size:10px;color:var(--char60)">('+a.count+'/'+a.min+' — '+a.pct+'%)</span></div>'+
-        '<div style="font-size:11px;color:var(--char60);padding-left:2px">Below 51% of their target — call to check if they can widen their search criteria or confirm availability.</div></div>';
-    }).join('');
+
+    var starGroup=cta.alerts.filter(function(a){return a.reason==='star';});
+    if(starGroup.length){
+      ctaHtml+='<div class="infobox iw" style="margin-bottom:6px">⭐ <strong>Unique opportunity</strong> — only 1 meeting, but it\'s a perfect/unique match. Call to make sure they don\'t miss it:</div>';
+      ctaHtml+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">'+starGroup.map(function(a){
+        var badgeCls=a.type==='Buyer'?'bb':'bbs';
+        return '<span class="ctag" style="background:var(--gray);color:var(--dark)"><span class="badge '+badgeCls+'" style="margin-right:4px">'+a.type+'</span>'+a.name+' <span style="color:var(--char60)">(with '+a.counterpart+')</span></span>';
+      }).join('')+'</div>';
+    }
+
+    var belowGroup=cta.alerts.filter(function(a){return a.reason==='below_target';});
+    if(belowGroup.length){
+      ctaHtml+='<div class="infobox iw" style="margin-bottom:6px">📞 Call to check if they can widen their search criteria or confirm availability:</div>';
+      ctaHtml+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">'+belowGroup.map(function(a){
+        var badgeCls=a.type==='Buyer'?'bb':'bbs';
+        return '<span class="ctag" style="background:var(--gray);color:var(--dark)"><span class="badge '+badgeCls+'" style="margin-right:4px">'+a.type+'</span>'+a.name+' <span style="color:var(--char60)">('+a.count+'/'+a.min+')</span></span>';
+      }).join('')+'</div>';
+    }
+
     ctaHtml+=buildCTAColumnPicker();
     ctaHtml+='<div style="margin-top:10px"><button class="btn bo bsm" onclick="exportCTAcsv()">⬇ Export contacts to call (CSV)</button></div>';
   } else if(!cta.capacityAlert){
@@ -2071,22 +2105,33 @@ function exportCTAcsv(){
   if(!S.cta||!S.cta.alerts.length){toast('No contacts to export','w');return;}
   var selectedCols=Object.keys(S.ctaCols||{}).filter(function(c){return S.ctaCols[c];});
   var rows=[['Type'].concat(selectedCols,['Reason for call'])];
+  // A participant can trigger more than one alert (e.g. below target AND a star match) —
+  // merge those into a single row per participant instead of one row per alert.
+  var byKey={};
+  var order=[];
   S.cta.alerts.forEach(function(a){
-    var isBuyer=a.type==='Buyer';
-    var data=isBuyer?S.buyers.d:S.sellers.d;
-    var headers=isBuyer?S.buyers.h:S.sellers.h;
-    var row=data.find(function(r){return getColVal(r,headers,'Company name')===a.name;});
+    var key=a.type+'||'+a.name;
     var reason=a.reason==='star'
       ? 'Unique opportunity — only 1 meeting but a perfect/unique match with '+a.counterpart
       : 'Below target: '+a.count+'/'+a.min+' meetings ('+a.pct+'%) — check if they can widen their search';
+    if(!byKey[key]){byKey[key]={type:a.type,name:a.name,reasons:[]};order.push(key);}
+    byKey[key].reasons.push(reason);
+  });
+  order.forEach(function(key){
+    var entry=byKey[key];
+    var isBuyer=entry.type==='Buyer';
+    var data=isBuyer?S.buyers.d:S.sellers.d;
+    var headers=isBuyer?S.buyers.h:S.sellers.h;
+    var row=data.find(function(r){return getColVal(r,headers,'Company name')===entry.name;});
     var vals=selectedCols.map(function(c){
       var h=findHeaderLoose(headers,c);
       return row&&h?getOptCol(row,headers,h):'';
     });
-    rows.push([a.type].concat(vals,[reason]));
+    rows.push([entry.type].concat(vals,[entry.reasons.join(' | ')]));
   });
   var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c||'').replace(/"/g,'""')+'"';}).join(',');}).join('\n');
-  var a2=document.createElement('a');a2.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a2.download='call_to_action_contacts.csv';a2.click();
+  var evName=(document.getElementById('ev-name').value||'Event').trim().replace(/[^a-z0-9]+/gi,'_');
+  var a2=document.createElement('a');a2.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a2.download='CTA_'+evName+'.csv';a2.click();
   toast('CTA contacts exported','ok');
 }
 function showTab(n,el){['tab-macro','tab-desks','tab-nm','tab-cta','tab-int'].forEach(function(t){document.getElementById(t).style.display='none';});document.getElementById('tab-'+n).style.display='block';document.querySelectorAll('.tab-bar .tab').forEach(function(t){t.classList.remove('active');});el.classList.add('active');}
